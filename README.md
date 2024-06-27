@@ -98,7 +98,7 @@ monitored by the kernel separetely. Welcome to the 90s.
 
 Concrete: the main loop in user space iterates over ALL current connection filedescriptors. If we have
 10000 active or sleeping Keep-Alive connections: 10000 syscalls (context switches between user and kernel
-space) will be done. The kernel will additionally loop on 10000 filedescriptors checking if there is
+space) will be done *every main loop iteration*. The kernel will additionally loop on 10000 filedescriptors checking if there is
 waiting incoming data. This will kill the kernels responsiveness.
 
 Unlike (also nginX) using epoll (also we use epoll) a single syscall will tell user space which
