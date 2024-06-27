@@ -6,7 +6,7 @@ solution: **HTTP1.2**.
 
 It will provide the following features:
 
-- Much more leightweight
+- Much more lightweight
 - Much more secure
 - Much faster
 - Drop bloating features
