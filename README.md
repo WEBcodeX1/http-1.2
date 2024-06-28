@@ -104,3 +104,40 @@ checking if there is waiting incoming data. This will kill the kernels responsiv
 Unlike (also nginX) using epoll (also we use epoll) a single syscall will tell user space which
 filedescriptors have waiting data. With optimized 64bit server CPU and good server code: Scaling, bingo!
 
+# Prefer Simple Solutions
+
+In times of Flatpak and Snap a desktop-application will be delivered in one single *packed* **FILE**, e.g.
+*application1.flatpak*. Also this has been widely used in Debian Linux as packaging system since 1996.
+
+The common problems of HTTP, especially what HTTP3 should solve: a huge amount of single requests 
+served with less overhead to a CCDN (Cloud Content Distribution Network).
+
+But think much more simple! The following workflow demonstrates: if you pack your browser-application
+(or subsections) you only have to transfer 1 single file 1 time and again when the application changes.
+A 304 not-modified request will keep your static application-server farm or CCDN idle.
+
+Also with modern CPU and 100Mbit+ DSL uplink 1. request 2. response 3. depacking 4. app rendering should
+be < 1 second if not too much media data included. We will provide Proof Of Concept in the near future.
+
+Somehow big Images or Videos still can be referenced dynamically as a link and still the technique is
+practicable.
+
+## Workflow1 (First Request)
+
+```
+Min:Sec
+00:00   Client    -------------- HTTP1.2 GET /app1.tar.bz2 ------------------->   Server
+00:00   Client    <------------- HTTP1.2 app1.tar.bz2 -------------------------   Server
+00:01   Client    ::depack()
+00:01   Client    ::render()
+```
+
+## Workflow2 (304 Not Modified)
+
+```
+Min:Sec
+00:00   Client    -------------- HTTP1.2 GET /app1.tar.bz2 ------------------->   Server
+00:00   Client    <------------- HTTP1.2 304 not modified ---------------------   Server
+00:00   Client    ::depack()
+00:00   Client    ::render()
+```
