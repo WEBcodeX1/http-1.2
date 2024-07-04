@@ -20,7 +20,7 @@ It will provide the following features:
 Also the part "HyperText" or even a complete renaming could be thought over. Its representation is by far not
 more appropriate these days.
 
-We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
+> We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
 ## Thoughts about HTTP/3
 
@@ -41,7 +41,7 @@ All logic which has been removed from transparent, 100% working Layer3 protocols
 "By Hand" including packet retransmission into Layer7. Phew: every Browser, every Server, every HTTP-related
 program has to implement this by themselves.
 
-Much fun implementing! See more details on http://der-it-pruefer.de.
+> Much fun implementing! See more details on http://der-it-pruefer.de.
 
 # HTTP/2
 
@@ -85,7 +85,7 @@ We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server inc
 
 The Proxy-Server Component has been engineered and will be published later on.
 
-Detailed draft and specifications can be found under /draft and /specs subdirs.
+> Detailed draft and specifications can be found under /draft and /specs subdirs.
 
 # Libevent / Epoll / Coroutines
 
