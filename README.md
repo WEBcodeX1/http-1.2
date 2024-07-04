@@ -141,3 +141,10 @@ Min:Sec
 00:00   Client    ::depack()
 00:00   Client    ::render()
 ```
+
+# Short "Interim Analysis"
+
+While collecting experience in HTTP/1.2 and Linux Socket Interface processing and testing at low level
+we came to the conclusion: *The Linux Kernel / Socket Interface drastically needs a rewrite!*
+
+> Detailed RFP / how to fix multiple logical processing and performance bugs will follow.
