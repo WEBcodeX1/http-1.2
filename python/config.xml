@@ -1,0 +1,47 @@
+<config>
+    <namespaces>
+        <namespace hostname="testapp1.local" path="/app1" interpreters="10"></namespace>
+        <namespace hostname="testapp2.local" path="/app2" interpreters="20"></namespace>
+    </namespaces>
+    <global>
+        <run>
+            <user>x0-http</user>
+            <group>x0-http</group>
+        </run>
+        <path>
+            <base>/var/www</base>
+        </path>
+        <connection>
+            <timeout>600</timeout>
+            <ipv4>
+                <address>127.0.0.1</address>
+                <port>80</port>
+            </ipv4>
+        </connection>
+        <server>
+            <mimetypes>
+                <mimetype>html</mimetype>
+                <mimetype>js</mimetype>
+                <mimetype>json</mimetype>
+                <mimetype>css</mimetype>
+                <mimetype>png</mimetype>
+                <mimetype>jpg</mimetype>
+                <mimetype>svg</mimetype>
+                <mimetype>woff2</mimetype>
+            </mimetypes>
+        </server>
+        <performance>
+            <server>
+            <cpus>
+                <cpu>0</cpu>
+            </cpus>
+            </server>
+            <staticfs>
+                <cpus>
+                    <cpu>1</cpu>
+                    <cpu>2</cpu>
+                </cpus>
+            </staticfs>
+        </performance>
+    </global>
+</config>
