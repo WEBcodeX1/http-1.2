@@ -1,5 +1,5 @@
 # project settings
-project(x0-data-gateway)
+project(http1.2)
 cmake_minimum_required(VERSION 3.0)
 aux_source_directory(. SRC_LIST)
 
