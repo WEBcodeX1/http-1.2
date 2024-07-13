@@ -8,7 +8,7 @@ It will provide the following features:
 
 - Much more lightweight
 - Much more secure
-- Much faster
+- Much faster (mutex-less)
 - Drop bloating features
 - Logical separated (TCP ports)
 - Easy to implement
