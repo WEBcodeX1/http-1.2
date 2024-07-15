@@ -25,10 +25,10 @@ UniqueKeys: TestID, TestIDRepeat
 | TestID                   | bigint (FK: "Test"."ID")            |                |          |
 | TestName                 | string                              |                | NOT NULL |
 | TestNr                   | int                                 |                | NOT NULL |
-| HTTPProtocol             | string enum (1.1 | 1.2 | 2.0)       |                | NOT NULL |
-| ServerType               | string (FalconAS | Apache2 | NginX) |                | NOT NULL |
-| ReqType                  | string enum (GET | POST)            |                | NOT NULL |
-| GetModified              | bool (true | false)                 | true           |          |
+| HTTPProtocol             | string enum (1.1, 1.2, 2.0)         |                | NOT NULL |
+| ServerType               | string (FalconAS, Apache2, NginX)   |                | NOT NULL |
+| ReqType                  | string enum (GET, POST)             |                | NOT NULL |
+| GetModified              | bool (true, false)                  | true           |          |
 | ClientNr                 | int                                 |                | NOT NULL |
 | ThreadNr                 | int                                 |                |          |
 | ReqData                  | string                              |                | NOT NULL |
