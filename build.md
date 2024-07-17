@@ -1,11 +1,12 @@
 # Prerequisites
 
-Basic Prerequisites:
+Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - git
 - cmake
+- python setup-tools
 
 ```bash
-# apt-get install git cmake
+# apt-get install git cmake python3-setuptools
 ```
 
 ## C++ Boost Libraries
@@ -41,10 +42,12 @@ We use our external Python XML Parser to bridge XML config to C++ using Boost Py
 # git clone https://github.com/clauspruefer/python-xml-microparser.git
 ```
 
-### Install Globally (force)
+### Install Globally
+
+Install as root.
 
 ```bash
-# python3 setup.py
+# sudo python3 setup.py install
 ```
 
 ## Compile / Install
