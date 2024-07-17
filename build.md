@@ -22,6 +22,14 @@ To install complete boost development files under Ubuntu 22.04 do:
 # apt-get install libboost-all-dev
 ```
 
+## Python Dev (Interpreter Source)
+
+If not done by Boost Python Library, the Python Interpreter Source Code is required for embedding. 
+
+```bash
+# apt-get install python3-dev
+```
+
 ## Python XML Microparser
 
 We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
