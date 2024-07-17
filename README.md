@@ -57,6 +57,8 @@ to be confusing and ununderstandable even using libevent.
 Its evertything packed in one really big box. Logical separation? Security? All going unfiltered over a
 single TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
 
+## SSL / TLS
+
 Also adding TLS / SSL handling inside the protocol is not appropriate anymore. Let this handle a separated
 component like Ingress-nginX on Kubernetes or a Hardware-Loadbalancer. Do not duplicate things you are not
 familiar with especially when other products exist which do the same for decades much smarter.
