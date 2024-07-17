@@ -7,32 +7,22 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+## 1. Describe Bug
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+## 2. Reproduce Behaviour
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. Start server with maximum Debug Level
+2. Check Error / Info Messages
+3. Check Segmentation Faults / try debugging with gdb, Valgrind or similar
+4. Provide us with details (**file**, **line number**, **gdb backtrace**)
+5. Repeat
 
-**Expected behavior**
+## 3. Expected behavior
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## 4. Operating System
+Currently just Linux x64 is supported. You are welcome to port to another architecture.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
+## 5. Additional context
 Add any other context about the problem here.
