@@ -1,4 +1,13 @@
 # Prerequisites
+
+Basic Prerequisites:
+- git
+- cmake
+
+```bash
+# apt-get install git cmake
+```
+
 ## C++ Boost Libraries
 
 The following Boost Libraries ```libboost1.74-dev``` (Ubuntu 22.04) are used. 
