@@ -22,6 +22,10 @@ more appropriate these days.
 
 > We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
+# Build Source Code
+
+See [build.md](build.md).
+
 ## Thoughts about HTTP/3
 
 HTTP/3 should be implemented using UDP or even UDPLite. Phew, also it should be HTTP downwards compatible.
