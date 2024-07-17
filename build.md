@@ -50,6 +50,7 @@ We use our external Python XML Parser to bridge XML config to C++ using Boost Py
 ## Compile / Install
 
 ```bash
+# cmake CMakeLists.txt
 # cmake build
 # cmake install
 ```
