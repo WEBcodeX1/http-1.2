@@ -78,12 +78,12 @@ This could be caused by:
 
 # Proof Of Concept
 
-We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including those components:
+The provided Proof Of Concept Code includes the working "FalconAS" HTTP/1.1 and HTTP/1.2 Server including those components:
 
 - Static-Content-Server Component
 - Applicaton-Server Component using Python Scripting Language
 
-The Proxy-Server Component has been engineered and will be published later on.
+The Proxy-Server component has been engineered and will be published later on.
 
 > Detailed draft and specifications can be found under /draft and /specs subdirs.
 
