@@ -51,11 +51,13 @@ program has to implement this by themselves.
 
 ## Complexity
 
-HTTP/2 adds too much complexity. The HTTP/1.1 simplicity is lost completely, especially OpenSource libraries
-tend to be confusing and ununderstandable even using libevent.
+HTTP/2 adds too much complexity. HTTP/1.1 simplicity has been lost, especially OpenSource libraries tend
+to be confusing and ununderstandable even using libevent.
 
-Its evertything packed in one really big box. Logical separation? Security? All going unfiltered over a single
-TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
+Its evertything packed in one really big box. Logical separation? Security? All going unfiltered over a
+single TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
+
+## SSL / TLS
 
 Also adding TLS / SSL handling inside the protocol is not appropriate anymore. Let this handle a separated
 component like Ingress-nginX on Kubernetes or a Hardware-Loadbalancer. Do not duplicate things you are not

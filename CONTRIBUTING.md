@@ -7,6 +7,12 @@ Basically:
 3. Create pull request (PR)
 4. Reviewers will merge or decline
 
+### Signing Key / pkcs11
+
+It is adviced to add a public signing key to GitHub and use Smartcards with openssh / ssh-agent.
+
+Details about configuration see: [GitHub Documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification).
+
 ### Questions / Feature Requests / Improvements
 
 Send questions regarding HTTP/1.2 to [http1-2@webcodex.de](http1-2@webcodex.de)
@@ -17,7 +23,7 @@ Send questions regarding HTTP/1.2 to [http1-2@webcodex.de](http1-2@webcodex.de)
 * If not already reported, open a new issue addressing the problem [New Issue](https://github.com/WEBcodeX1/http-1.2/issues/new).
   Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior.
 
-Issue templates following.
+Issue templates follow.
 
 ### Cosmetical Fixing
 
