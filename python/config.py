@@ -1,18 +1,18 @@
 import json
 
-from xml_microparser import microparser
+from xmlmicroparser import microparser
 
 
-with open('/home/cpruefer/Repos/data-gateway/python/config.xml', encoding='utf-8') as f:
+with open('/etc/falcon-http/config.xml', encoding='utf-8') as fh:
 
-    parser = microparser.Parser(f.read())
+    parser = microparser.Parser(fh.read())
     parser.build_serializer()
     parser.process_json()
 
     root_element = parser.get_root_element()
     config_dict = root_element.get_element_by_element_name('config').get_json_dict()
 
-    print(config_dict)
+    #print(config_dict)
 
     config_global = config_dict['config']['global']
 

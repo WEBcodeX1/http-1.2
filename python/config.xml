@@ -5,8 +5,8 @@
     </namespaces>
     <global>
         <run>
-            <user>x0-http</user>
-            <group>x0-http</group>
+            <user>falcon-http</user>
+            <group>falcon-http</group>
         </run>
         <path>
             <base>/var/www</base>
