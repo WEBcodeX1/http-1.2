@@ -95,7 +95,7 @@ void StaticFS::forkFilesystemProcess(void* SharedMemBaseAddr)
 
                 if (ClientCount == 0) {
                     ERR("ClientCount == 0 should never happen!");
-                    this_thread::sleep_for(chrono::milliseconds(IDLE_SLEEP_MILLISECONDS));
+                    this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
                 }
                 if (ClientCount > 0) {
 
@@ -110,7 +110,7 @@ void StaticFS::forkFilesystemProcess(void* SharedMemBaseAddr)
                 *(AtomicLockAddr) = 0;
             }
             else {
-                this_thread::sleep_for(chrono::milliseconds(IDLE_SLEEP_MILLISECONDS));
+                this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
             }
         }
         DBG(-1, "Exit Parent StaticFS Process.");
