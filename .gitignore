@@ -1,6 +1,7 @@
 CMakeLists.txt.user
 Module.symvers
 modules.order
+*.a
 *.o
 *.ko
 *.so
@@ -17,7 +18,15 @@ __pycache__
 build
 CMakeFiles
 CMakeLists*
+CMakeCache.txt
 Makefile
 cmake_install*
 compile_commands.json
-
+install_manifest.txt
+http1.2
+test/eval/test-boost-python
+test/integration/boost-regex/test-boost-regex
+test/integration/event/test-event
+test/integration/string-functions/test-string-functions
+test/integration/vector-multi-erase/test-Vector-multi-erase
+test/performance/test-performance
