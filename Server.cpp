@@ -167,7 +167,7 @@ void Server::ServerLoop()
             }
             //- no new client and no processed clients (idle)
             else if (ProcessedClients == 0) {
-                this_thread::sleep_for(chrono::milliseconds(IDLE_SLEEP_MILLISECONDS));
+                this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
             }
         }
 
