@@ -4,9 +4,10 @@ Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - git
 - cmake
 - python setup-tools
+- python pip
 
 ```bash
-# apt-get install git cmake python3-setuptools
+# apt-get install git cmake python3-setuptools python3-pip
 ```
 
 ## C++ Boost Libraries
@@ -42,12 +43,18 @@ We use our external Python XML Parser to bridge XML config to C++ using Boost Py
 # git clone https://github.com/clauspruefer/python-xml-microparser.git
 ```
 
-### Install Globally
+### Build / Install Globally
 
-Install as root.
+Build as normal user.
 
 ```bash
-# sudo python3 setup.py install
+# python3 setup.py sdist
+```
+
+Install globally as root.
+
+```bash
+# sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz --break-system-packages
 ```
 
 ## Compile / Install
