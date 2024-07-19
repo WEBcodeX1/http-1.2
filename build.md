@@ -71,3 +71,15 @@ be added to ```/etc/hosts```.
 Open http://testapp1.local or http://testapp2.local in a local browser to check if
 installation has succeeded.
 
+## Start Server
+
+Raise ulimit for open files before starting server. This will be put inside server startup
+script later.
+
+```bash
+# . ./scripts/ulimit.sh
+# /usr/local/bin/http1.2
+```
+
+Stop server with signal SIGTERM (```kill http-1.2```).
+
