@@ -64,3 +64,10 @@ Install globally as root.
 # make
 # make install
 ```
+
+On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
+be added to ```/etc/hosts```.
+
+Open http://testapp1.local or http://testapp2.local in a local browser to check if
+installation has succeeded.
+
