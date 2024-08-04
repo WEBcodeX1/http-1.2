@@ -7,6 +7,13 @@ Basically:
 3. Create pull request (PR)
 4. Reviewers will merge or decline
 
+### Clean Code
+
+I am a big fan of the clean code paradigm. So you should:
+
+1. Blame non-clean-code
+2. Code with the clean code paradigm in mind
+
 ### Signing Key / pkcs11
 
 It is adviced to add a public signing key to GitHub and use Smartcards with openssh / ssh-agent.
