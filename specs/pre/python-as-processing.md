@@ -1,8 +1,6 @@
-+-------------------------------------------------+
-| Component::ASProcessHandler                     |
-+-------------------------------------------------+
+# Component::ASProcessHandler
 
-OnServerStart
+## OnServerStart
 
 AS Index = 0
 - Loop on Config::VirtualDomains
@@ -10,9 +8,9 @@ AS Index = 0
     - Setup AS[Index] Process / SHM Reference
     - Index++
 
+## Shared Memory Layout
 
-Memory Layout
-
+```bash
 -- AS 1 Metadata ------------------------------------------------
 
 0x0000              atomic_uint8_t      ReadFinished    0
@@ -42,19 +40,19 @@ Memory Layout
 -- AS 2 Payload -------------------------------------------------
 
 0x0024+max_pl_bytes char[PayloadLenA2]  Payload         Nullptr
+```
 
+# Component::ResultProcessor
 
-+-------------------------------------------------+
-| Component::ResultProcessor::MainLoop            |
-+-------------------------------------------------+
-
-Virtual Interfaces:
+Logical segmentation:
 
 - Check / Read GET requests
 - Check / Read POST results
 - Thread Processor (1 Thread, 1 FD requests, terminate)
 
+## Main Loop
 
+```python
 loop:
 
   workdone = 0
@@ -78,25 +76,23 @@ loop:
 
   - if workdone == 0:
     sleep
+```
 
+## Process Threads function
 
-ProcessThreads:
 - Check: If ClientFD Thread busy
   - addWaitQueue (GET and POST)
   - else:
-    startupThread(
+    startupThread()
 
-    )
-
-+-------------------------------------------------+
-| Component::ResultProcessor::ThreadProcessor     |
-+-------------------------------------------------+
+# Component::ResultProcessor::ThreadProcessor
 
 - CheckThreadsJoinable()
+- startupThread(
+   #params following
+  )
 
-+-------------------------------------------------+
-| Component::ResultProcessor::ResultOrder         |
-+-------------------------------------------------+
+# Component::ResultProcessor::ResultOrder
 
 ClientFD
   ReqNr (PK, Order)
@@ -110,11 +106,10 @@ WaitForNextReqNr  1
 CheckNext     while not next: ReqNr+1
 
 
-+-------------------------------------------------+
-| Server::Looper                                  |
-+-------------------------------------------------+
+# Server::MainLoop modification
 
 - AddSHMQueue ALL Get Requests
 - AddSHMQueue count(nonbusyAS)
 
 Rest: add WaitQueue
+
