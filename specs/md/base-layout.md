@@ -75,19 +75,20 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 |                       | Python Interpreter    | Python Interpreter    |                       |
 +-----------------------+-----------------------+-----------------------+-----------------------+
 | Shared Mem                                                                                    |
-|  - Requests                                                                                   |
-|  - AS Results / Sync                                                                          |
+|  - StaticFS Requests                                                                          |
+|  - AS Requests                                                                                |
+|  - AS Results                                                                                 |
 +-----------------------------------------------------------------------------------------------+
 ```
 
 > 32bit memory addresses used for simplicity.
 
-## HTTP Requests
+## HTTP StaticFS Requests
 
 ```bash
 Address                 Type                Descr           Default
 
-0x00000000              atomic_uint64_t     WriteLock       0
+0x00000000              atomic_uint64_t     StaticFSLock    0
 0x00000008              uint16_t            RequestCount    0
 
 -- Req 1 Metadata ---------------------------------------------------
@@ -103,25 +104,43 @@ Address                 Type                Descr           Default
 0x0000000e+LenReq1+4    char[]              char[LenReq1]   Nullptr
 ```
 
-## Process Synchronization / Application Server Results
+## HTTP AS Requests
+
+```bash
+Address                 Type                Descr           Default
+
+-- AS 1 Metadata ----------------------------------------------------
+
+0x0000000a              uint16_t            ClientFD        Nullptr
+0x0000000c              uint16_t            PayloadLength   Nullptr
+0x0000000e              char[]              char[LenReq1]   Nullptr
+
+-- AS 2 Metadata ----------------------------------------------------
+
+0x0000000e+LenReq1      uint16_t            ClientFD        Nullptr
+0x0000000e+LenReq1+2    uint16_t            PayloadLength   Nullptr
+0x0000000e+LenReq1+4    char[]              char[LenReq1]   Nullptr
+```
+
+## Application Server Status / Results
 
 ```bash
 Address                 Type                Descr           Default
 
 -- AS 1 Metadata ---------------------------------------------------
 
-0x00000000              atomic_uint8_t      ReadFinished    0
+0x00000000              atomic_uint8_t      CanRead         1
 0x00000001              atomic_uint8_t      WriteReady      0
 0x00000002              atomic_uint8_t      Busy            0
 
 0x00000003              uint64_t            ClientFD        Nullptr
-0x000000ob              uint8_t             HTTPVersion     1
+0x0000000b              uint8_t             HTTPVersion     1
 0x0000000c              uint16_t            ReqNr           1
 0x0000000e              uint32_t            PayloadLength   Nullptr
 
 -- AS 2 Metadata ---------------------------------------------------
 
-0x00000012              atomic_uint8_t      ReadFinished    0
+0x00000012              atomic_uint8_t      CanRead         0
 0x00000013              atomic_uint8_t      WriteReady      0
 0x00000014              atomic_uint8_t      Busy            0
 
