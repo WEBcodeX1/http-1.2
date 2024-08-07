@@ -8,9 +8,9 @@ assignees: ''
 ---
 
 ## 1. Describe Bug
-A clear and concise description of what the bug is.
+A clear and concise description of how the bug behaves.
 
-## 2. Reproduce Behaviour
+## 2. Reproduce Behavior
 Steps to reproduce the behavior:
 1. Start server with maximum Debug Level
 2. Check Error / Info Messages
