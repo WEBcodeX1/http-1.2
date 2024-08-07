@@ -13,27 +13,27 @@ The following components are referenced throughout the documentation.
 
 > Logical Component Names used in documentation and the C++ Abstraction Model sometimes do not match.
 
-## Com::Configuration
+## Configuration
 
 XML Configuration Handling. C++ Transformation.
 
-## Com::Main::Server
+## Main::Server
 
 Main Server Loop.
 
-## Com::Main::ClientHandler
+## Main::ClientHandler
 
 Client / Connection Handler.
 
-## Com::ASProcessHandler
+## ASProcessHandler
 
 Python Application Server Process Handler. 
 
-## Com::ResultProcessor
+## ResultProcessor
 
 Result processing process (fork).
 
-## Com::ResultProcessor::ThreadHandler
+## ResultProcessor::ThreadHandler
 
 Result Thread Distributor.
 
@@ -45,7 +45,7 @@ processed in serial order.
 
 Big results using multiple writes are sent in the correct order as well.
 
-## Com::ResultProcessor::ResultOrder
+## ResultProcessor::ResultOrder
 
 Result Ordering will be done for the following types:
 
