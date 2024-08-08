@@ -131,29 +131,27 @@ Address                 Type                Descr           Default
 
 0x00000000              atomic_uint8_t      CanRead         1
 0x00000001              atomic_uint8_t      WriteReady      0
-0x00000002              atomic_uint8_t      Busy            0
 
-0x00000003              uint64_t            ClientFD        Nullptr
-0x0000000b              uint8_t             HTTPVersion     1
-0x0000000c              uint16_t            ReqNr           1
-0x0000000e              uint32_t            PayloadLength   Nullptr
+0x00000002              uint64_t            ClientFD        Nullptr
+0x0000000a              uint8_t             HTTPVersion     1
+0x0000000b              uint16_t            ReqNr           1
+0x0000000d              uint32_t            PayloadLength   Nullptr
 
 -- AS 2 Metadata ---------------------------------------------------
 
-0x00000012              atomic_uint8_t      CanRead         0
-0x00000013              atomic_uint8_t      WriteReady      0
-0x00000014              atomic_uint8_t      Busy            0
+0x00000011              atomic_uint8_t      CanRead         0
+0x00000012              atomic_uint8_t      WriteReady      0
 
-0x00000015              uint64_t            ClientFD        Nullptr
-0x0000001d              uint8_t             HTTPVersion     1
-0x0000001e              uint16_t            ReqNr           1
-0x00000020              uint32_t            PayloadLength   Nullptr
+0x00000013              uint64_t            ClientFD        Nullptr
+0x0000001b              uint8_t             HTTPVersion     1
+0x0000001c              uint16_t            ReqNr           1
+0x0000001e              uint32_t            PayloadLength   Nullptr
 
 -- AS 1 Payload ----------------------------------------------------
 
-0x00000024              char[PayloadLenA1]  Payload         Nullptr
+0x00000022              char[PayloadLenA1]  Payload         Nullptr
 
 -- AS 2 Payload ----------------------------------------------------
 
-0x00000024+max_pl_bytes char[PayloadLenA2]  Payload         Nullptr
+0x00000022+max_pl_bytes char[PayloadLenA2]  Payload         Nullptr
 ```
