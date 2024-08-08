@@ -25,6 +25,10 @@ Main Server Loop.
 
 Client / Connection Handler.
 
+## Main::StaticFSHandler
+
+Static Files / Virtual Host Handler.
+
 ## ASProcessHandler
 
 Python Application Server Process Handler. 
