@@ -6,3 +6,7 @@ This documentation contains the projects logical layout / specifications / depen
 
 Detailed Class Documentation can be found at `../../doc`.
 
+## Start
+
+You should start at [BaseLayout.md](./Baselayout.md).
+

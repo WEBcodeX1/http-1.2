@@ -21,21 +21,31 @@ XML Configuration Handling. C++ Transformation.
 
 Main Server Loop.
 
+[Main-Server.md](./Main-Server.md)
+
 ## Main::ClientHandler
 
 Client / Connection Handler.
+
+[ClientHandler.md](./ClientHandler.md)
 
 ## Main::StaticFSHandler
 
 Static Files / Virtual Host Handler.
 
+[StaticFSHandler.md](./StaticFSHandler.md)
+
 ## ASProcessHandler
 
 Python Application Server Process Handler.
 
+[ASProcessHandler.md](./ASProcessHandler.md)
+
 ## ResultProcessor
 
 Result processing process (fork).
+
+[ResultProcessor.md](./ResultProcessor.md)
 
 ## ResultProcessor::ThreadHandler
 
@@ -63,7 +73,7 @@ The Result Ordering Class keeps track of dependend ClientFD Requests / Request N
 
 ### HTTP/1.2
 
-No order needed. Our implementation appends the "" HTTP Header to the HTTP Response.
+No order needed. Our implementation appends the "Request-UUID" HTTP Header to the HTTP Response.
 
 # Shared Memory Layout
 
@@ -87,7 +97,7 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 
 > 32bit memory addresses used for simplicity.
 
-## HTTP StaticFS Requests
+## HTTP StaticFS Requests #1
 
 ```bash
 Address                 Type                Descr           Default
@@ -98,42 +108,44 @@ Address                 Type                Descr           Default
 -- Req 1 Metadata ---------------------------------------------------
 
 0x0000000a              uint16_t            ClientFD        Nullptr
-0x0000000c              uint16_t            PayloadLength   Nullptr
-0x0000000e              char[]              char[LenReq1]   Nullptr
+0x0000000c              uint8_t             HTTPVersion     Nullptr
+0x0000000d              uint16_t            RequestNr       Nullptr
+0x0000000f              uint16_t            PayloadLength   Nullptr
+0x00000011              char[]              char[LenReq1]   Nullptr
 
 -- Req 2 Metadata ---------------------------------------------------
 
-0x0000000e+LenReq1      uint16_t            ClientFD        Nullptr
-0x0000000e+LenReq1+2    uint16_t            PayloadLength   Nullptr
-0x0000000e+LenReq1+4    char[]              char[LenReq1]   Nullptr
+0x00000011+LenReq1      uint16_t            ClientFD        Nullptr
+0x00000011+LenReq1+2    uint8_t             HTTPVersion     Nullptr
+0x00000011+LenReq1+3    uint16_t            RequestNr       Nullptr
+0x00000011+LenReq1+5    uint16_t            PayloadLength   Nullptr
+0x00000011+LenReq1+7    char[]              char[LenReq1]   Nullptr
 ```
 
-## HTTP AS Requests
+## HTTP AS Requests #2
 
 ```bash
 Address                 Type                Descr           Default
 
 -- AS 1 Metadata ----------------------------------------------------
 
-0x0000000a              uint16_t            ClientFD        Nullptr
-0x0000000c              uint16_t            PayloadLength   Nullptr
-0x0000000e              char[]              char[LenReq1]   Nullptr
+0x00000000              uint16_t            PayloadLength   Nullptr
+0x00000002              char[]              char[LenReq1]   Nullptr
 
 -- AS 2 Metadata ----------------------------------------------------
 
-0x0000000e+LenReq1      uint16_t            ClientFD        Nullptr
-0x0000000e+LenReq1+2    uint16_t            PayloadLength   Nullptr
-0x0000000e+LenReq1+4    char[]              char[LenReq1]   Nullptr
+0x00000002+LenReq1      uint16_t            PayloadLength   Nullptr
+0x00000002+LenReq1+2    char[]              char[LenReq1]   Nullptr
 ```
 
-## Application Server Status / Results
+## Application Server Status / Results #3
 
 ```bash
 Address                 Type                Descr           Default
 
 -- AS 1 Metadata ---------------------------------------------------
 
-0x00000000              atomic_uint8_t      CanRead         1
+0x00000000              atomic_uint8_t      CanRead         0
 0x00000001              atomic_uint8_t      WriteReady      0
 
 0x00000002              uint64_t            ClientFD        Nullptr
