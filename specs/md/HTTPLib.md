@@ -75,14 +75,18 @@ string& Request
 
 - On Type POST AS (SHM Segment #2, #3)
 
+  // SHM Segment #3
   - Get Next Free AS Index (Check CanRead == 0 && WriteReady == 0)
     - If no Free AS:: add to RequestQueue
 
-  - Write ClientFD to SHM-PostAS Segment #2 @AS Index Address
-  - Write MsgNr to SHM-PostAS Segment #2 @AS Index Address
-  - Write MsgLength to SHM-PostAS Segment #2 @AS Index Address
-  - Write MsgPayload to SHM-PostAS Segment #2 @AS Index Address
+  // SHM Segment #2
+  - Write ClientFD to SHM-PostAS @AS Index Address
+  - Write HTTPVersion to SHM-PostAS @AS Index Address
+  - Write MsgNr to SHM-PostAS @AS Index Address
+  - Write MsgLength to SHM-PostAS @AS Index Address
+  - Write MsgPayload to SHM-PostAS @AS Index Address
 
+  // SHM Segment #3
   - Write CanRead = 1 @AS Index Address
 
   > IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.

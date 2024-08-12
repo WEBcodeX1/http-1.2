@@ -17,3 +17,13 @@ ASIndex = 0
     - Fork AS[Index] Process / SHM Reference
     - Index++
 ```
+
+### Main Loop
+
+```c++
+- Loop
+  - Check CanRead == 1 && WriteReady == 0
+    - If yes: Process Python Request
+    - Write CanRead == 0 && WriteReady = 1
+```
+
