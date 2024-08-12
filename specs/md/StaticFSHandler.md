@@ -8,6 +8,10 @@ member Objects / Structs.
 The File Data will be mmapped() into Kernel-Space for sendfile() usage when requested.
 If a files size is bigger than 2 Megabytes a huge-page for mmap() will be tried to allocate.
 
+![Info]
+> A huge amount of files / subdirs currently is a performance killer. Segmentation on subdirs
+must be implemented.
+
 ## Program Logic
 
 ### Initialization
