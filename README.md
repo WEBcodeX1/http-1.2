@@ -24,7 +24,7 @@ more appropriate these days.
 
 # Build Source Code
 
-See [build.md](build.md).
+See [BUILD.md](BUILD.md).
 
 ## Thoughts about HTTP/3
 
