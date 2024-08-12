@@ -25,7 +25,7 @@ If WriteReady == 1 (Existing result):
 
 Result for HTTP/1.1 must be synchronous / ordered.
 
-Result Ordering Class definition see: []()
+Result Ordering Class definition see: [ResultOrder.md](./ResultOrder.md)
 
 ## 1.4. Main Loop
 
