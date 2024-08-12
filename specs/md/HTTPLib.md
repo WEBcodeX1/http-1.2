@@ -39,8 +39,10 @@ method will be called (see next topic).
 
 #### 1.2.3.1. Params
 
-void* SHMStaticFS
-void* SHMPostAS
+| Type      | Name           |
+------------------------------
+| void*     | SHMStaticFS    |
+| void*     | SHMPostAS      |
 
 #### 1.2.3.2. Processing Logic
 
