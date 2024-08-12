@@ -1,4 +1,4 @@
-# Application Server Process Handler
+# 1. Application Server Process Handler
 
 The Application Server Process Handler manages:
 
@@ -6,9 +6,9 @@ The Application Server Process Handler manages:
 - SHM Requests / Synchronization for all AS Instances
 - SHM Writes / Synchronization for all AS Instances
 
-## Program Logic
+## 1.1. Program Logic
 
-### Initialization
+### 1.1.1. Initialization
 
 ```c++
 ASIndex = 0
@@ -18,7 +18,7 @@ ASIndex = 0
     - Index++
 ```
 
-### Main Loop
+### 1.1.2. Main Loop
 
 ```c++
 - Loop

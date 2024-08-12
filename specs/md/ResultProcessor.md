@@ -1,4 +1,4 @@
-# Result Processor
+# 1. Result Processor
 
 The Result Processor manages the following tasks:
 
@@ -6,13 +6,13 @@ The Result Processor manages the following tasks:
 - Check / Read AS POST Results
 - Result Send Thread Processor
 
-## Read StaticFS Requests
+## 1.1. Read StaticFS Requests
 
 If Lock::get_read_data (Server Main Loop) == 1, SHM Data with StaticFS requests is ready to read.
 
 Loop on all GET requests and feed into `ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)`.
 
-## Read AS Results
+## 1.2. Read AS Results
 
 Check all AS Instances if WriteReady == 1.
 
@@ -21,13 +21,13 @@ If WriteReady == 1 (Existing result):
 - `ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)`
 - Reset AS Instance Properties to default (CanRead == 1, WriteReady = 0)
 
-## Result Order
+## 1.3. Result Order
 
 Result for HTTP/1.1 must be synchronous / ordered.
 
 Result Ordering Class definition see: []()
 
-## Main Loop
+## 1.4. Main Loop
 
 Main Loop Layout.
 
@@ -57,11 +57,11 @@ loop:
     sleep Config::Microseconds
 ```
 
-### On Idle
+### 1.4.1. On Idle
 
 If workdone == 0 (no work done), micro-sleep.
 
-## Result Send Thread Processor
+## 1.5. Result Send Thread Processor
 
 ```bash
 +-------------+-----------+------------------------------+
@@ -83,7 +83,7 @@ If workdone == 0 (no work done), micro-sleep.
 +-------------+-----------+------------------------------+
 ```
 
-### Thread 1 (detached)
+### 1.5.1. Thread 1 (detached)
 
 Thread 1 will sendfile() three results to ClientFD 212 socket.
 
@@ -101,7 +101,7 @@ Thread 1 will sendfile() three results to ClientFD 212 socket.
 
 Thread sets terminate flag to 1 after execution and waits to be terminated.
 
-### Thread 2 (detached)
+### 1.5.2. Thread 2 (detached)
 
 If AS result has been processed in time, Thread2 will sendfile() the first 3 results and
 afterwards write() the AS result to ClientFD 403 socket.

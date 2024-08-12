@@ -1,4 +1,4 @@
-# HTTP Library (internal)
+# 1. HTTP Library (internal)
 
 The HTTP Library is split up in three parts:
 
@@ -6,18 +6,18 @@ The HTTP Library is split up in three parts:
 - httpparser.cpp / HTTP Parsing (Header, Payload) 
 - httpgen.cpp / HTTP Generating (Header)
 
-## Compiling / Linking
+## 1.1. Compiling / Linking
 
 The HTTPLib library gets linked shared because it wil be used by multiple applications (e.g. test).
 
-## Program Logic (httpparser.cpp)
+## 1.2. Program Logic (httpparser.cpp)
 
 The parser is programmed to support the following:
 
 - Multiple HTTP "messages" in one TCP packet
 - Fragmented (partial) messages without end marker "\n\r"
 
-### appendBuffer()
+### 1.2.1. appendBuffer()
 
 1. Params
 
@@ -29,13 +29,13 @@ The parser is programmed to support the following:
 The passed buffer data will be apended to _HTTPRequest private member. Afterwards _splitRequests()
 method will be called (see next topic).
 
-### _splitRequests()
+### 1.2.2. _splitRequests()
 
 - _SplittedRequests Vector will be cleared
 - All requests inside _HTTPRequest buffer get split by "\n\r" HTTP end marker
 - Single requests will be put inside _SplittedRequests Vector
 
-### parseRequestsBasic()
+### 1.2.3. parseRequestsBasic()
 
 1. Params
 
@@ -49,7 +49,7 @@ void* SHMPostAS
 
 - Loop (for each _SplittedRequests element) call this._processBasePropsSHM()
 
-### _processBasePropsSHM
+### 1.2.4. _processBasePropsSHM
 
 1. Params
 
