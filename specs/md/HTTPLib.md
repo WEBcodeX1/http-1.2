@@ -19,12 +19,12 @@ The parser is programmed to support the following:
 
 ### 1.2.1. appendBuffer()
 
-1. Params
+#### 1.2.1.1. Params
 
 - const char* BufferRef
 - const uint16_t BufferSize
 
-2. Processing Logic
+#### 1.2.1.2. Processing Logic
 
 The passed buffer data will be apended to _HTTPRequest private member. Afterwards _splitRequests()
 method will be called (see next topic).
@@ -37,12 +37,12 @@ method will be called (see next topic).
 
 ### 1.2.3. parseRequestsBasic()
 
-1. Params
+#### 1.2.3.1. Params
 
 void* SHMStaticFS
 void* SHMPostAS
 
-2. Processing Logic
+#### 1.2.3.2. Processing Logic
 
 - Store StaticFS Shared Mem Address Pointer inside object instance
 - Store AS POST Shared Mem Address Pointer inside object instance
@@ -51,11 +51,11 @@ void* SHMPostAS
 
 ### 1.2.4. _processBasePropsSHM
 
-1. Params
+#### 1.2.4.1. Params
 
 string& Request
 
-2. Processing Logic
+#### 1.2.4.2. Processing Logic
 
 - Get HTTP Version
 - Get HTTP Payload
