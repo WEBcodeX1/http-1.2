@@ -39,10 +39,8 @@ method will be called (see next topic).
 
 #### 1.2.3.1. Params
 
-| Type      | Name           |
-------------------------------
-| void*     | SHMStaticFS    |
-| void*     | SHMPostAS      |
+- void* SHMStaticFS-
+- void* SHMPostAS
 
 #### 1.2.3.2. Processing Logic
 
@@ -55,7 +53,7 @@ method will be called (see next topic).
 
 #### 1.2.4.1. Params
 
-string& Request
+- string& Request
 
 #### 1.2.4.2. Processing Logic
 
