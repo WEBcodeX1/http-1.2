@@ -5,7 +5,7 @@ using namespace std;
 int main()
 {
     cout << "### >> ---------------------------------------------------------------" << endl;
-    cout << "### >> x0-data-gateway server " << SERVER_VERSION << endl;
+    cout << "### >> FalconAS python application server " << SERVER_VERSION << endl;
     cout << "### >> ---------------------------------------------------------------" << endl;
 
     //- init server object
