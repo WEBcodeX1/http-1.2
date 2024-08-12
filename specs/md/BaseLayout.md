@@ -97,7 +97,7 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 
 > 32bit memory addresses used for simplicity.
 
-## HTTP StaticFS Requests #1
+## HTTP StaticFS Requests SHM #1
 
 ```bash
 Address                 Type                Descr           Default
@@ -122,7 +122,7 @@ Address                 Type                Descr           Default
 0x00000011+LenReq1+7    char[]              char[LenReq1]   Nullptr
 ```
 
-## HTTP AS Requests #2
+## HTTP AS Requests SHM #2
 
 ```bash
 Address                 Type                Descr           Default
@@ -138,7 +138,7 @@ Address                 Type                Descr           Default
 0x00000002+LenReq1+2    char[]              char[LenReq1]   Nullptr
 ```
 
-## Application Server Status / Results #3
+## Application Server Status / Results SHM #3
 
 ```bash
 Address                 Type                Descr           Default
