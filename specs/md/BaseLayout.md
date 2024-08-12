@@ -31,7 +31,7 @@ Static Files / Virtual Host Handler.
 
 ## ASProcessHandler
 
-Python Application Server Process Handler. 
+Python Application Server Process Handler.
 
 ## ResultProcessor
 
