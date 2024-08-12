@@ -71,6 +71,7 @@ string& Request
   - Write MsgLength to SHM-StaticFS, increment Pointer Address
   - Write MsgPayload to SHM-StaticFS, increment Pointer Address
 
+  > [!NOTE]
   > IPCHandler.cpp is used to calculate Shared Memory Adress Offsets.
 
 - On Type POST AS (SHM Segment #2, #3)
@@ -89,4 +90,5 @@ string& Request
   // SHM Segment #3
   - Write CanRead = 1 @AS Index Address
 
+  > [!NOTE]
   > IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.
