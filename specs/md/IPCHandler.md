@@ -5,8 +5,8 @@ Segmentation which is used for passing data between system processes.
 
 The following two handler exist:
 
-- IPCHandler (StaticFS GET Requests)
-- IPCHandlerAS (POST Application Server Requests)
+- IPCHandler (StaticFS GET Requests), IPCHandler.cpp
+- IPCHandlerAS (POST Application Server Requests), IPCHandlerAS.cpp
 
 ## 1.1. IPCHandler
 
