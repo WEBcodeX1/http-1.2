@@ -19,12 +19,12 @@ The parser is programmed to support the following:
 
 ### 1.2.1. appendBuffer()
 
-#### 1.2.1.1. Params
+1. Params
 
 - const char* BufferRef
 - const uint16_t BufferSize
 
-#### 1.2.1.2. Processing Logic
+2. Processing Logic
 
 The passed buffer data will be apended to _HTTPRequest private member. Afterwards _splitRequests()
 method will be called (see next topic).
@@ -37,12 +37,12 @@ method will be called (see next topic).
 
 ### 1.2.3. parseRequestsBasic()
 
-#### 1.2.3.1. Params
+1. Params
 
-- void* SHMStaticFS-
-- void* SHMPostAS
+void* SHMStaticFS
+void* SHMPostAS
 
-#### 1.2.3.2. Processing Logic
+2. Processing Logic
 
 - Store StaticFS Shared Mem Address Pointer inside object instance
 - Store AS POST Shared Mem Address Pointer inside object instance
@@ -51,11 +51,11 @@ method will be called (see next topic).
 
 ### 1.2.4. _processBasePropsSHM
 
-#### 1.2.4.1. Params
+1. Params
 
-- string& Request
+string& Request
 
-#### 1.2.4.2. Processing Logic
+2. Processing Logic
 
 - Get HTTP Version
 - Get HTTP Payload
@@ -71,8 +71,7 @@ method will be called (see next topic).
   - Write MsgLength to SHM-StaticFS, increment Pointer Address
   - Write MsgPayload to SHM-StaticFS, increment Pointer Address
 
-> [!NOTE]
-> IPCHandler.cpp is used to calculate Shared Memory Adress Offsets.
+  > IPCHandler.cpp is used to calculate Shared Memory Adress Offsets.
 
 - On Type POST AS (SHM Segment #2, #3)
 
@@ -90,5 +89,4 @@ method will be called (see next topic).
   // SHM Segment #3
   - Write CanRead = 1 @AS Index Address
 
-> [!NOTE]
-> IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.
+  > IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.

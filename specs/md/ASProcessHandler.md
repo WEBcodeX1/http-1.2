@@ -26,4 +26,3 @@ ASIndex = 0
     - If yes: Process Python Request
     - Write CanRead == 0 && WriteReady = 1
 ```
-
