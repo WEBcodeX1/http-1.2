@@ -12,7 +12,7 @@ The following two handler exist:
 
 IPCHandler Memory (SHM Segment #1) Layout see [BaseLayout.md](./BaseLayout.md) Section 3.1.
 
-The following describes the functionality 
+The following describes the functionality in detail.
 
 ### 1.1.1. Construtor
 
