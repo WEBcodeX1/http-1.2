@@ -12,8 +12,7 @@ target_link_libraries(test-result-order ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 # add custom targets
 add_custom_target(
-    result-order-header
+    test-result-order-header
     SOURCES
     ./test-result-order.hpp
 )
-
