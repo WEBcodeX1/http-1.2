@@ -15,8 +15,7 @@ The ResultScheduler Component manages the following things "inside" ResultProces
       { HTTPType, SendFileFD, ASIndex }
 
 - "LastRequest" (unordered map)
-  - ClientFD (Key)
-    - { RequestNr, RequestTime }
+  - ClientFD (Key), RequestNr
 
 - "LastRequests" (unordered map)
   - ClientFD (Key)
@@ -41,8 +40,10 @@ The ResultScheduler Component manages the following things "inside" ResultProces
 - Process (loop on "Requests" ClientFDs)
   - If ClientFD not in "LastRequest"
     - Insert into "LastRequest" with Default RequestNr 1 and RequestTime now()
-  - ResultOrder.getNextRequests(ClientFD, HTTP1.1) -> ThreadHandler(getVirtualDomain())
   - ResultOrder.getNextRequests(ClientFD, HTTP1.2) -> ThreadHandler(getVirtualDomain())
+  - ResultOrder.getNextRequests(ClientFD, HTTP1.1) -> ThreadHandler(getVirtualDomain())
+  
+  # Process in serial order. First: HTTP/1.2, afterwards HTTP/1.1. If no HTTP/1.2 request: process HTTP/1.1.
 
 - On ThreadHandler::Terminator::ClientFD::Termination (Callback pointer)
   - Update "LastRequest" (unordered map) ClientFD RequestNr, RequestTime
