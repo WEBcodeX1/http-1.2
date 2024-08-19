@@ -21,11 +21,11 @@ If WriteReady == 1 (Existing result):
 - `ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)`
 - Reset AS Instance Properties to default (CanRead == 1, WriteReady = 0)
 
-## 1.3. Result Order
+## 1.3. Result Scheduler
 
 Result for HTTP/1.1 must be synchronous / ordered.
 
-Result Ordering Class definition see: [ResultOrder.md](./ResultOrder.md)
+Result Scheduler Class definition see: [ResultScheduler.md](./ResultScheduler.md)
 
 ## 1.4. Main Loop
 
