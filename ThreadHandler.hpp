@@ -77,7 +77,7 @@ public:
     ThreadHandler();
     ~ThreadHandler();
 
-    friend class StaticFS; //- TODO: correct?
+    friend class ResultProcessor;
 
 private:
 

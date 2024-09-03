@@ -6,6 +6,8 @@
 #include "../../Debug.cpp"
 #include "../../Helper.hpp"
 #include "../../IPCHandler.hpp"
+#include "../../IPCHandlerAS.hpp"
+#include "../../ASRequestHandler.hpp"
 #include "../../Client.hpp"
 
 #include <string>
@@ -25,12 +27,11 @@ static const vector<string> HeaderList
     "Host",
     "Request-UUID"
     "User-Agent",
-    "Last-modified", //- remove, just in response!
     "ETag"
 };
 
 
-class HTTPParser: public Client, public SharedMemManager
+class HTTPParser: private Client, private SHMStaticFS, private SHMPythonAS
 {
 
 public:
@@ -39,17 +40,17 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    SharedMemAddress_t parseRequestsBasic(void*);
+    uint parseRequestsBasic(SharedMemAddress_t, const ASRequestHandlerRef_t);
     void parseRequestsComplete();
 
 private:
 
     void _splitRequests();
     void _parseRequestHeader();
-    void _parseBaseProps(string&);
+    uint16_t _parseBaseProps(string&, const ASRequestHandlerRef_t);
 
     RequestHeader_t _RequestHeaders;
-    vector<string> _SplttedRequests;
+    vector<string> _SplittedRequests;
 
     size_t _RequestCount;
     string _HTTPRequest;

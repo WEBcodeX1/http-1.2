@@ -21,7 +21,7 @@
 
 typedef struct {
     string PathRel;
-    unsigned int InterpreterCount;
+    uint InterpreterCount;
     std::shared_ptr<Filesystem> FilesystemRef;
 } NamespaceProps_t;
 

@@ -36,7 +36,6 @@ static const MimetypeRelations_t MimeRelations{
     { "json", "application/json" },
     { "css", "text/css" },
     { "png", "image/png" },
-    { "jpg", "image/jpg" },
     { "svg", "image/svg+xml" },
     { "woff", "font/woff" },
     { "woff2", "font/woff2" }

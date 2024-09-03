@@ -20,3 +20,9 @@ Client::~Client()
 {
     DBG(120, "Destructor");
 }
+
+ClientRequestNr_t Client::getNextReqNr()
+{
+    _RequestNr += 1;
+    return _RequestNr;
+}

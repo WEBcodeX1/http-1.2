@@ -20,8 +20,19 @@ ClientHandler::~ClientHandler()
     DBG(120, "Destructor");
 }
 
-void ClientHandler::setSharedMemPointer(void* SharedMemPointer) {
-    _SharedMemBase = SharedMemPointer;
+void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPointer) {
+    _SHMStaticFS = SharedMemPointer.StaticFSPtr;
+    _SHMPythonASMeta = SharedMemPointer.PostASMetaPtr;
+    _SHMPythonASRequests = SharedMemPointer.PostASRequestsPtr;
+}
+
+void ClientHandler::setClientHandlerConfig(Namespaces_t Namespaces) {
+    _Namespaces = Namespaces;
+    _ASRequestHandlerRef = new ASRequestHandler(Namespaces);
+}
+
+ASRequestHandlerRef_t ClientHandler::getClientHandlerASRequestHandlerRef() {
+    return _ASRequestHandlerRef;
 }
 
 void ClientHandler::addClient(const uint16_t ClientFD)
@@ -46,7 +57,7 @@ void ClientHandler::addClient(const uint16_t ClientFD)
 
 void ClientHandler::processClients()
 {
-    //- reset processed clients
+    //- reset processed clients count
     ProcessedClients = 0;
 
     //- get epoll ready filedescriptors
@@ -60,7 +71,6 @@ void ClientHandler::processClients()
     //- on error
     if (FDCount == -1) {
         ERR("Epoll Error:" << errno);
-        ProcessedClients = 0;
         return;
     }
 
@@ -70,24 +80,23 @@ void ClientHandler::processClients()
         //- read client data
         readClientData(FDCount);
     }
+
+    //- process appserver queue
+    ProcessedClients += _ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)
 {
     DBG(70, "Read client data. Filedescriptor count:" << FDCount);
 
-    //- reset base shm pointer
-    void* CientSharedMemData = static_cast<char*>(_SharedMemBase) + sizeof(atomic_int64_t) + sizeof(uint16_t);
+    //- set offset starting addresses
+    void* SHMGetRequests = static_cast<char*>(_SHMStaticFS) + sizeof(atomic_int8_t) + sizeof(uint16_t);
 
-    DBG(100, "Parent Server CientSharedMemData Address:" << CientSharedMemData);
-
-    //- reset processed clients count
-    uint16_t ProcessedClients = 0;
+    DBG(100, "Parent Server GetRequestsSHM Address:" << SHMGetRequests);
 
     //- process all filedescriptors with data (or close)
     for (uint16_t i=0; i<FDCount; ++i) {
 
-        //char* Buffer[BUFFER_SIZE];
         uint16_t ReadFD = EpollEvents[i].data.fd;
 
         // read data into buffer
@@ -107,16 +116,18 @@ void ClientHandler::readClientData(const uint16_t FDCount)
             if (Clients.contains(ReadFD)) {
                 ClientRef_t ClientRef = Clients.at(ReadFD);
                 ClientRef->appendBuffer(Buffer, RcvBytes);
-                CientSharedMemData = ClientRef->parseRequestsBasic(CientSharedMemData);
-                ++ProcessedClients;
+
+                if (ClientRef->parseRequestsBasic(SHMGetRequests, _ASRequestHandlerRef) > 0) {
+                    ++ProcessedClients;
+                }
             }
         }
     }
 
-    //- trigger data processing if processed > 0
+    //- trigger data processing in ResultProcessor
     if (ProcessedClients > 0) {
-        DBG(100, "Processed Clients:" << ProcessedClients << " ShmBase:" << _SharedMemBase);
-        new(_SharedMemBase) atomic_int64_t(1);
-        new(static_cast<char*>(_SharedMemBase)+sizeof(atomic_int64_t)) uint16_t(ProcessedClients);
+        DBG(100, "Processed Clients:" << ProcessedClients << " ShmBase:" << _SHMStaticFS);
+        new(_SHMStaticFS) atomic_int8_t(1);
+        new(static_cast<char*>(_SHMStaticFS)+sizeof(atomic_int8_t)) uint16_t(ProcessedClients);
     }
 }

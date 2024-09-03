@@ -20,9 +20,6 @@ void ThreadHandler::_setGlobalData(pidfd_t ParentPidFD, Namespaces_t Namespaces)
 
 void ThreadHandler::_addClient(ClientRequestData_t ReqData)
 {
-    //-> rq1, rq2, rq3, rq4, rq5 (2 req could be from one client)
-    //-> 2 req then must be processed inside 1 thread
-
     //- if clientfd key exists, push to req vector
     if (_ClientRequests.contains(ReqData.ClientFD)) {
         _ClientRequests.at(ReqData.ClientFD).push_back(ReqData);

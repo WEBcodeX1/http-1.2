@@ -11,8 +11,11 @@ Server::Server() :
     DBG(120, "Constructor");
 
     //- setup shared memory
-    void* SharedMemPointer = setupSharedMemory();
-    setSharedMemPointer(SharedMemPointer);
+    setupSharedMemory();
+    setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests } );
+
+    //- set client handler namespaces
+    setClientHandlerConfig(Namespaces);
 
     //- TODO: just set if exists in config, else default
     SocketListenAddress = ServerAddress;
@@ -31,10 +34,25 @@ Server::Server() :
     setupPoll();
 
     //- init static filesystem
-    loadFilesystemData(Namespaces, BasePath, Mimetypes);
+    loadStaticFSData(Namespaces, BasePath, Mimetypes);
 
-    //- fork filesystem processing process
-    forkFilesystemProcess(SharedMemPointer);
+    //- fork result processor process
+    forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASResults } );
+
+    //- get ASRequestHandler reference
+    ASRequestHandlerRef_t ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
+
+    //- set base memory addresses
+    ASRequestHandlerRef->setBaseAddresses( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- fork application server proesses
+    setASProcessHandlerNamespaces(Namespaces);
+    setASProcessHandlerOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- check interpreter count
+    uint ASInterpreterCount = getASInterpreterCount();
+    DBG(50, "Sum AS Interpreter:" << ASInterpreterCount);
 
     //- drop privileges
     dropPrivileges();
@@ -198,13 +216,22 @@ void Server::acceptClient()
     }
 }
 
-void* Server::setupSharedMemory()
+void Server::setupSharedMemory()
 {
     DBG(120, "Setup Shared Memory.");
 
-    void* SharedMemPtr = mmap(NULL, SHMEM_PROCESS_QUEUE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(SharedMemPtr, SHMEM_PROCESS_QUEUE_SIZE, MADV_HUGEPAGE);
+    _SHMStaticFS = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMStaticFS, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
 
-    DBG(120, "SharedMemAddress Parent:" << SharedMemPtr);
-    return SharedMemPtr;
+    _SHMPythonASMeta = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASMeta, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    _SHMPythonASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASRequests, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    _SHMPythonASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASResults, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    DBG(120, "SharedMemAddress:" << _SHMStaticFS);
+    //return { SHMStaticFSPtr, SHMPOstASStatusPtr, SHMPOstASRequestsPtr,  SHMPOstASResultsPtr };
 }
