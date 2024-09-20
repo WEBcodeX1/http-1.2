@@ -54,6 +54,13 @@ Build as normal user.
 Install globally as root.
 
 ```bash
+# sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz
+```
+
+>[!IMPORTANT]  
+> Some python3 pip versions do not allow installing packages globally anymore, the --break-system-packages flag is mandatory.
+
+```bash
 # sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz --break-system-packages
 ```
 
