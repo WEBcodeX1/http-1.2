@@ -1,17 +1,17 @@
-# Client Handler
+# 1. Client Handler
 
 The ClientHandler Component handles Client Sockets / Epoll Setup / Data Buffering.
 
-## Program Logic
+## 1.1. Program Logic
 
-### Add Client
+### 1.1.1. Add Client
 
 Called from Main::Server on new Client Socket.
 
 - Insert ClientObject with ClientFD as Key into internal C++ Map
 - Add ClientFD to Kernel Epoll
 
-### Process Clients
+### 1.1.2. Process Clients
 
 Get all Epoll FDs with waiting data.
 
@@ -20,7 +20,7 @@ Array of these 2000 Filedescriptor integers.
 
 Process all Filedescriptors calling readClientData().
 
-### Read Client Data
+### 1.1.3. Read Client Data
 
 Process all Filedescriptors with waiting data.
 

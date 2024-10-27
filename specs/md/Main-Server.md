@@ -1,11 +1,11 @@
-# Main Server
+# 1. Main Server
 
 The Main Server Process initializes all components on startup using configuation from
 XML Configuration file.
 
-## Program Logic
+## 1.1. Program Logic
 
-### Initialization
+### 1.1.1. Initialization
 
 - Setup Shared Memory Segments
 - Disable Signals / Setup Termination Handling
@@ -17,7 +17,7 @@ XML Configuration file.
 - Drop System Privileges
 - Enter Server Loop
 
-### Main Loop
+### 1.1.2. Main Loop
 
 ```c++
 - While Static::RunServer is True
