@@ -77,8 +77,8 @@ void Filesystem::processFileProperties()
 
             string FileListKey = RelPath + "/" + FileName;
 
-            DBG(180, "FilePath:" << FilePath << " ReplacePath:" << ReplacePath << " FileListKey:" << FileListKey);
-            DBG(180, "FileName:" << FileName << " FD:" << fd << " RelPath:" << RelPath << " Extension:" << FileExtension << " Mimetype:" << MimeType);
+            DBG(210, "FilePath:" << FilePath << " ReplacePath:" << ReplacePath << " FileListKey:" << FileListKey);
+            DBG(210, "FileName:" << FileName << " FD:" << fd << " RelPath:" << RelPath << " Extension:" << FileExtension << " Mimetype:" << MimeType);
 
             FileProperties_t FileProps;
             FileProps.Filedescriptor = fd;

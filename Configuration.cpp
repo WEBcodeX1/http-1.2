@@ -11,14 +11,17 @@ Configuration::Configuration() :
 
     namespace bp = boost::python;
 
-    const string PScript = "/etc/falcon-http/config.py";
+    const string PScript = "/home/cpruefer/Documents/Repos/data-gateway/python/config.py";
 
     FILE* fp = fopen(PScript.c_str(), "r");
     PyObject *MainModule, *MainDict, *TmpPyObject;
+
     Py_InitializeEx(0);
+
+    PyRun_SimpleFile(fp, PScript.c_str());
+
     MainModule = PyImport_ImportModule("__main__");
     MainDict = PyModule_GetDict(MainModule);
-    PyRun_SimpleFile(fp, PScript.c_str());
 
     TmpPyObject = PyMapping_GetItemString(MainDict, "server_run_user");
     RunAsUnixUser = PyUnicode_AsUTF8(TmpPyObject);
@@ -77,6 +80,9 @@ Configuration::Configuration() :
             NamespacePair_t(NamespaceID, NamespaceProps)
         );
     }
+
+    Py_FinalizeEx();
+
 }
 
 Configuration::~Configuration()

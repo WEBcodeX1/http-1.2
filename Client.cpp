@@ -4,6 +4,7 @@ using namespace std;
 
 Client::Client(ClientFD_t ClientFD) :
     _ClientFD(ClientFD),
+    _RequestNr(0),
     _Error(false),
     _ErrorID(0),
     _RequestStartTime(0),
@@ -19,4 +20,10 @@ Client::Client(ClientFD_t ClientFD) :
 Client::~Client()
 {
     DBG(120, "Destructor");
+}
+
+ClientRequestNr_t Client::getNextReqNr()
+{
+    _RequestNr += 1;
+    return _RequestNr;
 }

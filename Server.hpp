@@ -14,27 +14,27 @@
 #include "Constant.hpp"
 #include "Configuration.hpp"
 #include "ClientHandler.hpp"
-#include "StaticFS.hpp"
+#include "ASProcessHandler.hpp"
+#include "ResultProcessor.hpp"
 
 
-class Server : public Configuration, public StaticFS, public ClientHandler {
+class Server : private Configuration, private ResultProcessor, private ASProcessHandler, private ClientHandler {
 
 public:
 
     Server();
     ~Server();
 
+    void init();
     void setupSocket();
     void setupPoll();
-    void dropPrivileges();
     void ServerLoop();
     void acceptClient();
 
     void setTerminationHandler();
     static void terminate(int);
 
-    void* setupSharedMemory();
-    void* getSharedMemPointer();
+    void setupSharedMemory();
 
 private:
 
@@ -47,6 +47,11 @@ private:
     int ServerSocketFD;
 
     struct pollfd ServerConnFD[1];
+
+    void* _SHMStaticFS;
+    void* _SHMPythonASMeta;
+    void* _SHMPythonASRequests;
+    void* _SHMPythonASResults;
 
 };
 

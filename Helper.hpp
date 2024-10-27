@@ -44,7 +44,7 @@ public:
             if (FileType.compare((*rdi).path().extension().string()) == 0)
             {
                 FileListRef.push_back((*rdi).path().string());
-                DBG(180, (*rdi).path().string());
+                DBG(210, (*rdi).path().string());
             }
         }
     }
@@ -56,7 +56,7 @@ class String {
 
 public:
 
-    //- TODO: make erase optional, also ugly
+    //- TODO: make erase optional, ugly
     static void split(string& String, const string Delimiter, vector<string>& ResultRef)
     {
         size_t FindPos = 0;

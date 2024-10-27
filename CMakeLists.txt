@@ -1,5 +1,5 @@
 # project settings
-project(http1.2)
+project(x0-data-gateway)
 cmake_minimum_required(VERSION 3.0)
 aux_source_directory(. SRC_LIST)
 
@@ -46,8 +46,12 @@ add_custom_target(
     ./MemoryManager.hpp
     ./ThreadHandler.hpp
     ./IPCHandler.hpp
+    ./IPCHandlerAS.hpp
     ./ClientHandler.hpp
-    ./StaticFS.hpp
+    ./ASProcessHandler.hpp
+    ./ASRequestHandler.hpp
+    ./ResultProcessor.hpp
+    ./ResultOrder.hpp
     ./Constant.hpp
     ./Vector.hpp
 )
@@ -57,10 +61,4 @@ add_subdirectory(lib)
 add_subdirectory(test)
 
 # install
-install(CODE "execute_process(COMMAND ./scripts/add_user_group.sh)")
-install(CODE "execute_process(COMMAND ./scripts/mk_www.sh)")
-install(CODE "execute_process(COMMAND ./scripts/cp_etc.sh)")
-install(CODE "execute_process(COMMAND ./scripts/set-transparent-hugepages.sh)")
-install(CODE "execute_process(COMMAND ./scripts/patch_etc_hosts.sh)")
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-

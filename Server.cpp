@@ -9,10 +9,21 @@ Server::Server() :
     SocketListenPort(80)
 {
     DBG(120, "Constructor");
+}
 
+Server::~Server()
+{
+    DBG(120, "Destructor");
+}
+
+void Server::init()
+{
     //- setup shared memory
-    void* SharedMemPointer = setupSharedMemory();
-    setSharedMemPointer(SharedMemPointer);
+    setupSharedMemory();
+    setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- set client handler namespaces
+    setClientHandlerConfig(Namespaces);
 
     //- TODO: just set if exists in config, else default
     SocketListenAddress = ServerAddress;
@@ -31,24 +42,35 @@ Server::Server() :
     setupPoll();
 
     //- init static filesystem
-    loadFilesystemData(Namespaces, BasePath, Mimetypes);
+    loadStaticFSData(Namespaces, BasePath, Mimetypes);
 
-    //- fork filesystem processing process
-    forkFilesystemProcess(SharedMemPointer);
+    //- get ASRequestHandler reference
+    ASRequestHandlerRef_t ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
 
-    //- drop privileges
-    dropPrivileges();
+    //- fork result processor process
+    ResultProcessor::setVHostOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- set base memory addresses
+    //ASRequestHandlerRef->setBaseAddresses( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- fork application server proesses
+    setASProcessHandlerNamespaces(Namespaces);
+    setASProcessHandlerOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
+    //- check interpreter count
+    uint ASInterpreterCount = getASInterpreterCount();
+    DBG(50, "Sum AS Interpreter:" << ASInterpreterCount);
 
     //- apply cpu bound processing
     //setCPUConfig();
 
+    //- drop privileges
+    Permission::dropPrivileges(RunAsUnixGroupID, RunAsUnixUserID);
+
     //- start server loop
     ServerLoop();
-}
-
-Server::~Server()
-{
-    DBG(120, "Destructor");
 }
 
 void Server::setTerminationHandler()
@@ -61,28 +83,6 @@ void Server::terminate(int _ignored)
 {
     DBG(-1, "SIGTERM Main Server received, shutting down");
     RunServer = false;
-}
-
-void Server::dropPrivileges()
-{
-    //- in case of being root, drop privileges
-    if (getuid() == 0) {
-
-        if (setgid(RunAsUnixGroupID) != 0) {
-            cout << "Failed setting groupid to:" << RunAsUnixGroupID << endl;
-            exit(EXIT_FAILURE);
-        }
-
-        if (setuid(RunAsUnixUserID) != 0) {
-            cout << "Failed setting userid to:" << RunAsUnixUserID << endl;
-            exit(EXIT_FAILURE);
-        }
-
-    }
-    else {
-        cout << "Error. Running server as root user is recommended." << endl;
-        exit(EXIT_FAILURE);
-    }
 }
 
 void Server::setupSocket()
@@ -198,13 +198,22 @@ void Server::acceptClient()
     }
 }
 
-void* Server::setupSharedMemory()
+void Server::setupSharedMemory()
 {
     DBG(120, "Setup Shared Memory.");
 
-    void* SharedMemPtr = mmap(NULL, SHMEM_PROCESS_QUEUE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(SharedMemPtr, SHMEM_PROCESS_QUEUE_SIZE, MADV_HUGEPAGE);
+    _SHMStaticFS = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMStaticFS, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
 
-    DBG(120, "SharedMemAddress Parent:" << SharedMemPtr);
-    return SharedMemPtr;
+    _SHMPythonASMeta = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASMeta, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    _SHMPythonASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASRequests, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    _SHMPythonASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    madvise(_SHMPythonASResults, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
+
+    DBG(120, "SharedMemAddress:" << _SHMStaticFS);
+    //return { SHMStaticFSPtr, SHMPOstASStatusPtr, SHMPOstASRequestsPtr,  SHMPOstASResultsPtr };
 }

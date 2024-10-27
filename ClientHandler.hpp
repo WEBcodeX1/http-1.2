@@ -13,7 +13,9 @@
 
 #include "Helper.hpp"
 #include "Global.hpp"
+#include "Configuration.hpp"
 #include "MemoryManager.hpp"
+#include "ASRequestHandler.hpp"
 
 #include "lib/http/httpparser.hpp"
 
@@ -21,6 +23,13 @@
 typedef std::shared_ptr<HTTPParser> ClientRef_t;
 typedef pair<uint16_t, const ClientRef_t> ClientMapPair_t;
 typedef unordered_map<uint16_t, const ClientRef_t> ClientMap_t;
+
+typedef struct {
+    void* StaticFSPtr;
+    void* PostASMetaPtr;
+    void* PostASRequestsPtr;
+    void* PostASResultsPtr;
+} ClientHandlerSHMPointer_t;
 
 
 class ClientHandler
@@ -34,7 +43,10 @@ public:
     void addClient(const uint16_t);
     void processClients();
     void readClientData(const uint16_t);
-    void setSharedMemPointer(void*);
+    void setSharedMemPointer(ClientHandlerSHMPointer_t);
+    void setClientHandlerConfig(Namespaces_t);
+
+    ASRequestHandlerRef_t getClientHandlerASRequestHandlerRef();
 
     uint16_t ProcessedClients;
     MemoryManager<char> BufferMemory;
@@ -50,7 +62,15 @@ private:
     uint8_t LastProcessingIDStaticFS;
     uint8_t LastProcessingIDAppServer;
 
-    void* _SharedMemBase;
+    void* _SHMStaticFS;
+    void* _SHMPythonASMeta;
+    void* _SHMPythonASRequests;
+    void* _SHMPythonASResults;
+
+    ASRequestHandlerRef_t _ASRequestHandlerRef;
+
+    Namespaces_t _Namespaces;
+
 };
 
 #endif

@@ -3,50 +3,49 @@
 //- convert to C++ 20 iterator / C++ 23 generator
 using namespace std;
 
-SharedMemManager::SharedMemManager() :
+SHMStaticFS::SHMStaticFS() :
     _ElementOffset(0)
 {
     DBG(120, "Constructor");
     _OffsetSizes = ElementSizes;
 }
 
-SharedMemManager::~SharedMemManager()
+SHMStaticFS::~SHMStaticFS()
 {
     DBG(120, "Destructor");
 }
 
-void SharedMemManager::setSharedMemBaseAddress(void* BaseAddress)
+void SHMStaticFS::setBaseAddress(SharedMemAddress_t BaseAddress)
 {
     _BaseAddress = BaseAddress;
-    resetSharedMemOffsetAddress();
+    resetOffset();
 }
 
-void SharedMemManager::resetSharedMemOffsetAddress()
+void SHMStaticFS::resetOffset()
 {
     _OffsetAddress = _BaseAddress;
 }
 
-SharedMemAddress_t SharedMemManager::getCurrentOffsetAddress()
+SharedMemAddress_t SHMStaticFS::getCurrentOffsetAddress()
 {
     return _OffsetAddress;
 }
 
-SharedMemAddress_t SharedMemManager::getNextSharedMemAddress()
+SharedMemAddress_t SHMStaticFS::getNextAddress()
 {
     _OffsetAddress = static_cast<char*>(_OffsetAddress) + _OffsetSizes.at(_ElementOffset);
-    _stepSharedMemElementOffset();
+    _stepElementOffset();
     return _OffsetAddress;
 }
 
-SharedMemAddress_t SharedMemManager::getNextSharedMemAddress(uint16_t ByteCount)
+SharedMemAddress_t SHMStaticFS::getNextAddress(uint16_t ByteCount)
 {
     _OffsetAddress = static_cast<char*>(_OffsetAddress) + ByteCount;
-    _stepSharedMemElementOffset();
+    _stepElementOffset();
     return _OffsetAddress;
 }
 
-void SharedMemManager::_stepSharedMemElementOffset() {
+void SHMStaticFS::_stepElementOffset() {
     _ElementOffset += 1;
-    //- TOD: not hardcoded, check struct element count
-    if (_ElementOffset == 3) { _ElementOffset = 0; }
+    if (_ElementOffset == ElementSizes.size()) { _ElementOffset = 0; }
 }
