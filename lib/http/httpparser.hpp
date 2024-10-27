@@ -11,6 +11,7 @@
 #include "../../Client.hpp"
 
 #include <string>
+#include <regex>
 
 typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
@@ -27,7 +28,8 @@ static const vector<string> HeaderList
     "Host",
     "Request-UUID"
     "User-Agent",
-    "ETag"
+    "ETag",
+    "Content-Length"
 };
 
 
@@ -54,6 +56,7 @@ private:
 
     size_t _RequestCount;
     string _HTTPRequest;
+    regex _RegexContentLength;
 
 protected:
 
