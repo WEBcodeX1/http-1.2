@@ -9,10 +9,18 @@ Server::Server() :
     SocketListenPort(80)
 {
     DBG(120, "Constructor");
+}
 
+Server::~Server()
+{
+    DBG(120, "Destructor");
+}
+
+void Server::init()
+{
     //- setup shared memory
     setupSharedMemory();
-    setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests } );
+    setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- set client handler namespaces
     setClientHandlerConfig(Namespaces);
@@ -36,14 +44,15 @@ Server::Server() :
     //- init static filesystem
     loadStaticFSData(Namespaces, BasePath, Mimetypes);
 
-    //- fork result processor process
-    forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASResults } );
-
     //- get ASRequestHandler reference
     ASRequestHandlerRef_t ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
 
+    //- fork result processor process
+    ResultProcessor::setVHostOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+
     //- set base memory addresses
-    ASRequestHandlerRef->setBaseAddresses( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    //ASRequestHandlerRef->setBaseAddresses( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- fork application server proesses
     setASProcessHandlerNamespaces(Namespaces);
@@ -54,19 +63,14 @@ Server::Server() :
     uint ASInterpreterCount = getASInterpreterCount();
     DBG(50, "Sum AS Interpreter:" << ASInterpreterCount);
 
-    //- drop privileges
-    dropPrivileges();
-
     //- apply cpu bound processing
     //setCPUConfig();
 
+    //- drop privileges
+    Permission::dropPrivileges(RunAsUnixGroupID, RunAsUnixUserID);
+
     //- start server loop
     ServerLoop();
-}
-
-Server::~Server()
-{
-    DBG(120, "Destructor");
 }
 
 void Server::setTerminationHandler()
@@ -79,28 +83,6 @@ void Server::terminate(int _ignored)
 {
     DBG(-1, "SIGTERM Main Server received, shutting down");
     RunServer = false;
-}
-
-void Server::dropPrivileges()
-{
-    //- in case of being root, drop privileges
-    if (getuid() == 0) {
-
-        if (setgid(RunAsUnixGroupID) != 0) {
-            cout << "Failed setting groupid to:" << RunAsUnixGroupID << endl;
-            exit(EXIT_FAILURE);
-        }
-
-        if (setuid(RunAsUnixUserID) != 0) {
-            cout << "Failed setting userid to:" << RunAsUnixUserID << endl;
-            exit(EXIT_FAILURE);
-        }
-
-    }
-    else {
-        cout << "Error. Running server as root user is recommended." << endl;
-        exit(EXIT_FAILURE);
-    }
 }
 
 void Server::setupSocket()
