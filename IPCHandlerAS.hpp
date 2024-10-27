@@ -23,20 +23,10 @@ static const SHMOffset_t MetadataSizes{
     sizeof(uint16_t), //- write ready user space lock
     sizeof(uint16_t), //- client file descriptor
     sizeof(uint16_t), //- http version
-    sizeof(uint16_t)  //- request number
+    sizeof(uint16_t), //- http method
+    sizeof(uint16_t), //- request number
+    sizeof(uint32_t), //- payload length
 };
-
-/*
-static const SHMOffset_t RequestSizes{
-    sizeof(uint16_t), //- payload length (bytes)
-    sizeof(nullptr)   //- payload data
-};
-
-static const SHMOffset_t ResponseSizes{
-    sizeof(uint32_t), //- payload length (bytes)
-    sizeof(nullptr)   //- payload data
-};
-*/
 
 
 class SHMPythonAS

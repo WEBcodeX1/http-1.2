@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace bp = boost::python;
+
 int main()
 {
     cout << "### >> ---------------------------------------------------------------" << endl;
@@ -10,6 +12,7 @@ int main()
 
     //- init server object
     Server ServerObj;
+    ServerObj.init();
 
     return 0;
 }

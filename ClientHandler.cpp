@@ -24,11 +24,15 @@ void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPoint
     _SHMStaticFS = SharedMemPointer.StaticFSPtr;
     _SHMPythonASMeta = SharedMemPointer.PostASMetaPtr;
     _SHMPythonASRequests = SharedMemPointer.PostASRequestsPtr;
+    _SHMPythonASResults = SharedMemPointer.PostASResultsPtr;
 }
 
 void ClientHandler::setClientHandlerConfig(Namespaces_t Namespaces) {
     _Namespaces = Namespaces;
-    _ASRequestHandlerRef = new ASRequestHandler(Namespaces);
+    _ASRequestHandlerRef = new ASRequestHandler(
+        Namespaces,
+        { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults }
+    );
 }
 
 ASRequestHandlerRef_t ClientHandler::getClientHandlerASRequestHandlerRef() {
@@ -82,7 +86,8 @@ void ClientHandler::processClients()
     }
 
     //- process appserver queue
-    ProcessedClients += _ASRequestHandlerRef->processQueue();
+    //ProcessedClients += _ASRequestHandlerRef->processQueue();
+    _ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)
@@ -90,7 +95,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
     DBG(70, "Read client data. Filedescriptor count:" << FDCount);
 
     //- set offset starting addresses
-    void* SHMGetRequests = static_cast<char*>(_SHMStaticFS) + sizeof(atomic_int8_t) + sizeof(uint16_t);
+    void* SHMGetRequests = static_cast<char*>(_SHMStaticFS) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
 
     DBG(100, "Parent Server GetRequestsSHM Address:" << SHMGetRequests);
 
@@ -127,7 +132,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
     //- trigger data processing in ResultProcessor
     if (ProcessedClients > 0) {
         DBG(100, "Processed Clients:" << ProcessedClients << " ShmBase:" << _SHMStaticFS);
-        new(_SHMStaticFS) atomic_int8_t(1);
-        new(static_cast<char*>(_SHMStaticFS)+sizeof(atomic_int8_t)) uint16_t(ProcessedClients);
+        new(_SHMStaticFS) atomic_uint16_t(1);
+        new(static_cast<char*>(_SHMStaticFS)+sizeof(atomic_uint16_t)) uint16_t(ProcessedClients);
     }
 }

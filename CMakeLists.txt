@@ -51,6 +51,7 @@ add_custom_target(
     ./ASProcessHandler.hpp
     ./ASRequestHandler.hpp
     ./ResultProcessor.hpp
+    ./ResultOrder.hpp
     ./Constant.hpp
     ./Vector.hpp
 )

@@ -25,9 +25,9 @@ public:
     Server();
     ~Server();
 
+    void init();
     void setupSocket();
     void setupPoll();
-    void dropPrivileges();
     void ServerLoop();
     void acceptClient();
 

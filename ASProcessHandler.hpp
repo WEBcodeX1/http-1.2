@@ -4,9 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/wait.h>
+#include <sys/prctl.h>
 
 #include <atomic>
 #include <cstdlib>
+
+#include <iostream>
+#include <fstream>
+#include <filesystem>
 
 #include "CPU.hpp"
 #include "Global.hpp"

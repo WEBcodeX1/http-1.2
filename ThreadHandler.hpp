@@ -22,16 +22,16 @@
 
 using namespace std;
 
-typedef struct {
-    ClientFD_t ClientFD;
-    ClientFD_t ClientFDShared;
-    uint16_t MsgLength;
-    string HTTPMessage;
-} ClientRequestData_t;
-
 typedef thread ClientPThread_t;
-typedef vector<ClientRequestData_t> ClientRequestDataVec_t;
+typedef uint16_t PocessRequestsIndex_t;
+
+typedef vector<RequestProps_t> ClientRequestDataVec_t;
 typedef unordered_map<ClientFD_t, ClientRequestDataVec_t> ClientRequestDataList_t;
+typedef pair<ClientFD_t, ClientRequestDataVec_t> ClientRequestDataListPair_t;
+typedef vector<ClientRequestDataListPair_t> ClientRequestDataListVector_t;
+typedef unordered_map<ClientFD_t, PocessRequestsIndex_t> ProcessRequestsIndexList_t;
+typedef pair<ClientFD_t, PocessRequestsIndex_t> ProcessRequestsIndexListPair_t;
+
 
 typedef struct {
     pidfd_t ParentPidFD;
@@ -39,33 +39,37 @@ typedef struct {
 } ThreadHandlerGlobals_t;
 
 
-class ClientThread: private HTTPParser
+class ClientThread: private HTTPParser, private SHMPythonAS
 {
 
 public:
 
-    ClientThread(ClientRequestDataVec_t, ThreadHandlerGlobals_t);
+    ClientThread(
+        ClientFD_t, Namespaces_t&, ClientRequestDataVec_t
+    );
+
     ~ClientThread();
 
-    void startPocessingThread();
+    void startThread();
     void processRequests();
-    void processRequest(unsigned int);
 
     bool join();
 
 private:
 
     ClientPThread_t _ThreadRef;
+
+    ClientFD_t _ClientFD;
+    ClientFD_t _ClientFDShared;
+    Namespaces_t& _Namespaces;
+
     ClientRequestDataVec_t _ClientRequests;
-    ThreadHandlerGlobals_t _Globals;
 
 };
 
 
 typedef const std::shared_ptr<ClientThread> ClientThreadObjRef_t;
 typedef pair<const ClientFD_t, const ClientThreadObjRef_t> ClientListPair_t;
-typedef pair<const ClientFD_t, vector<ClientRequestData_t>> ClientRequestDataPair_t;
-
 typedef unordered_map<ClientFD_t, const ClientThreadObjRef_t> ClientThreads_t;
 
 
@@ -77,17 +81,17 @@ public:
     ThreadHandler();
     ~ThreadHandler();
 
-    friend class ResultProcessor;
-
-private:
+protected:
 
     void _setGlobalData(pidfd_t, Namespaces_t);
-    void _addClient(ClientRequestData_t);
-    void _startProcessingThreads();
+    void _addRequests(ClientRequestDataVec_t);
+    void _processThreads();
     void _checkProcessed();
 
     ThreadHandlerGlobals_t _Globals;
-    ClientRequestDataList_t _ClientRequests;
+    ClientRequestDataList_t _RequestsSorted;
+    ClientRequestDataListVector_t _ProcessRequests;
+    ProcessRequestsIndexList_t _ProcessRequestsIndex;
     ClientThreads_t _ClientThreads;
 };
 

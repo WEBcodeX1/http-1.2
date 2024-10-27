@@ -56,7 +56,7 @@ class String {
 
 public:
 
-    //- TODO: make erase optional, also ugly
+    //- TODO: make erase optional, ugly
     static void split(string& String, const string Delimiter, vector<string>& ResultRef)
     {
         size_t FindPos = 0;

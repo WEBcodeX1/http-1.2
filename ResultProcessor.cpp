@@ -4,8 +4,7 @@ using namespace std;
 
 static bool RunServer = true;
 
-ResultProcessor::ResultProcessor() :
-    _ThreadHandler(new ThreadHandler())
+ResultProcessor::ResultProcessor()
 {
     DBG(120, "Constructor");
 }
@@ -51,10 +50,17 @@ void ResultProcessor::loadStaticFSData(
     }
 }
 
+void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
+    _VHostOffsetsPrecalc = VHostOffsets;
+}
+
 void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHMAdresses)
 {
     //- reset atomic lock
-    atomic_int8_t* AtomicLockAddr = new(SHMAdresses.StaticFSPtr) atomic_int8_t(0);
+    atomic_uint16_t* StaticFSLock = new(SHMAdresses.StaticFSPtr) atomic_uint16_t(0);
+
+    //- set as memory base addresses
+    setBaseAddresses( { SHMAdresses.PostASMetaPtr, SHMAdresses.PostASRequestsPtr, SHMAdresses.PostASResultsPtr } );
 
     _ForkResult = fork();
 
@@ -65,33 +71,37 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
 
     if (_ForkResult > 0) {        
         DBG(120, "Parent ResultProcessor Process PID:" << getpid());
-        DBG(120, "Parent ResultProcessor Atomic Address:" << AtomicLockAddr);
+        DBG(120, "Parent ResultProcessor Atomic Address:" << StaticFSLock);
     }
 
     if (_ForkResult == 0) {
 
         //- get parent pid filedescriptor
         _ParentPidFD = Syscall::pidfd_open(getppid(), 0);
-        _ThreadHandler->_setGlobalData(_ParentPidFD, _Namespaces);
+        THsetGlobalData(_ParentPidFD, _Namespaces);
 
         //- overwrite parent termination handler
         setTerminationHandler();
 
         DBG(120, "Child ResultProcessor Process PID:" << getpid() << " ParentPidFD:" << _ParentPidFD);
         DBG(120, "Child ResultProcessor SharedMemAddress:" << SHMAdresses.StaticFSPtr);
-        DBG(120, "Child ResultProcessor Atomic Address:" << AtomicLockAddr << " Value:" << *(AtomicLockAddr));
+        DBG(120, "Child ResultProcessor Atomic Address:" << StaticFSLock << " Value:" << *(StaticFSLock));
 
-        //- static fs main loop
+        //- main loop until terminate signal raised
         while(RunServer) {
 
-            //DBG(120, "ResultProcessor Address:" << AtomicLockAddr << " Atomic Lock = " << *(AtomicLockAddr));
+            DBG(250, "ResultProcessor Address:" << StaticFSLock << " Atomic Lock = " << *(StaticFSLock));
 
-            if (*(AtomicLockAddr) == 1)
+            bool WorkDone = false;
+
+            ResultOrder::reset();
+
+            if (*(StaticFSLock) == 1)
             {
-                void* ClientCountAddr = static_cast<char*>(SHMAdresses.StaticFSPtr) + sizeof(atomic_int8_t);
+                void* ClientCountAddr = static_cast<char*>(SHMAdresses.StaticFSPtr) + sizeof(atomic_uint16_t);
                 uint16_t ClientCount = *(static_cast<uint16_t*>(ClientCountAddr));
 
-                DBG(120, "ResultProcessor ClientCount = " << ClientCount);
+                DBG(120, "StaticFS GET Request ClientCount = " << ClientCount);
 
                 if (ClientCount == 0) {
                     ERR("ClientCount == 0 should never happen!");
@@ -102,47 +112,116 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
                     DBG(120, "Child ResultProcessor - processing client requests PID:" << getpid() << " ClientCount:" << ClientCount);
 
                     //- set shared memory handler base address
-                    void* CientDataMemAddr = static_cast<char*>(SHMAdresses.StaticFSPtr) + sizeof(atomic_int8_t) + sizeof(uint16_t);
+                    void* CientDataMemAddr = static_cast<char*>(SHMAdresses.StaticFSPtr) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
                     setBaseAddress(CientDataMemAddr);
 
-                    _processClients(ClientCount);
+                    _processStaticFSRequests(ClientCount);
                 }
-                *(AtomicLockAddr) = 0;
+                *(StaticFSLock) = 0;
+                WorkDone = true;
             }
-            else {
+
+            uint16_t WorkDoneASResults = _processPythonASResults();
+
+            ResultOrder::calculate();
+            ResultOrder::processRequests(HTTP1_2);
+            ResultOrder::processRequests(HTTP1_1);
+
+            THprocessThreads();
+
+            if (WorkDone == true || WorkDoneASResults > 0) {
+                WorkDone = true;
+            }
+
+            if (WorkDone == false) {
                 this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
             }
         }
+
+        delete StaticFSLock;
+
         DBG(-1, "Exit Parent ResultProcessor Process.");
         exit(0);
     }
 }
 
-void ResultProcessor::_processClients(uint16_t RequestCount)
+void ResultProcessor::_processStaticFSRequests(uint16_t RequestCount)
 {
     for (uint16_t i=0; i<RequestCount; ++i) {
 
         void* ClientFDAddr = static_cast<char*>(getCurrentOffsetAddress());
         uint16_t ClientFD = *(static_cast<uint16_t*>(ClientFDAddr));
 
-        void* ClientMsgLengthAddr = static_cast<char*>(getNextAddress());
-        uint16_t ClientMsgLength = *(static_cast<uint16_t*>(ClientMsgLengthAddr));
+        void* HTTPVersionAddr = static_cast<char*>(getNextAddress());
+        uint16_t HTTPVersion = *(static_cast<uint16_t*>(HTTPVersionAddr));
 
-        void* ClientMsgAddr = static_cast<char*>(getNextAddress());
-        DBG(120, "MemAddr ClientFD:" << ClientFDAddr << " MsgLength:" << ClientMsgLengthAddr << " HTTPMessage:" << ClientMsgAddr);
+        void* ReqNrAddr = static_cast<char*>(getNextAddress());
+        uint16_t ReqNr = *(static_cast<uint16_t*>(ReqNrAddr));
 
-        char ClientMsg[ClientMsgLength];
-        memcpy(&ClientMsg[0], ClientMsgAddr, ClientMsgLength);
-        string ClientMsgString(ClientMsg, ClientMsgLength);
+        void* ClientPayloadLengthAddr = static_cast<char*>(getNextAddress());
+        uint16_t ClientPayloadLength = *(static_cast<uint16_t*>(ClientPayloadLengthAddr));
 
-        getNextAddress(ClientMsgLength);
-        DBG(120, "ClientFD:" << ClientFD << " MessageLength:" << ClientMsgLength << " Message:'" << ClientMsgString << "'");
+        void* ClientPayloadAddr = static_cast<char*>(getNextAddress());
+        DBG(120, "MemAddr ClientFD:" << ClientFDAddr << " ReqNr:" << ReqNrAddr << " PayloadLength:" << ClientPayloadLengthAddr << " HTTPPayload:" << ClientPayloadAddr);
+
+        char ClientPayload[ClientPayloadLength];
+        memcpy(&ClientPayload[0], ClientPayloadAddr, ClientPayloadLength);
+        string ClientPayloadString(ClientPayload, ClientPayloadLength);
+
+        getNextAddress(ClientPayloadLength);
+        DBG(120, "ClientFD:" << ClientFD << " ReqNr:" << ReqNr << " HTTpVersion:" << HTTPVersion << " PayloadLength:" << ClientPayloadLength << " Payload:'" << ClientPayloadString << "'");
 
         ClientFD_t ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, ClientFD, 0);
 
-        _ThreadHandler->_addClient({ClientFD, ClientFDShared, ClientMsgLength, ClientMsgString});
-    }
+        RequestProps_t Request;
 
-    _ThreadHandler->_startProcessingThreads();
-    _ThreadHandler->_checkProcessed();
+        Request.ClientFD = ClientFD;
+        Request.ClientFDShared = ClientFDShared;
+        Request.HTTPPayload = ClientPayloadString;
+        Request.HTTPVersion = HTTPVersion;
+        Request.PayloadLength = ClientPayloadLength;
+        Request.ASIndex = -1;
+
+        ResultOrder::append(ReqNr, std::move(Request));
+    }
+}
+
+uint16_t ResultProcessor::_processPythonASResults()
+{
+    uint16_t processed = 0;
+
+    for (const auto& Namespace: _Namespaces) {
+        for (const auto &Index: _VHostOffsetsPrecalc.at(Namespace.first)) {
+            atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
+            atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));
+            if (*(CanReadAddr) == 0 && *(WriteReadyAddr) == 1) {
+
+                DBG(120, "PythonAS Index:" << Index << " CanRead=0 WriteReady=1");
+
+                RequestProps_t Request;
+
+                Request.ClientFD = *(static_cast<ClientFD_t*>(getMetaAddress(Index, 2)));
+                Request.ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, Request.ClientFD, 0);
+                Request.HTTPVersion = *(static_cast<HTTPVersionType_t*>(getMetaAddress(Index, 3)));
+                Request.PayloadLength = *(static_cast<HTTPPayloadLentgh_t*>(getMetaAddress(Index, 7)));
+
+                char HTTPPayload[Request.PayloadLength];
+                memcpy(&HTTPPayload[0], static_cast<char*>(getResultAddress(Index)), Request.PayloadLength);
+                string ClientPayloadString(HTTPPayload, Request.PayloadLength);
+
+                Request.HTTPPayload = HTTPPayload;
+                Request.ASIndex = Index;
+
+                DBG(120, "PythonAS Index:" << Index << " ClientFD:" << Request.ClientFD << " ClientFDShared:" << Request.ClientFDShared << " HTTPType:" << Request.HTTPVersion << " PayloadLength:" << Request.PayloadLength);
+
+                ResultOrder::append(*(static_cast<HTTPMethodType_t*>(getMetaAddress(Index, 5))), std::move(Request));
+
+                new(getMetaAddress(Index, 0)) uint16_t(0);
+                new(getMetaAddress(Index, 1)) uint16_t(0);
+
+                processed += 1;
+            }
+        }
+    }
+    return processed;
 }

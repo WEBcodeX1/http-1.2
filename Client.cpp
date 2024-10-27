@@ -4,6 +4,7 @@ using namespace std;
 
 Client::Client(ClientFD_t ClientFD) :
     _ClientFD(ClientFD),
+    _RequestNr(0),
     _Error(false),
     _ErrorID(0),
     _RequestStartTime(0),

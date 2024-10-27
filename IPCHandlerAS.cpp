@@ -21,8 +21,8 @@ SHMPythonAS::~SHMPythonAS()
 
 void SHMPythonAS::setBaseAddresses(const BaseAdresses_t BaseAdresses)
 {
-    _BaseAdresses = BaseAdresses;
     DBG(120, "Addresses Meta:" << BaseAdresses.PostASMetaPtr << " Requests:" << BaseAdresses.PostASRequestsPtr << " Results:" << BaseAdresses.PostASResultsPtr);
+    _BaseAdresses = BaseAdresses;
 }
 
 SharedMemAddress_t SHMPythonAS::getMetaAddress(const uint8_t SegmentIndex, const uint8_t MetaIndex)
@@ -32,10 +32,14 @@ SharedMemAddress_t SHMPythonAS::getMetaAddress(const uint8_t SegmentIndex, const
 
 SharedMemAddress_t SHMPythonAS::getRequestAddress(const uint8_t SegmentIndex)
 {
-    return static_cast<char*>(_BaseAdresses.PostASRequestsPtr) + (SegmentIndex * HTTP_REQUEST_MAX_SIZE);
+    return static_cast<char*>(_BaseAdresses.PostASRequestsPtr) + (
+        SegmentIndex * HTTP_REQUEST_MAX_SIZE
+    );
 }
 
 SharedMemAddress_t SHMPythonAS::getResultAddress(const uint8_t SegmentIndex)
 {
-    return static_cast<char*>(_BaseAdresses.PostASResultsPtr) + (SegmentIndex * HTTP_REQUEST_MAX_SIZE);
+    return static_cast<char*>(_BaseAdresses.PostASResultsPtr) + (
+        SegmentIndex * HTTP_RESPONSE_MAX_SIZE
+    );
 }

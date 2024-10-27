@@ -13,10 +13,10 @@ typedef void* SharedMemAddress_t;
 
 static const SharedMemOffset_t ElementSizes{
     sizeof(uint16_t), //- client filedescriptor
-    sizeof(uint8_t),  //- http version
-    sizeof(uint16_t), //- request numberr
-    sizeof(uint16_t), //- msg-length (bytes)
-    sizeof(nullptr)   //- message-size (bytes), dynamic size
+    sizeof(uint16_t),  //- http version
+    sizeof(uint16_t), //- request number
+    sizeof(uint16_t), //- payload-length (bytes)
+    sizeof(nullptr)   //- payload-size (bytes), dynamic size
 };
 
 typedef struct {

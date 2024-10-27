@@ -3,10 +3,11 @@
 using namespace std;
 
 
-ASRequestHandler::ASRequestHandler(Namespaces_t Namespaces)
+ASRequestHandler::ASRequestHandler(Namespaces_t Namespaces, BaseAdresses_t BaseAddresses)
 {
     DBG(120, "Constructor");
     _Namespaces = Namespaces;
+    setBaseAddresses(BaseAddresses);
     _calculateOffsets();
     _resetSharedMem();
 }
@@ -58,7 +59,6 @@ void ASRequestHandler::_calculateOffsets() {
 }
 
 void ASRequestHandler::_resetSharedMem() {
-
     for (const auto &Offset:_VHostOffsetsPrecalc) {
         for (const auto &Index:Offset.second) {
             DBG(80, "Namespace:" << Offset.first << " Reset@Index:" << Index);
@@ -66,10 +66,9 @@ void ASRequestHandler::_resetSharedMem() {
             new(getMetaAddress(Index, 1)) uint16_t(0);
        }
     }
-
 }
 
-void ASRequestHandler::addRequest(const RequestProps_t RequestProps) {
+void ASRequestHandler::addRequest(const ASRequestProps_t RequestProps) {
     _Queue.push_back(RequestProps);
 }
 
@@ -100,13 +99,25 @@ uint16_t ASRequestHandler::processQueue() {
         //DBG(180, "ASRequestQueue Item ClientFD:" << QueueItem.ClientFD << " VHost:" << QueueItem.VirtualHost);
         const AppServerID_t AppServerID = _getNextFreeAppServerID(QueueItem.VirtualHost);
         if (AppServerID > 0) {
+
             DBG(140, "Writing SHM @AppServerID:" << AppServerID);
-            void* BaseAddr = getRequestAddress(AppServerID);
-            void* PayloadAddr = static_cast<char*>(BaseAddr)+2;
-            uint16_t* PayloadLengthAddr = static_cast<uint16_t*>(BaseAddr);
+            void* PayloadAddr = getRequestAddress(AppServerID);
+
+            uint16_t* ClientFDAddr = static_cast<uint16_t*>(getMetaAddress(AppServerID, 2));
+            uint16_t* HTTPVersionAddr = static_cast<uint16_t*>(getMetaAddress(AppServerID, 3));
+            uint16_t* HTTPMethodAddr = static_cast<uint16_t*>(getMetaAddress(AppServerID, 4));
+            uint16_t* ReqNrAddr = static_cast<uint16_t*>(getMetaAddress(AppServerID, 5));
+            uint16_t* PayloadLengthAddr = static_cast<uint16_t*>(getMetaAddress(AppServerID, 6));
+
+            *(ClientFDAddr) = QueueItem.ClientFD;
+            *(HTTPVersionAddr) = QueueItem.HTTPVersion;
+            *(HTTPMethodAddr) = QueueItem.HTTPMethod;
+            *(ReqNrAddr) = QueueItem.RequestNr;
             *(PayloadLengthAddr) = QueueItem.Payload.length();
+
             const char* PayloadChar = QueueItem.Payload.c_str();
             memcpy(PayloadAddr, &PayloadChar[0], QueueItem.Payload.length());
+
             atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(AppServerID, 0));
             DBG(140, "Writing at CanReadAddr:" << CanReadAddr);
             new(getMetaAddress(AppServerID, 0)) atomic_uint16_t(1);

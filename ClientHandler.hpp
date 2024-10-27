@@ -28,6 +28,7 @@ typedef struct {
     void* StaticFSPtr;
     void* PostASMetaPtr;
     void* PostASRequestsPtr;
+    void* PostASResultsPtr;
 } ClientHandlerSHMPointer_t;
 
 
@@ -64,6 +65,7 @@ private:
     void* _SHMStaticFS;
     void* _SHMPythonASMeta;
     void* _SHMPythonASRequests;
+    void* _SHMPythonASResults;
 
     ASRequestHandlerRef_t _ASRequestHandlerRef;
 
