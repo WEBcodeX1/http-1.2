@@ -22,9 +22,9 @@ more appropriate these days.
 
 We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
-## Thoughts about HTTP3
+## Thoughts about HTTP/3
 
-HTTP3 should be implemented using UDP or even UDPLite. Phew, also it should be HTTP downwards compatible.
+HTTP/3 should be implemented using UDP or even UDPLite. Phew, also it should be HTTP downwards compatible.
 
 How could this be achieved by switching from a Connection-Oriented (TCP) to a much much simpler
 Connection-Less-Protocol (UDP)? Maybe engineering department has contracts with Harry Potter?
@@ -54,8 +54,10 @@ Its evertything packed in one really big box. Logical separation? Security? All 
 TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
 
 Also adding TLS / SSL handling inside the protocol is not appropriate anymore. Let this handle a separated
-component like Ingress-nginX on Kubernetes or a Hardware-Loadbalancer. Do not duplicate things you are not
-familiar with especially when other products exist which do the same for decades much smarter.
+component like nginx (reverse proxy), ingress-nginx on Kubernetes, stunnel or a Hardware-Loadbalancer.
+
+Do not duplicate things you are not familiar with especially when other products exist which do the same
+for decades much smarter.
 
 ## HTTP1.1 Pipelined Connections
 
