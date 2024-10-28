@@ -6,6 +6,7 @@ aux_source_directory(. SRC_LIST)
 # find python3
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 find_package(PythonLibs REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIRS} )
 
 # find boost::python
 find_package(Boost 1.74 REQUIRED COMPONENTS system filesystem python)
