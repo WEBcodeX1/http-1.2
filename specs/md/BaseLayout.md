@@ -97,77 +97,83 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 
 > 32bit memory addresses used for simplicity.
 
-## 3.1. HTTP StaticFS Requests SHM #1
+## 3.1. StaticFS Requests SHM #1
 
 ```bash
 Address                 Type                Descr           Default
 
-0x00000000              atomic_uint64_t     StaticFSLock    0
-0x00000008              uint16_t            RequestCount    0
+0x00000000              atomic_uint16_t     StaticFSLock    0
+0x00000002              uint16_t            RequestCount    0
 
 -- Req 1 Metadata ---------------------------------------------------
 
-0x0000000a              uint16_t            ClientFD        Nullptr
-0x0000000c              uint8_t             HTTPVersion     Nullptr
-0x0000000d              uint16_t            RequestNr       Nullptr
-0x0000000f              uint16_t            PayloadLength   Nullptr
-0x00000011              char[]              char[LenReq1]   Nullptr
+0x00000004              uint16_t            ClientFD        Nullptr
+0x00000006              uint16_t            HTTPVersion     Nullptr
+0x00000008              uint16_t            RequestNr       Nullptr
+0x0000000a              uint16_t            PayloadLength   Nullptr
+0x0000000c              char[]              char[LenReq1]   Nullptr
 
 -- Req 2 Metadata ---------------------------------------------------
 
-0x00000011+LenReq1      uint16_t            ClientFD        Nullptr
-0x00000011+LenReq1+2    uint8_t             HTTPVersion     Nullptr
-0x00000011+LenReq1+3    uint16_t            RequestNr       Nullptr
-0x00000011+LenReq1+5    uint16_t            PayloadLength   Nullptr
-0x00000011+LenReq1+7    char[]              char[LenReq1]   Nullptr
+0x0000000c+LenReq1      uint16_t            ClientFD        Nullptr
+0x0000000e+LenReq1+2    uint16_t            HTTPVersion     Nullptr
+0x00000010+LenReq1+4    uint16_t            RequestNr       Nullptr
+0x00000012+LenReq1+6    uint16_t            PayloadLength   Nullptr
+0x00000014+LenReq1+8    char[]              char[LenReq2]   Nullptr
 ```
 
-## 3.2. HTTP AS Requests SHM #2
-
-```bash
-Address                 Type                Descr           Default
-
--- AS 1 Metadata ----------------------------------------------------
-
-0x00000000              uint16_t            PayloadLength   Nullptr
-0x00000002              char[]              char[LenReq1]   Nullptr
-
--- AS 2 Metadata ----------------------------------------------------
-
-0x00000002+LenReq1      uint16_t            PayloadLength   Nullptr
-0x00000002+LenReq1+2    char[]              char[LenReq1]   Nullptr
-```
-
-## 3.3. Application Server Status / Results SHM #3
+## 3.2. AS Requests and Results Metadata SHM #2
 
 ```bash
 Address                 Type                Descr           Default
 
 -- AS 1 Metadata ---------------------------------------------------
 
-0x00000000              atomic_uint8_t      CanRead         0
-0x00000001              atomic_uint8_t      WriteReady      0
+0x00000000              atomic_uint16_t     CanRead         0
+0x00000002              atomic_uint16_t     WriteReady      0
 
-0x00000002              uint64_t            ClientFD        Nullptr
-0x0000000a              uint8_t             HTTPVersion     1
-0x0000000b              uint16_t            ReqNr           1
-0x0000000d              uint32_t            PayloadLength   Nullptr
+0x00000004              uint16_t            ClientFD        Nullptr
+0x00000006              uint16_t            HTTPVersion     1
+0x00000008              uint16_t            HTTPMethod      1
+0x0000000a              uint16_t            ReqNr           1
+0x0000000c              uint32_t            ReqPayloadLen   Nullptr
+0x00000010              uint32_t            ResPayloadLen   Nullptr
 
 -- AS 2 Metadata ---------------------------------------------------
 
-0x00000011              atomic_uint8_t      CanRead         0
-0x00000012              atomic_uint8_t      WriteReady      0
+0x00000014              atomic_uint16_t     CanRead         0
+0x00000016              atomic_uint16_t     WriteReady      0
 
-0x00000013              uint64_t            ClientFD        Nullptr
-0x0000001b              uint8_t             HTTPVersion     1
-0x0000001c              uint16_t            ReqNr           1
-0x0000001e              uint32_t            PayloadLength   Nullptr
-
--- AS 1 Payload ----------------------------------------------------
-
-0x00000022              char[PayloadLenA1]  Payload         Nullptr
-
--- AS 2 Payload ----------------------------------------------------
-
-0x00000022+max_pl_bytes char[PayloadLenA2]  Payload         Nullptr
+0x00000018              uint16_t            ClientFD        Nullptr
+0x0000001a              uint16_t            HTTPVersion     1
+0x0000001c              uint16_t            HTTPMethod      1
+0x0000001e              uint16_t            ReqNr           1
+0x00000020              uint32_t            ReqPayloadLen   Nullptr
+0x00000024              uint32_t            ResPayloadLen   Nullptr
 ```
+
+## 3.3. AS Requests Payload Data SHM #3
+
+```bash
+Address                 Type                Descr           Default
+
+-- AS 1 Payload -----------------------------------------------------
+
+0x00000000              char[]              char[LenReq]    Nullptr
+
+-- AS 2 Payload -----------------------------------------------------
+
+0x00000000+SegmentSize  char[]              char[LenReq]    Nullptr
+```
+
+## 3.4. AS Results Payload Data SHM #4
+
+-- AS 1 Payload -----------------------------------------------------
+
+0x00000000              char[]              char[LenRes]    Nullptr
+
+-- AS 2 Payload -----------------------------------------------------
+
+0x00000000+SegmentSize  char[]              char[LenRes]    Nullptr
+```
+

@@ -1,8 +1,8 @@
-# Abstract / HTTP1.2
+# Abstract, HTTP/1.2
 
-Currently Google-Engineers plan moving towards HTTP3. As HTTP2 still is not used commonly worldwide and
+Currently Google-Engineers plan moving towards HTTP3. As HTTP/2 still is not used commonly worldwide and
 major implementation flaws and performance issues exist we try to build a much simpler and secure
-solution: **HTTP1.2**.
+solution: **HTTP/1.2**.
 
 It will provide the following features:
 
@@ -43,14 +43,14 @@ program has to implement this by themselves.
 
 Much fun implementing! See more details on http://der-it-pruefer.de.
 
-# HTTP2
+# HTTP/2
 
-## HTTP2.0 Complexity
+## HTTP/2 Complexity
 
-HTTP2.0 adds too much complexity. The HTTP1.1 simplicity is lost completely, especially OpenSource libraries
+HTTP/2 adds too much complexity. The HTTP/1.1 simplicity is lost completely, especially OpenSource libraries
 tend to be confusing and ununderstandable even using libevent.
 
-Its evertything packed in one really big box. Logical separation? Security? All going unfiltered over a single
+Its everything packed in one really big box. Logical separation? Security? All going unfiltered over a single
 TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
 
 Also adding TLS / SSL handling inside the protocol is not appropriate anymore. Let this handle a separated
@@ -59,18 +59,18 @@ component like nginx (reverse proxy), ingress-nginx on Kubernetes, stunnel or a 
 Do not duplicate things you are not familiar with especially when other products exist which do the same
 for decades much smarter.
 
-## HTTP1.1 Pipelined Connections
+## HTTP/1.1 Pipelined Connections
 
-HTTP2 fixes the HTTP1.1 Pipelined Connections problem. Due to a bug in asynchronously handling the responses
+HTTP/2 fixes the HTTP/1.1 Pipelined Connections problem. Due to a bug in asynchronously handling the responses
 (wrong Request / Reply order) the complete feature was removed from *ALL* browsers worldwide.
 
-Our HTTP1.2 implementation also fixes the problem by extending the HTTP1.1 protocol by just some lines of code.
+Our HTTP/1.2 implementation also fixes the problem by extending the HTTP/1.1 protocol by just some lines of code.
 A unique identifier (UUID) will be added for each Request so Response-Ordering will be obsolete.
 
 ## Web Application Server
 
-With fixing the Pipelined Connections problem, HTTP2 **should** also fix speeding up dynamic WebServices
-Request / Response times. In theory the HTTP2 specs look quite good, real live shows different behaviour.
+With fixing the Pipelined Connections problem, HTTP/2 **should** also fix speeding up dynamic WebServices
+Request / Response times. In theory the HTTP/2 specs look quite good, real live shows different behaviour.
 
 This could be caused by:
 
@@ -80,7 +80,7 @@ This could be caused by:
 
 # Proof Of Concept
 
-We provide Proof Of Conecept Code and our working "FalconAS" HTTP1.2 Server including those components:
+We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including those components:
 
 - Static-Content-Server Component
 - Applicaton-Server Component using Python Scripting Language

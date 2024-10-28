@@ -15,7 +15,6 @@ Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 The following Boost Libraries ```libboost1.74-dev``` (Ubuntu 22.04) are used. 
 
 - Boost Unittest
-- Boost Regex
 - Boost Python
 
 To install complete boost development files under Ubuntu 22.04 do:
@@ -75,9 +74,6 @@ Install globally as root.
 On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
 be added to ```/etc/hosts```.
 
-Open http://testapp1.local or http://testapp2.local in a local browser to check if
-installation has succeeded.
-
 ## Start Server
 
 Raise ulimit for open files before starting server. This will be put inside server startup
@@ -89,4 +85,18 @@ script later.
 ```
 
 Stop server with signal SIGTERM (```kill http-1.2```).
+
+
+## Check Server Working
+
+1. Check GET requests
+
+Open http://testapp1.local or http://testapp2.local in a local browser to check if
+installation has succeeded.
+
+2. Check POST requests
+
+```bash
+# wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/python/test
+```
 
