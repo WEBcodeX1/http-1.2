@@ -4,6 +4,12 @@ Currently Google-Engineers plan moving towards HTTP/3. As HTTP/2 still is not us
 major implementation flaws and performance issues exist we try to build a much simpler and secure
 solution: **HTTP/1.2**.
 
+# Build / Test
+
+See [BUILD.md](BUILD.md) to compile, test and run.
+
+# Features
+
 It will provide the following features:
 
 - Much more leightweight
