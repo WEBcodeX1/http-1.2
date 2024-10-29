@@ -32,7 +32,7 @@ We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.d
 
 HTTP/3 has been implemented using UDP, switching from TCP/IP.
 
->[!NOTE]  
+>[!NOTE]
 > All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax!
 
 See [HTTP Feature Matrix, HTTP/3](FEATURE-MATRIX.md)
@@ -60,6 +60,9 @@ HTTP/2 fixes the HTTP/1.1 Pipelined Connections problem. Due to a bug in asynchr
 
 Our HTTP/1.2 implementation also fixes the problem by extending the HTTP/1.1 protocol by just some lines of code.
 A unique identifier (UUID) will be added for each Request so Response-Ordering will be obsolete.
+
+>[!CAUTION]
+> Our HTTP/1.2 implementation makes HTTP/2 and HTTP/3 obsolete and reduces complexity by far.
 
 ## Web Application Server
 
