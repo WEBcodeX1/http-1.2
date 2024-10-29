@@ -86,7 +86,6 @@ script later.
 
 Stop server with signal SIGTERM (```kill http-1.2```).
 
-
 ## Check Server Working
 
 ### Check GET requests
