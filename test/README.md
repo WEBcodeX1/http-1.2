@@ -55,8 +55,3 @@ sysctl -w kernel.watchdog=0
 sysctl -w vm.swappiness=0
 
 ```
-
-## Dump Packets
-
-To check 
-
