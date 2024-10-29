@@ -25,7 +25,7 @@ For testing all Virtual Domain Names will be written to /etc/hosts.
 
 ### TCP / IP Stack
 
-Currently TCP_CORK and TCP_NODELAY options are set by default.
+Currently TCP_NODELAY option is set by default.
 This is proposed inside Kernel Documentation and must be re-validated if indeed working correctly.
 
 ### Sysctl Values
