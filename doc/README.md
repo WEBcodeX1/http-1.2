@@ -1,0 +1,25 @@
+# Internal Class Reference / Interface Documentation
+
+The following documentation will be rendered by Doxygen and a Python
+Doxygen-Sphinx bridge (breathe).
+
+# Prerequisites
+
+The following packages (Ubuntu 22.04) need to be installed:
+
+```bash
+# apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe
+```
+
+# Continuous Integration
+
+In future releases this process will be integrated in CI systems and
+triggered regulary.
+
+# Render Sphinx Documentation
+
+```bash
+# doxygen
+# sphinx-build -b html -Dbreathe_projects.falconas=doc_render/xml . doc_render/sphinx/
+```
+

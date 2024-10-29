@@ -2,8 +2,8 @@
 
 The HTTP Library is split up in three parts:
 
-- httpnet.cpp / Network Processing (used in Tests) 
-- httpparser.cpp / HTTP Parsing (Header, Payload) 
+- httpnet.cpp / Network Processing (Tests)
+- httpparser.cpp / HTTP Parsing (Header, Payload)
 - httpgen.cpp / HTTP Generating (Header)
 
 ## 1.1. Compiling / Linking
@@ -12,54 +12,57 @@ The HTTPLib library gets linked shared because it wil be used by multiple applic
 
 ## 1.2. Program Logic (httpparser.cpp)
 
-The parser is programmed to support the following:
+Features:
 
+- GET Requests (without Content-Length header)
+- POST Requests (with Content-Length header and bytes[size] after "\n\r" end marker
 - Multiple HTTP "messages" in one TCP packet
-- Fragmented (partial) messages without end marker "\n\r"
+- Fragmented (partial) messages without end marker "\n\r" (GET) or "Content-Length" (POST)
 
 ### 1.2.1. appendBuffer()
 
 #### 1.2.1.1. Params
 
-- const char* BufferRef
-- const uint16_t BufferSize
+1. const char* BufferRef
+2. const uint16_t BufferSize
 
 #### 1.2.1.2. Processing Logic
 
 The passed buffer data will be apended to _HTTPRequest private member. Afterwards _splitRequests()
-method will be called (see next topic).
+method will be called.
 
 ### 1.2.2. _splitRequests()
 
-- _SplittedRequests Vector will be cleared
-- All requests inside _HTTPRequest buffer get split by "\n\r" HTTP end marker
-- Single requests will be put inside _SplittedRequests Vector
+1. _SplittedRequests Vector will be cleared
+2. All requests inside _HTTPRequest buffer get split by "\n\r" or "\n\r"+Content-Length
+3. Single requests will be put inside _SplittedRequests Vector
 
 ### 1.2.3. parseRequestsBasic()
 
 #### 1.2.3.1. Params
 
-- void* SHMStaticFS
-- void* SHMPostAS
+1. SharedMemAddress_t SHMGetRequests
+2. const ASRequestHandlerRef_t ASRequestHandlerRef
 
 #### 1.2.3.2. Processing Logic
 
-- Store StaticFS Shared Mem Address Pointer inside object instance
-- Store AS POST Shared Mem Address Pointer inside object instance
+1. Set SHM Base Address (SHMGetRequests)
+2. Foreach _SplittedRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
 
-- Loop (for each _SplittedRequests element) call this._processBasePropsSHM()
 
-### 1.2.4. _processBasePropsSHM
+### 1.2.4. _parseBaseProps
 
 #### 1.2.4.1. Params
 
-- string& Request
+1. string& Request
+2. const ASRequestHandlerRef_t ASRequestHandlerRef
 
 #### 1.2.4.2. Processing Logic
 
-- Get HTTP Version
+- Get HTTP Version (HTTP/1.1 or HTTP/1.2)
+- Get HTTP Method (GET/POST)
 - Get HTTP Payload
-- Get HTTP Payload size (bytes)
+- Get HTTP Payload Size (Bytes)
 
 - Check Request Type (StaticFS / Python Script POST AS)
 
@@ -73,20 +76,23 @@ method will be called (see next topic).
 
 > IPCHandler.hpp and IPCHandler.cpp is used to calculate Shared Memory Adress Offsets.
 
-- On Type POST AS (SHM Segment #2, #3)
+- On Type POST AS (SHM Segment #2/Metadata, #3/RequestPayloads)
 
-  // SHM Segment #3
+  // SHM Segment #2
   - Get Next Free AS Index (Check CanRead == 0 && WriteReady == 0)
     - If no Free AS:: add to RequestQueue
 
   // SHM Segment #2
   - Write ClientFD to SHM-PostAS @AS Index Address
   - Write HTTPVersion to SHM-PostAS @AS Index Address
-  - Write MsgNr to SHM-PostAS @AS Index Address
-  - Write MsgLength to SHM-PostAS @AS Index Address
-  - Write MsgPayload to SHM-PostAS @AS Index Address
+  - Write HTTPMethod to SHM-PostAS @AS Index Address
+  - Write ReqNr to SHM-PostAS @AS Index Address
+  - Write ReqPayloadLength to SHM-PostAS @AS Index Address
 
-  // SHM Segment #3
+  //- SHM Segment #3
+  - Write ReqPayload to SHM-PostAS @AS Index Address
+
+  // SHM Segment #2
   - Write CanRead = 1 @AS Index Address
 
 > IPCHandlerAS.hpp and IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.
