@@ -90,6 +90,7 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 +-----------------------+-----------------------+-----------------------+-----------------------+
 | Shared Mem                                                                                    |
 |  - StaticFS Requests                                                                          |
+|  - AS Metadata                                                                                |
 |  - AS Requests                                                                                |
 |  - AS Results                                                                                 |
 +-----------------------------------------------------------------------------------------------+
