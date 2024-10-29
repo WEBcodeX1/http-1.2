@@ -48,4 +48,21 @@ Set _OffsetSizes from `static const SharedMemOffset_t ElementSizes` (std::vector
 
 ## 1.2. IPCHandlerAS
 
-IPCHandler Memory (SHM Segment #2 and Segment #3) Layout see [BaseLayout.md](./BaseLayout.md) Section 3.2. and 3.3.
+IPCHandler Memory (SHM Segment #2, #3 and #4) Layout see [BaseLayout.md](./BaseLayout.md) Section 3.2., 3.3 and 3.4.
+
+### 1.2.1. setBaseAddresses()
+
+Set SHM Address Pointers for SHM Segment #2, #3 and #4.
+
+### 1.2.2. getMetaAddress()
+
+Get Meta Address by Index (SHM Segment #2).
+
+### 1.2.3. getRequestAddress()
+
+Get Request Payload Address (SHM Segment #3).
+
+### 1.2.4. getResultAddress()
+
+Get Result Payload Address (SHM Segment #4).
+
