@@ -67,5 +67,6 @@ install(CODE "execute_process(COMMAND ./scripts/mk_www.sh)")
 install(CODE "execute_process(COMMAND ./scripts/cp_etc.sh)")
 install(CODE "execute_process(COMMAND ./scripts/set-transparent-hugepages.sh)")
 install(CODE "execute_process(COMMAND ./scripts/patch_etc_hosts.sh)")
+install(CODE "execute_process(COMMAND ./scripts/cp_pythonas_example.sh)")
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
