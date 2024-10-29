@@ -3,13 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to HTTP/1.2's documentation!
-====================================
+FalconAS (HTTP Python Application Server) Documentation.
+========================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+.. doxygenclass:: ClientThread
+   :members:
 
 
 Indices and tables
