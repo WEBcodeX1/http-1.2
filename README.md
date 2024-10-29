@@ -14,7 +14,7 @@ It will provide the following features:
 - Easy to implement
 - Low cost maintainable
 - Application Server friendly
-- Proxy Server freiendly
+- Proxy Server friendly
 - Scalable to infinity
 
 Also the part "HyperText" or even a complete renaming could be thought over. Its representation is by far not
