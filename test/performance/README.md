@@ -40,3 +40,6 @@ Also tests will be repeated with Test-Parameters defined in "./specs/HTTP_1.2 Te
 5. Run / Loop Tests, write stat results into C++ structs
 6. Insert Test Results into "TestMeasurement" table
 
+# Test Specs (Google Sheet)
+
+https://docs.google.com/spreadsheets/d/1Da3KsIfTPGJOpeS1Ns2pHvEU_RpdWwx8kU5Ug-b_ZAE/edit?usp=drive_link
