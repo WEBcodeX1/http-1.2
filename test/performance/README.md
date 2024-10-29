@@ -1,6 +1,6 @@
 # Performance Tests
 
-HTTP1.2 tests include WEB/codeX FalconAS *web-server* / *application server* which runs currently on Linux Kernel 6.5.
+Performance Tests will record statistical data about *Static File* and *Application Server* components.
 
 # Global Settings
 
@@ -12,24 +12,20 @@ Tests include the following subsections:
 - Proxy Server Performance
 - Comparison to Apache2 and nginX external Web-Servers
 
-All Tests will be primarily done on FalconAS Server with HTTP1.2 protocol.
-
-All Tests will be repeated internally using protocols:
-
-- HTTP1.1
+All Tests will be primarily done on FalconAS Server using HTTP/1.2 and HTTP/1.1 protocol.
 
 All Tests will be repeated externally on different web-servers using protocols:
 
-- HTTP1.1
-- HTTP2
+- HTTP/1.1
+- HTTP/2
 
-All Tests will be repeated on external web.servers:
+# External Products
+
+All Tests will be repeated on the following web-server products:
 
 - Apache2 Threaded Model
 - Apache2 Event Driven Model
 - nginX
-
-Also tests will be repeated with Test-Parameters defined in "./specs/HTTP_1.2 Test-Specs.xlsx" sheet.
 
 # Detailed  Workflow
 
