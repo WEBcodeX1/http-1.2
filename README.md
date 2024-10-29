@@ -1,6 +1,6 @@
 # Abstract, HTTP/1.2
 
-Currently Google-Engineers plan moving towards HTTP3. As HTTP/2 still is not used commonly worldwide and
+Currently Google-Engineers plan moving towards HTTP/3. As HTTP/2 still is not used commonly worldwide and
 major implementation flaws and performance issues exist we try to build a much simpler and secure
 solution: **HTTP/1.2**.
 
