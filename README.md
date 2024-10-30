@@ -28,6 +28,11 @@ more appropriate these days.
 
 We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
+## Web-Application-Server / Python
+
+The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
+specially adapted for Modern-Browser-Applications (SPA).
+
 ## Thoughts about HTTP/3
 
 HTTP/3 has been implemented using UDP, switching from TCP/IP.
