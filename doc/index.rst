@@ -1,8 +1,3 @@
-.. HTTP1.2 documentation master file, created by
-   sphinx-quickstart on Thu Jun 27 15:21:01 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 FalconAS (HTTP Python Application Server) Documentation.
 ========================================================
 
@@ -10,13 +5,68 @@ FalconAS (HTTP Python Application Server) Documentation.
    :maxdepth: 2
    :caption: Contents:
 
-.. doxygenclass:: ClientThread
+.. doxygenclass:: Server
+   :project: falconas
    :members:
+   :undoc-members:
+
+.. doxygenclass:: Client
+   :project: falconas
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ClientHandler
+   :project: falconas
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: Configuration
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: Filesystem
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: CPU
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ASRequestHandler
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ASProcessHandler
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ResultProcessor
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ResultOrder
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: SHMStaticFS
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: SHMPythonAS
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: ThreadHandler
+   :members:
+   :undoc-members:
+
+.. doxygenclass:: Vector
+   :members:
+   :undoc-members:
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
