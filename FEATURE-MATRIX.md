@@ -5,17 +5,17 @@ HTTP/3 has been ommited because of completely different protocol design / no bac
 
 | Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
 |-------------------------------------|------------------------|------------------------|------------------------|
-| Keep-Alive Connections              | x                      | x (permanent, see #1)  | x                      |
-| Parametrized Keep-Alive (Header)    | x                      | - (see #2)             | x                      |
-| Transfer Encoding (Compressed)      | x                      | - (see #3)             | x                      |
-| Byte Range Requests                 | x                      | - (see #4)             | x                      |
-| Pipelined Requests                  | x (broken)             | x (working, see #5)    | - (Layer7 multiplexed) |
-| Chunked Encoding                    | x                      | - (see #6)             | x                      |
+| Keep-Alive Connections              | x                      | x (permanent, see 1.1) | x                      |
+| Parametrized Keep-Alive (Header)    | x                      | - (see 1.2)            | x                      |
+| Transfer Encoding (Compressed)      | x                      | - (see 1.3)            | x                      |
+| Byte Range Requests                 | x                      | - (see 1.4)            | x                      |
+| Pipelined Requests                  | x (broken)             | x (working, see 1.5)   | - (Layer7 multiplexed) |
+| Chunked Encoding                    | x                      | - (see 1.6)            | x                      |
 | Caching Mechanism / Header          | x                      | x (Static Content)     | x                      |
 | Caching 304 not modified            | x                      | x (Static Content)     | x                      |
 | Cookies                             | x                      | x                      | x                      |
 | Text Based Protocol                 | x                      | x                      | -                      |
-| Binary Based Protocol               | -                      | - (see #7)             | x                      |
+| Binary Based Protocol               | -                      | - (see 1.7)            | x                      |
 
 See [Exemplary HTTP Network Processing](http://der-it-pruefer.de/) for a detailed explanation / analysis why HTTP/2 and HTTP/3 are not suitable for future-proof Web-Applications.
 
