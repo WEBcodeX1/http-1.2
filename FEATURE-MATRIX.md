@@ -64,7 +64,7 @@ Its failure never has been understood correctly.
 
 Instead of correcting the very small design flaw (wrong result ordering) HTTP/2 **copied** already existing (and working) TCP/IP Layer3 features (unneccessarily) into Layer7.
 
-Modern, *generic* OOP design teaches: **NEVER COPY IF YOU CAN AVOID, LAZY MORON!**
+Modern, *generic* OOP design teaches: **NEVER COPY IF YOU CAN AVOID, DONT BE LAZY!**
 
 HTTP/1.2 corrects these design flaws with a single new HTTP-Header: "Request-UUID". Every HTTP-Request puts a Unique Identifier Hash inside the HTTP-Header which will be sent back by the Server in the Response. The Client now is able to allocate the Response to the correct Request even if the Network-Order asynchronously mismatches.
 
