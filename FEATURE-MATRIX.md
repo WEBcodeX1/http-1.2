@@ -9,7 +9,7 @@ HTTP/3 has been ommited because of completely different protocol design / no bac
 | Parametrized Keep-Alive (Header)    | x                      | - (see #2)             | x                      |
 | Transfer Encoding (Compressed)      | x                      | - (see #3)             | x                      |
 | Byte Range Requests                 | x                      | - (see #4)             | x                      |
-| Pipelined Requests                  | x (broken)             | x (working, see #5)    | - (multiplexed)        |
+| Pipelined Requests                  | x (broken)             | x (working, see #5)    | - (Layer7 multiplexed) |
 | Chunked Encoding                    | x                      | - (see #6)             | x                      |
 | Caching Mechanism / Header          | x                      | x (Static Content)     | x                      |
 | Caching 304 not modified            | x                      | x (Static Content)     | x                      |
@@ -17,51 +17,82 @@ HTTP/3 has been ommited because of completely different protocol design / no bac
 | Text Based Protocol                 | x                      | x                      | -                      |
 | Binary Based Protocol               | -                      | - (see #7)             | x                      |
 
-See []() for a detailed explanation / analysis why HTTP/2 and HTTP/3 are not suitable for future-proof
-Web-Applications.
+See [Exemplary HTTP Network Processing](http://der-it-pruefer.de/) for a detailed explanation / analysis why HTTP/2 and HTTP/3 are not suitable for future-proof Web-Applications.
 
-# Permanent Keep-Alive Connection (#1)
+# 1. Permanent Keep-Alive Connection
 
-HTTP/1.2 uses *permanent* Keep-Alive. This means a single Client always connects through 1 single socket to a
+HTTP/1.2 uses *permanent* Keep-Alive. This means **1 Single Client** always connects through **1 Single Socket** to a
 Server Domain / Virtual Host.
 
-# Parametrized Keep-Alive (#2)
+>[!TIP]
+> TCP/IP **does** allow multiple "multiplexed" data-channels **by design** without blocking anything or arising retransmission problems.
+
+>[!CAUTION]
+> HTTP/1.2 will correct the broken HTTP/1.1 *Pipelined Connection* implementation. This will automagically use the existing rock solid TCP/IP data channel "multiplexing" feature (which was unnecessarily implemented on top into HTTP/2 at Layer7).
+
+Also read [Exemplary HTTP Network Processing](http://der-it-pruefer.de/).
+
+# 2. Parametrized Keep-Alive
 
 Due to a permanent Keep-Alive, we also do not need Parametrized Keep-Alive settings which will drastically reduce
 Protocol-Logic.
 
-# Compressed Transfer Encoding (#3)
+Also it is no good idea to allow a non-authenticated client to modify server-parameters (from a security point of view) at runtime.
 
-Our oppinion: Runtime Compression pollutes our environment. Unneccesarry consumed CPU-Power. And in times of
-Intel XEON 6 and 800Gigabit Ethernet Runtime Based Compression should be considered as old-fashioned.
+# 3. Compressed Transfer Encoding
 
-Think of a "Web-Pack-Format" which only sends "ONE" Metadata+Media-Package at Initial-Request and App-Updates
-(compressed, not runtime-compressed).
+Our oppinion: Runtime Compression pollutes our environment. Unneccesarry consumed CPU-Power. In times of
+Intel XEON 6 and 800Gigabit Ethernet *Runtime Based Compression* should be considered as old-fashioned.
 
-# Byte Range Requests (#4)
+Think of a "Web-Pack-Format" which only sends **a single* Metadata+Media-Package at Initial-Client-Request and when App-Updates exist (compressed, not runtime-compressed).
+
+>[!CAUTION]
+> Worldwide socket-count *again* reduced by a factor of 1.000.000.
+
+# 4. Byte Range Requests
 
 Our primary goal is to drastically speed up Modern-Web-Applications, not being a Streaming-Client. Feature also
 ommitted in HTTP/1.2.
 
-# Pipelined Requests (#5)
+>[!TIP]
+> Think about *existing* streaming-protocols designed primarily for streaming purpose!
 
-Pipelined Requests! This HTTP/1.1 feature is responsible for the current HTTP/2 and HTTP/3 desaster.
+# 5. Pipelined Requests
 
-The non-correct-working response-ordering made HTTP/1.1 fail for high-speed asynchronous Web-Applications.
+Pipelined Requests! This key-feature started confusion inside the HTTP-Developer-Community.
+Its failure never has been understood correctly.
 
-We correct this by adding the UUID Header ... This must be implemented on Client-Side ...
-#TODO: finish
+Instead of correcting the very small design flaw (wrong result ordering) HTTP/2 **copied** already existing (and working) TCP/IP Layer3 features (unneccessarily) into Layer7.
 
-# Chunked Encoding (#6)
+Modern, *generic* OOP design teaches: **NEVER COPY IF YOU CAN AVOID, LAZY MORON!**
 
-Also completely useless .
-#TODO: finish
+HTTP/1.2 corrects these design flaws with a single new HTTP-Header: "Request-UUID". Every HTTP-Request puts a Unique Identifier Hash inside the HTTP-Header which will be sent back by the Server in the Response. The Client now is able to allocate the Response to the correct Request even if the Network-Order asynchronously mismatches.
 
-# Text / Binary Based Protocols (#7)
+HTTP/1.2 will use stable, existing TCP/IP Layer3 feature to "multiplex" Requests without the need of adding Layer7 logic.
 
-Switching to Protocol-Binary-Format in times of Intel XEON 6 in our oppinion is the wrong decision.
+# 6. Chunked Encoding
 
-We even tend to specify a HTTP-Request in XML format (see []()).
+Also completely useless. Seldomly used for sending large data to the client.
+
+>[!TIP]
+> Think of using a *File Transfer Protocol* instead.
+
+# 7. Text / Binary Based Protocols (#7)
+
+In times of Intel XEON 6 Processors a binary protocol is not guaranteed to be faster than a text-based. It makes the following tasks even more complex / error-prone:
+
+- Debugging
+- Generic Type Handling
+- Parsing
+
+XML improves:
+
+- DTD / Clear Type Definition
+- Non Error-Prone Parsing
+- Updateable Protocol-Features / Protocol-Versions
+
+Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this:
+
 
 # Bottlenecks
 
