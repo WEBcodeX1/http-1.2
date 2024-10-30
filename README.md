@@ -28,21 +28,14 @@ more appropriate these days.
 
 We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
+A detailed feature comparison see: [HTTP Feature Matrix, HTTP/3](FEATURE-MATRIX.md).
+
 ## Web-Application-Server / Python
 
 The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
 specially adapted for Modern-Browser-Applications (SPA).
 
-## Thoughts about HTTP/3
-
-HTTP/3 has been implemented using UDP, switching from TCP/IP.
-
->[!NOTE]
-> All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax!
-
-See [HTTP Feature Matrix, HTTP/3](FEATURE-MATRIX.md)
-
-# HTTP/2
+# HTTP/2, HTTP/3
 
 ## HTTP/2 Complexity
 
@@ -68,6 +61,13 @@ A unique identifier (UUID) will be added for each Request so Response-Ordering w
 
 >[!CAUTION]
 > Our HTTP/1.2 implementation makes HTTP/2 and HTTP/3 obsolete and reduces complexity by far.
+
+## Thoughts about HTTP/3
+
+HTTP/3 has been implemented using UDP, switching from TCP/IP.
+
+>[!NOTE]
+> All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax!
 
 ## Web Application Server
 
