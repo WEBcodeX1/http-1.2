@@ -158,11 +158,28 @@ Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this
 
 # 2. Advanced Feature Matrix
 
+| Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
+|-------------------------------------|------------------------|------------------------|------------------------|
+| CORS                                | x                      | - (see 2.1)            | x                      |
+| HTTP Method OPTIONS                 | x                      | - (see 2.2)            | x                      |
+| HTTP Method HEAD                    | x                      | - (see 2.2)            | x                      |
+| HTTP Method TRACE                   | x                      | - (see 2.2)            | x                      |
+| HTTP Method PUT                     | x                      | - (see 2.2)            | x                      |
+| HTTP Method DELETE                  | x                      | - (see 2.2)            | x                      |
 
+# 2.1. Cross Site Scripting
+
+A clean Application Environment / Setup (including Kubernetes) makes CORS / Cross-Site obsolete. Our Web-Application Design forbids using Cross-Site.
+
+# 2.2. Document Based Methods
+
+These are ancient features. No one needs anymore. Handle via Web-Service. Documents reside on scalable Storage-Backends these days.
 
 # 3. Bottlenecks
+#TODO: write.
 
 ## 3.1. Ring-0 / Context Switching
+#TODO: write.
 
 ## 3.2. TLS
-
+#TODO: write.
