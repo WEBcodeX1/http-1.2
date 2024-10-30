@@ -1,7 +1,6 @@
 # 1. Feature Matrix (Basic)
 
 The following table shows features compared to the different HTTP Versions.
-HTTP/3 has been ommited because of completely different protocol design / no backward compatibility.
 
 | Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
 |-------------------------------------|------------------------|------------------------|------------------------|
