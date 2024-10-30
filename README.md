@@ -1,7 +1,7 @@
 # Abstract, HTTP/1.2, HTTP/3
 
 Currently Google-Engineers plan pushing HTTP/3. As HTTP/2 still is not used commonly worldwide and
-major implementation flaws and performance issues exist we try to build a much simpler and secure
+major implementation flaws, even performance issues exist we try to build a much simpler and secure
 solution: **HTTP/1.2**.
 
 # Build / Test
