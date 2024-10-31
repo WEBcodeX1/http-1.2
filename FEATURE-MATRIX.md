@@ -192,3 +192,6 @@ So drop this feature in **HTTP/1.2** or **WAP**, however we will call the new pr
 
 ## 3.2. TLS
 #TODO: write.
+
+## 3.3. Global Security
+#TODO: write.
