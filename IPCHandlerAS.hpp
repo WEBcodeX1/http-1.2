@@ -25,7 +25,8 @@ static const SHMOffset_t MetadataSizes{
     sizeof(uint16_t), //- http version
     sizeof(uint16_t), //- http method
     sizeof(uint16_t), //- request number
-    sizeof(uint32_t), //- payload length
+    sizeof(uint32_t), //- request payload length
+    sizeof(uint32_t)  //- result payload length
 };
 
 
