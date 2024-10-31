@@ -171,6 +171,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 | HTTP Method PUT                     | x                      | - (see 2.2)            | x                      |
 | HTTP Method DELETE                  | x                      | - (see 2.2)            | x                      |
 | Streaming Characteristics           | x                      | - (see 2.3)            | x                      |
+| WebSockets                          | x                      | x (see 2.4)            | x                      |
 
 # 2.1. Cross Site Scripting
 
@@ -187,6 +188,17 @@ HTML in times of AOL 38.400 Baud Modem lines was built to inline-display content
 In times of *Intel XEON 6 6980P*, *PCI Express 5.0*, *Kernel DMA* and *800Gbit Ethernet* computers are able to render > 1000 pages with a loading time < 1 second.
 
 So drop this feature in **HTTP/1.2** or **WAP**, however we will call the new protocol suite.
+
+# 2.4. WebSockets
+
+**Long-Polling** was used before WebSockets Protocol has been invented.
+
+**Long-Polling** also works *better* and *more leightweight* when using one single **Keep-Alived** TCP/IP socket (using Request-UUID).
+
+>[!IMPORTANT]
+> But: Think of implementing this on a separated (firewallable) TCP/IP port, maybe WACP (Web-Application-Control-Protocol), idea?
+
+So HTTP/1.2 is able to use **Long-Polling** if really needed.
 
 # 3. Bottlenecks
 #TODO: write.
