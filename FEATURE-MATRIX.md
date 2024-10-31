@@ -101,6 +101,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
     <host>testapp1.local</host>
     <URL>/testpath/index.html</URL>
     <UserAgent>Falcon-Browser</UserAgent>
+    <Request-UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</Request-UUID>
 </header>
 ```
 
@@ -113,6 +114,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
     <connection-close>1</connection-close>
     <mime-type>text/html</mime-type>
     <encoding>UTF-8</encoding>
+    <Request-UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</Request-UUID>
 </header>
 <payload>
     <html>
@@ -134,6 +136,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
     <URL>/python/svc1</URL>
     <UserAgent>Falcon-Application-Controller</UserAgent>
     <mime-type>XML-native</mime-type>
+    <Request-UUID>70936869-3b17-4bcd-89fb-72adf57acc27</Request-UUID>
     <payload>
         <param1>Value1</param1>
         <param2>Value2</param2>
@@ -150,6 +153,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
     <variant>Response</variant>
     <mime-type>application/json</mime-type>
     <encoding>UTF-8</encoding>
+    <Request-UUID>70936869-3b17-4bcd-89fb-72adf57acc27</Request-UUID>
 </header>
 <payload>
   { "Result": 100 }
