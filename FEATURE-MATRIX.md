@@ -54,7 +54,7 @@ Our primary goal is to drastically speed up Modern-Web-Applications, not being a
 ommitted in HTTP/1.2.
 
 >[!TIP]
-> Think about *existing* streaming-protocols designed primarily for streaming purpose!
+> Think about using *existing* streaming-protocols designed primarily for streaming purpose!
 
 ## 1.5. Pipelined Requests
 
