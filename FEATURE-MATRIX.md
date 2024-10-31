@@ -90,13 +90,13 @@ XML improves:
 - Non Error-Prone Parsing
 - Updateable Protocol-Features / Protocol-Versions
 
-Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this:
+Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 
 ### 1.7.1. Request (StaticFile)
 
 ```xml
 <header>
-    <version>WACP/0.1</version>
+    <version>WAP/0.1</version>
     <variant>Request</variant>
     <host>testapp1.local</host>
     <URL>/testpath/index.html</URL>
@@ -108,7 +108,7 @@ Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this
 
 ```xml
 <header>
-    <version>WACP/0.1</version>
+    <version>WAP/0.1</version>
     <variant>Response</variant>
     <connection-close>1</connection-close>
     <mime-type>text/html</mime-type>
@@ -128,7 +128,7 @@ Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this
 
 ```xml
 <header>
-    <version>WACP/0.1</version>
+    <version>WAP/0.1</version>
     <variant>Request</variant>
     <host>testapp1.local</host>
     <URL>/python/svc1</URL>
@@ -146,7 +146,7 @@ Next-Gen-WACP (Web-Application-Control-Protocol) should use XML format like this
 
 ```xml
 <header>
-    <version>WACP/0.1</version>
+    <version>WAP/0.1</version>
     <variant>Response</variant>
     <mime-type>application/json</mime-type>
     <encoding>UTF-8</encoding>
