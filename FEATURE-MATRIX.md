@@ -74,7 +74,7 @@ HTTP/1.2 will use stable, existing TCP/IP Layer3 feature to "multiplex" Requests
 Also completely useless. Seldomly used for sending large data to the client.
 
 >[!TIP]
-> Think of using a *File Transfer Protocol* instead.
+> Think of using an already existing *File Transfer Protocol* instead.
 
 ## 1.7. Text / Binary Based Protocols
 
