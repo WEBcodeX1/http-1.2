@@ -166,6 +166,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 | HTTP Method TRACE                   | x                      | - (see 2.2)            | x                      |
 | HTTP Method PUT                     | x                      | - (see 2.2)            | x                      |
 | HTTP Method DELETE                  | x                      | - (see 2.2)            | x                      |
+| Streaming Characteristics           | x                      | - (see 2.3)            | x                      |
 
 # 2.1. Cross Site Scripting
 
@@ -174,6 +175,14 @@ A clean Application Environment / Setup (including Kubernetes) makes CORS / Cros
 # 2.2. Document Based Methods
 
 These are ancient features. No one needs anymore. Handle via Web-Service. Documents reside on scalable Storage-Backends these days.
+
+# 2.3. Streaming Characteristics
+
+HTML in times of AOL 38.400 Baud Modem lines was built to inline-display content **while loading** the HTML page.
+
+In times of *Intel XEON 6 6980P*, *PCI Express 5.0*, *Kernel DMA* and *800Gbit Ethernet* computers are able to render > 1000 pages with a loading time < 1 second.
+
+So drop this feature in **HTTP/1.2** or **WAP**, however we will call the new protocol suite.
 
 # 3. Bottlenecks
 #TODO: write.
