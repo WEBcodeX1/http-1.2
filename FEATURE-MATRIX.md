@@ -209,5 +209,5 @@ So HTTP/1.2 is able to use **Long-Polling** if really needed.
 ## 3.2. TLS
 #TODO: write.
 
-## 3.3. Global Security
+# 4. Global Security
 #TODO: write.
