@@ -203,7 +203,7 @@ uint16_t ResultProcessor::_processPythonASResults()
                 Request.ClientFD = *(static_cast<ClientFD_t*>(getMetaAddress(Index, 2)));
                 Request.ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, Request.ClientFD, 0);
                 Request.HTTPVersion = *(static_cast<HTTPVersionType_t*>(getMetaAddress(Index, 3)));
-                Request.PayloadLength = *(static_cast<HTTPPayloadLentgh_t*>(getMetaAddress(Index, 7)));
+                Request.PayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 7)));
 
                 char HTTPPayload[Request.PayloadLength];
                 memcpy(&HTTPPayload[0], static_cast<char*>(getResultAddress(Index)), Request.PayloadLength);

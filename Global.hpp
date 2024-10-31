@@ -21,7 +21,7 @@ typedef unsigned int pidfd_t;
 typedef uint16_t HTTPVersionType_t;
 typedef uint16_t HTTPMethodType_t;
 typedef uint16_t HTTPReqNrType_t;
-typedef uint32_t HTTPPayloadLentgh_t;
+typedef uint32_t HTTPPayloadLength_t;
 typedef int16_t ASIndex_t;
 typedef uint16_t RequestNr_t;
 typedef uint32_t RequestType_t;
@@ -39,7 +39,7 @@ typedef struct {
     ClientFD_t ClientFD;
     ClientFD_t ClientFDShared;
     string HTTPPayload;
-    HTTPPayloadLentgh_t PayloadLength;
+    HTTPPayloadLength_t PayloadLength;
     ASIndex_t ASIndex;
 } RequestProps_t;
 

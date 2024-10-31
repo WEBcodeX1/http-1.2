@@ -135,7 +135,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                         string ReqJSON = "{\"payload\": 32}";
 
-                        HTTPPayloadLentgh_t ReqPayloadLength = *(static_cast<HTTPPayloadLentgh_t*>(getMetaAddress(Index, 6)));
+                        HTTPPayloadLength_t ReqPayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 6)));
 
                         char ReqPayload[ReqPayloadLength];
                         memcpy(&ReqPayload[0], static_cast<char*>(getRequestAddress(Index)), ReqPayloadLength);
@@ -160,7 +160,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                         memcpy(Payload, &ResultCString[0], PyResultString.length());
 
                         //- set result payload length
-                        new(getMetaAddress(Index, 7)) HTTPPayloadLentgh_t(PyResultString.length());
+                        new(getMetaAddress(Index, 7)) HTTPPayloadLength_t(PyResultString.length());
 
                         //- set CanRead and WriteReady
                         new(getMetaAddress(Index, 0)) uint16_t(0);
