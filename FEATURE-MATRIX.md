@@ -138,9 +138,9 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
     <mime-type>XML-native</mime-type>
     <Request-UUID>70936869-3b17-4bcd-89fb-72adf57acc27</Request-UUID>
     <payload>
-        <param1>Value1</param1>
-        <param2>Value2</param2>
-        <param3>Value3</param3>
+        <param id="param1">Value1</param>
+        <param id="param2">Value2</param>
+        <param id="param3">Value3</param>
     </payload>
 </header>
 ```
