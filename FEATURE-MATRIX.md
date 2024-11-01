@@ -105,7 +105,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 </header>
 ```
 
-### 1.7.2. Response (HTML)
+### 1.7.2. Response (Inline-HTML)
 
 ```xml
 <header>
