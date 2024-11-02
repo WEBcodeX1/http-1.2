@@ -6,7 +6,9 @@ solution: **HTTP/1.2**.
 
 # Build / Test
 
-See [BUILD.md](BUILD.md) to compile, test and run.
+See [BUILD.md](BUILD.md) to compile, tests: [/test/README.md](/test/README.md), specs: [/specs/md/README.md](/specs/md/README.md).
+
+CI generated doc: [/doc/README.md](/doc/README.md) or http://docs.webcodex.de/wap.
 
 # Features
 
