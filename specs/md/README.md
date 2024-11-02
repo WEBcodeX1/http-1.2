@@ -4,7 +4,7 @@ This documentation contains the projects logical layout / specifications / depen
 
 ## Detailed Class Documentation
 
-Detailed Class Documentation (CI rendered) can be found at `../../doc`.
+Detailed Class Documentation (CI rendered) can be found at [/doc/README.md](/doc/README.md).
 
 ## Start
 
