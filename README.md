@@ -66,10 +66,13 @@ A unique identifier (UUID) will be added for each Request so Response-Ordering w
 
 ## Thoughts about HTTP/3
 
-HTTP/3 has been implemented using UDP, switching from TCP/IP.
+HTTP/3 has been implemented using UDP, switching from TCP/IP. A possible solution for precalculated (non-realtime) CDN data, not realtime-applications.
+
+Details at **Der IT Prüfer** / [Exemplary HTTP Network Processing](http://der-it-pruefer.de/).
 
 >[!NOTE]
-> All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax!
+> All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax! If something gets blocked its caused by something in the OSI upper Layers, not Layer-3.
+
 
 ## Web Application Server
 
