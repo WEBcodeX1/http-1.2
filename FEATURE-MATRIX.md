@@ -139,7 +139,7 @@ Phew, almost forgotten: **Up / Downloads**. It seems likely that protocol-archit
 
 What exactly happens when you send data over an TCP/IP socket? Currently, all stream packets will be processed by Kernel (ring-0) and then passed to User-Space (ring-3). This will be done for each single packet (CPU Context-Switch). Due to a slightly oldfashioned Socket-API / Kernel-Interface all packets must be handled additionally in User-Space by the application? **YES**.
 
-Detailed CPU tasks for a **BIG** Application-Upload:
+Detailed CPU tasks for a **Standard** Application-Upload:
 
 1. Kernel IP-Packet receive
 2. Pass IP-Packet to User-Space (1 CPU Context-Switch)
