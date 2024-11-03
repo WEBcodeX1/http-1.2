@@ -113,3 +113,5 @@ waiting incoming data. This will kill the kernels responsiveness.
 Unlike (also nginX) using epoll (also we use epoll) a single syscall will tell user space which
 filedescriptors have waiting data. With optimized 64bit server CPU and good server code: Scaling, bingo!
 
+>[!NOTE]
+> Coroutines in C++ should be used for Generators exclusively. Think of the Python Generators-Hype generating HTML code which has been dropped very very fast.
