@@ -172,7 +172,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 </header>
 <payload>
     <param id="res-string" type="string">Error in Big-Data processing</param>
-    <param id="res-id" type="uint_16">20</param>
+    <param id="res-id" type="uint16_t">20</param>
     <param id="node-id" type="string">kube-us-nw.valkey-01.domain.io</param>
 </payload>
 <status>
