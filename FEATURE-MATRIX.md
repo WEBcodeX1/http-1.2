@@ -236,7 +236,7 @@ Detailed CPU tasks for a **BIG** Application-Upload:
 1. Kernel IP-Packet receive
 2. Pass IP-Packet to User-Space (1 CPU Context-Switch)
 3. Process the Buffer inside Application (e.g. Python Interpreter) - Generates CPU Cycles
-4. Pass the Buffer back to Kernel-Space ("write" to File-Descriptor, 1 Context Switch)
+4. Pass the Buffer back to Kernel-Space ("write" to File-Descriptor, 1 CPU Context Switch)
 
 HTTP/2 is even worse, implementing flow-control features which already exist in underlaying TCP/IP, so CPU load even raises and throughput reduces.
 
