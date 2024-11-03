@@ -186,16 +186,17 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 
 # 2. Advanced Feature Matrix
 
-| Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
-|-------------------------------------|------------------------|------------------------|------------------------|
-| CORS                                | x                      | - (see 2.1)            | x                      |
-| HTTP Method OPTIONS                 | x                      | - (see 2.2)            | x                      |
-| HTTP Method HEAD                    | x                      | - (see 2.2)            | x                      |
-| HTTP Method TRACE                   | x                      | - (see 2.2)            | x                      |
-| HTTP Method PUT                     | x                      | - (see 2.2)            | x                      |
-| HTTP Method DELETE                  | x                      | - (see 2.2)            | x                      |
-| Streaming Characteristics           | x                      | - (see 2.3)            | x                      |
-| WebSockets                          | x                      | x (see 2.4)            | x                      |
+| Feature                             | HTTP/1.1                   | HTTP/1.2                   | HTTP/2                     |
+|-------------------------------------|----------------------------|----------------------------|----------------------------|
+| CORS                                | x                          | - (see 2.1)                | x                          |
+| HTTP Method OPTIONS                 | x                          | - (see 2.2)                | x                          |
+| HTTP Method HEAD                    | x                          | - (see 2.2)                | x                          |
+| HTTP Method TRACE                   | x                          | - (see 2.2)                | x                          |
+| HTTP Method PUT                     | x                          | - (see 2.2)                | x                          |
+| HTTP Method DELETE                  | x                          | - (see 2.2)                | x                          |
+| Streaming Characteristics           | x                          | - (see 2.3)                | x                          |
+| WebSockets                          | x                          | x (see 2.4)                | x                          |
+| Global Up/Downloads                 | x                          | x (see 2.5, encapsulated)  | x                          |
 
 # 2.1. Cross Site Scripting
 
@@ -223,3 +224,21 @@ So drop this feature in **HTTP/1.2** or **WAP**, however we will call the new pr
 > But: Think of implementing this on a separated (firewallable) TCP/IP port, maybe WACP (Web-Application-Control-Protocol), idea?
 
 So HTTP/1.2 is able to use **Long-Polling** if really needed.
+
+# 2.5. Up / Downloads
+
+Phew, almost forgotten: **Up / Downloads**. It seems likely that protocol-architects did not cope with x86_64 CPU architecture enough. Both HTTP/1.1 and HTTP/2 (not mentioning HTTP/3) involve a catastrophic approach in design and implementation.
+
+What exactly happens when you send data over an TCP/IP socket? Currently, all stream packets will be processed by Kernel (ring-0) and then passed to User-Space (ring-3). This will be done for each single packet (CPU Context-Switch). Due to a slightly oldfashioned Socket-API / Kernel-Interface all packets must be handled additionally in User-Space by the application? **YES**.
+
+Detailed CPU tasks for a **BIG** Application-Upload:
+
+1. Kernel IP-Packet receive
+2. Pass IP-Packet to User-Space (1 CPU Context-Switch)
+3. Process the Buffer inside Application (e.g. Python Interpreter) - Generates CPU Cycles
+4. Pass the Buffer back to Kernel-Space ("write" to File-Descriptor, 1 Context Switch)
+
+HTTP/2 is even worse, implementing flow-control features which already exist in underlaying TCP/IP, so CPU load even raises and throughput reduces.
+
+>[!TIP]
+> This could be done easily (completely) in ring-0 like existing file protocols already do (file-descriptor-reference).
