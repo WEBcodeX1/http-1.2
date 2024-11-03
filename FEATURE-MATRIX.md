@@ -160,6 +160,30 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 </payload>
 ```
 
+### 1.7.5. Response (Status)
+
+```xml
+<header>
+    <version>WAP/0.1</version>
+    <variant>Response</variant>
+    <mime-type>application/xml-inline</mime-type>
+    <encoding>UTF-8</encoding>
+    <Request-UUID>d8f76180-411c-4128-bd06-c0f8edcc2597</Request-UUID>
+</header>
+<payload>
+    <param id="res-string" type="string">Error in Big-Data processing</param>
+    <param id="res-id" type="uint_16">20</param>
+    <param id="node-id" type="string">kube-us-nw.valkey-01.domain.io</param>
+</payload>
+<status>
+    <error>
+        <msg>Backend Error occured.</msg>
+        <id>500</id>
+        <inform>admin@domain.com</inform>
+    </error>
+</status>
+```
+
 # 2. Advanced Feature Matrix
 
 | Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
