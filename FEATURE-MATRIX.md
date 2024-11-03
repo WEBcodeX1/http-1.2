@@ -145,7 +145,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 </header>
 ```
 
-### 1.7.2. Response (JSON)
+### 1.7.4. Response (JSON)
 
 ```xml
 <header>
