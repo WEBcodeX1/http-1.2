@@ -32,7 +32,7 @@ We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.d
 
 A detailed feature comparison see: [HTTP Feature Matrix, HTTP/3](FEATURE-MATRIX.md).
 
-## Web-Application-Server / Python
+## Primary Milestone
 
 The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
 specially adapted for Modern-Browser-Applications (SPA).
