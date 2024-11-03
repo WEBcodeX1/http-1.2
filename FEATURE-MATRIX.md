@@ -199,15 +199,3 @@ So drop this feature in **HTTP/1.2** or **WAP**, however we will call the new pr
 > But: Think of implementing this on a separated (firewallable) TCP/IP port, maybe WACP (Web-Application-Control-Protocol), idea?
 
 So HTTP/1.2 is able to use **Long-Polling** if really needed.
-
-# 3. Bottlenecks
-#TODO: write.
-
-## 3.1. Ring-0 / Context Switching
-#TODO: write.
-
-## 3.2. TLS
-#TODO: write.
-
-# 4. Global Security
-#TODO: write.
