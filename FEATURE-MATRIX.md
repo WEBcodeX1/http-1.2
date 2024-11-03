@@ -196,7 +196,7 @@ Next-Gen-WAP (Web-Application-Protocol) should use XML format like this:
 | HTTP Method DELETE                  | x                          | - (see 2.2)                | x                          |
 | Streaming Characteristics           | x                          | - (see 2.3)                | x                          |
 | WebSockets                          | x                          | x (see 2.4)                | x                          |
-| Global Up/Downloads                 | x                          | x (see 2.5, encapsulated)  | x                          |
+| Global Up/Downloads                 | x                          | x (see 2.5, decapsulated)  | x                          |
 
 # 2.1. Cross Site Scripting
 
