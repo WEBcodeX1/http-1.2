@@ -2,19 +2,19 @@
 
 The following table shows features compared to the different HTTP Versions.
 
-| Feature                             | HTTP/1.1               | HTTP/1.2               | HTTP/2                 |
-|-------------------------------------|------------------------|------------------------|------------------------|
-| Keep-Alive Connections              | x                      | x (permanent, see 1.1) | x                      |
-| Parametrized Keep-Alive (Header)    | x                      | - (see 1.2)            | x                      |
-| Transfer Encoding (Compressed)      | x                      | - (see 1.3)            | x                      |
-| Byte Range Requests                 | x                      | - (see 1.4)            | x                      |
-| Pipelined Requests                  | x (broken)             | x (working, see 1.5)   | - (Layer7 multiplexed) |
-| Chunked Encoding                    | x                      | - (see 1.6)            | x                      |
-| Caching Mechanism / Header          | x                      | x (Static Content)     | x                      |
-| Caching 304 not modified            | x                      | x (Static Content)     | x                      |
-| Cookies                             | x                      | x                      | x                      |
-| Text Based Protocol                 | x                      | x                      | -                      |
-| Binary Based Protocol               | -                      | - (see 1.7)            | x                      |
+| Feature                             | HTTP/1.1                     | HTTP/1.2                                | HTTP/2                   |
+|-------------------------------------|------------------------------|-----------------------------------------|--------------------------|
+| Keep-Alive Connections              | :white_check_mark:           | :white_check_mark: (permanent, see 1.1) | :white_check_mark:       |
+| Parametrized Keep-Alive (Header)    | :white_check_mark:           | :x: (see 1.2)                           | :white_check_mark:       |
+| Transfer Encoding (Compressed)      | :white_check_mark:           | :x: (see 1.3)                           | :white_check_mark:       |
+| Byte Range Requests                 | :white_check_mark:           | :x: (see 1.4)                           | :white_check_mark:       |
+| Pipelined Requests                  | :white_check_mark: (broken)  | :white_check_mark: (working, see 1.5)   | :x: (Layer7 multiplexed) |
+| Chunked Encoding                    | :white_check_mark:           | :x: (see 1.6)                           | :white_check_mark:       |
+| Caching Mechanism / Header          | :white_check_mark:           | :white_check_mark: (Static Content)     | :white_check_mark:       |
+| Caching 304 not modified            | :white_check_mark:           | :white_check_mark: (Static Content)     | :white_check_mark:       |
+| Cookies                             | :white_check_mark:           | :white_check_mark:                      | :white_check_mark:       |
+| Text Based Protocol                 | :white_check_mark:           | :white_check_mark:                      | :x:                      |
+| Binary Based Protocol               | :x:                          | :x: (see 1.7)                           | :white_check_mark:       |
 
 See [Exemplary HTTP Network Processing](http://der-it-pruefer.de/) for a detailed explanation / analysis why HTTP/2 and HTTP/3 are not suitable for future-proof Web-Applications.
 
@@ -94,17 +94,17 @@ Next-Gen-WAP (Web-Application-Protocol) XML Specs RFP see: [WAP-AS-XML-SPECS.md]
 
 # 2. Advanced Feature Matrix
 
-| Feature                             | HTTP/1.1                   | HTTP/1.2                   | HTTP/2                     |
-|-------------------------------------|----------------------------|----------------------------|----------------------------|
-| CORS                                | x                          | - (see 2.1)                | x                          |
-| HTTP Method OPTIONS                 | x                          | - (see 2.2)                | x                          |
-| HTTP Method HEAD                    | x                          | - (see 2.2)                | x                          |
-| HTTP Method TRACE                   | x                          | - (see 2.2)                | x                          |
-| HTTP Method PUT                     | x                          | - (see 2.2)                | x                          |
-| HTTP Method DELETE                  | x                          | - (see 2.2)                | x                          |
-| Streaming Characteristics           | x                          | - (see 2.3)                | x                          |
-| WebSockets                          | x                          | x (see 2.4)                | x                          |
-| Global Up/Downloads                 | x                          | x (see 2.5, decapsulated)  | x                          |
+| Feature                             | HTTP/1.1                   | HTTP/1.2                                   | HTTP/2                     |
+|-------------------------------------|----------------------------|--------------------------------------------|----------------------------|
+| CORS                                | :white_check_mark:         | :x: (see 2.1)                              | :white_check_mark:         |
+| HTTP Method OPTIONS                 | :white_check_mark:         | :x: (see 2.2)                              | :white_check_mark:         |
+| HTTP Method HEAD                    | :white_check_mark:         | :x: (see 2.2)                              | :white_check_mark:         |
+| HTTP Method TRACE                   | :white_check_mark:         | :x: (see 2.2)                              | :white_check_mark:         |
+| HTTP Method PUT                     | :white_check_mark:         | :x: (see 2.2)                              | :white_check_mark:         |
+| HTTP Method DELETE                  | :white_check_mark:         | :x: (see 2.2)                              | :white_check_mark:         |
+| Streaming Characteristics           | :white_check_mark:         | :x: (see 2.3)                              | :white_check_mark:         |
+| WebSockets                          | :white_check_mark:         | :white_check_mark: (see 2.4)               | :white_check_mark:         |
+| Global Up/Downloads                 | :white_check_mark:         | :white_check_mark: (see 2.5, decapsulated) | :white_check_mark:         |
 
 # 2.1. Cross Site Scripting
 
