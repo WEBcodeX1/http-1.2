@@ -14,4 +14,4 @@ PDF rendered / from Visio.
 
 ## 1.4. MS Visio
 
-Visio Slides.
+Microsoft Visio Slides.
