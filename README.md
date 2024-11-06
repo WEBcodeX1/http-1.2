@@ -73,18 +73,6 @@ Details at **Der IT Prüfer** / [Exemplary HTTP Network Processing](http://der-i
 >[!NOTE]
 > All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax! If something gets blocked its caused by something in the OSI upper Layers, not Layer-3.
 
-
-## Web Application Server
-
-With fixing the Pipelined Connections problem, HTTP/2 **should** also fix speeding up dynamic WebServices
-Request / Response times. In theory the HTTP/2 specs look quite good, real live shows different behaviour.
-
-This could be caused by:
-
-- Defective implementation inside the HTTP library
-- Defective programming on Application-Server side
-- Missing fine-grained Test-Framework
-
 # Proof Of Concept
 
 We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including those components:
@@ -94,7 +82,7 @@ We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server inc
 
 The Proxy-Server Component has been engineered and will be published later on.
 
-Detailed draft and specifications can be found under /draft and /specs subdirs.
+Detailed specifications can be found at [/specs](/specs/README.md) subfolder.
 
 # Libevent / Epoll / Coroutines
 
