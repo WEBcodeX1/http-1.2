@@ -30,7 +30,7 @@ more appropriate these days.
 
 We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
 
-A detailed feature comparison see: [HTTP Feature Matrix, HTTP/3](FEATURE-MATRIX.md).
+A detailed feature comparison see: [HTTP Feature Matrix](FEATURE-MATRIX.md).
 
 ## 3. Primary Milestone
 
