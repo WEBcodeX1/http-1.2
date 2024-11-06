@@ -35,7 +35,7 @@ A detailed feature comparison see: [HTTP Feature Matrix](FEATURE-MATRIX.md).
 ## 3. Primary Milestone
 
 The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
-specially adapted for Modern-Browser-Applications (SPA).
+especially adapted for Modern-Browser-Applications (SPA).
 
 ## 4. HTTP/2, HTTP/3
 
