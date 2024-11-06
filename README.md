@@ -98,8 +98,8 @@ Concrete: the main loop in user space iterates over **ALL** current connection f
 space) will be done. The kernel will additionally loop on 10000 filedescriptors checking if there is
 waiting incoming data. This will kill the kernels responsiveness.
 
-Unlike (also nginX) using epoll (also we use epoll) a single syscall will tell user space which
-filedescriptors have waiting data. With optimized 64bit server CPU and good server code: Scaling, bingo!
+Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will tell user space which
+filedescriptors have waiting data. With optimized 64bit server CPU and a good implementation: go lightspeed.
 
 >[!NOTE]
 > Coroutines in C++ should be used for Generators exclusively. Think of the Python Generators-Hype generating HTML code which has been dropped very very fast.
