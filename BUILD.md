@@ -1,4 +1,4 @@
-# Prerequisites
+# 1. Prerequisites
 
 Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - git
@@ -10,7 +10,7 @@ Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 # apt-get install git cmake python3-setuptools python3-pip
 ```
 
-## C++ Boost Libraries
+## 1.1. C++ Boost Libraries
 
 The following Boost Libraries ```libboost1.74-dev``` (Ubuntu 22.04) are used. 
 
@@ -23,7 +23,7 @@ To install complete boost development files under Ubuntu 22.04 do:
 # apt-get install libboost-all-dev
 ```
 
-## Python Dev (Interpreter Source)
+## 1.2. Python Dev (Interpreter Source)
 
 If not done by Boost Python Library, the Python Interpreter Source Code is required for embedding. 
 
@@ -31,18 +31,18 @@ If not done by Boost Python Library, the Python Interpreter Source Code is requi
 # apt-get install python3-dev
 ```
 
-## Python XML Microparser
+## 1.3. Python XML Microparser
 
 We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
 
-### Clone Repository
+### 1.3.1. Clone Repository
 
 ```bash
 # cd repodir
 # git clone https://github.com/clauspruefer/python-xml-microparser.git
 ```
 
-### Build / Install Globally
+### 1.3.2. Build / Install Globally
 
 Build as normal user.
 
@@ -63,7 +63,7 @@ Install globally as root.
 # sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz --break-system-packages
 ```
 
-## Compile / Install
+## 1.4. Compile / Install
 
 ```bash
 # cmake CMakeLists.txt
@@ -74,7 +74,7 @@ Install globally as root.
 On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
 be added to ```/etc/hosts```.
 
-## Start Server
+## 1.5. Start Server
 
 Raise ulimit for open files before starting server. This will be put inside server startup
 script later.
@@ -86,14 +86,14 @@ script later.
 
 Stop server with signal SIGTERM (```kill http-1.2```).
 
-## Check Server Working
+## 1.6. Check Server Working
 
-### Check GET requests
+### 1.6.1. Check GET requests
 
 Open http://testapp1.local or http://testapp2.local in a local browser to check if
 installation has succeeded.
 
-### Check POST requests
+### 1.6.2. Check POST requests
 
 ```bash
 # wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/python/test
