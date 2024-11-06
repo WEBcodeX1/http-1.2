@@ -93,7 +93,7 @@ But **beware**: Coroutines could be contraproductive for scaling aspects. If you
 Kernel Socket Programming and implement the socket in a blocking way: Each client filedescriptor will be
 monitored by the kernel separetely. Welcome to the 90s.
 
-Concrete: the main loop in user space iterates over ALL current connection filedescriptors. If we have
+Concrete: the main loop in user space iterates over **ALL** current connection filedescriptors. If we have
 10000 active or sleeping Keep-Alive connections: 10000 syscalls (context switches between user and kernel
 space) will be done. The kernel will additionally loop on 10000 filedescriptors checking if there is
 waiting incoming data. This will kill the kernels responsiveness.
