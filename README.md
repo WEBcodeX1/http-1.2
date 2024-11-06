@@ -82,8 +82,6 @@ We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server inc
 
 The Proxy-Server Component has been engineered and will be published later on.
 
-Detailed specifications can be found at [/specs](/specs/README.md) subfolder.
-
 # 6. Libevent / Epoll / Coroutines
 
 Currently Coroutines is the word of interest in the Coding-Community. Libevent uses Coroutines.
