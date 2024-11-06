@@ -37,6 +37,8 @@ A detailed feature comparison see: [HTTP Feature Matrix](FEATURE-MATRIX.md).
 The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
 especially adapted for Modern-Browser-Applications (SPA).
 
+Also the FalconAS Python Application Server will be a main-component of the [x0 JavaScript Framework](https://github.com/WEBcodeX1/x0) in the near future.
+
 ## 4. HTTP/2, HTTP/3
 
 ### 4.1. HTTP/2 Complexity
