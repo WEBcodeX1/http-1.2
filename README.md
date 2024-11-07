@@ -77,7 +77,7 @@ Details at **Der IT Prüfer** / [Exemplary HTTP Network Processing](http://der-i
 
 # 5. Proof Of Concept
 
-We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including those components:
+We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including these components:
 
 - Static-Content-Server Component
 - Applicaton-Server Component using Python Scripting Language
