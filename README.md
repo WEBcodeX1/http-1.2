@@ -98,7 +98,7 @@ Concrete: the main loop in user space iterates over **ALL** current connection f
 space) will be done to check if socket contains received data permanently.
 
 Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will tell user space about
-multiple filedescriptors have waiting data. With optimized 64bit server CPU and a good implementation:
+multiple filedescriptors having waiting data. With optimized 64bit server CPU and a good implementation:
 go lightspeed.
 
 >[!NOTE]
