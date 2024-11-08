@@ -101,6 +101,5 @@ Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will
 multiple filedescriptors having waiting data. With optimized 64bit server CPU and a good implementation:
 go lightspeed.
 
->[!NOTE]
-> Coroutines in C++ should be used for Generators exclusively. Think of the Python Generators-Hype generatin
-> HTML code which has been dropped very very fast.
+>[!WARNING]
+> Coroutines in C++ should be used for Generators exclusively.
