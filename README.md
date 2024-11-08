@@ -89,9 +89,9 @@ The Proxy-Server Component has been engineered and will be published later on.
 Currently Coroutines is the word of interest in the Coding-Community. Libevent uses Coroutines.
 Multiple Server Products use Libevent for client connection handling. 
 
-But **beware**: Coroutines could be contraproductive for scaling aspects. If you are not familiar with
-Kernel Socket Programming and implement the socket in a blocking way: Each client filedescriptor will be
-monitored by the kernel separetely: *Welcome to the 90s*.
+But **beware**: Coroutines could be contraproductive considering scaling aspects. If you are not familiar
+with Kernel Socket Programming and implement the socket in a blocking way: Each client filedescriptor will
+be monitored by the kernel separetely: *Welcome to the 90s*.
 
 Concrete: the main loop in user space iterates over **ALL** current connection filedescriptors. If we have
 10000 active or sleeping Keep-Alive connections: 10000 syscalls (context switches between user and kernel
