@@ -95,7 +95,7 @@ monitored by the kernel separetely: *Welcome to the 90s*.
 
 Concrete: the main loop in user space iterates over **ALL** current connection filedescriptors. If we have
 10000 active or sleeping Keep-Alive connections: 10000 syscalls (context switches between user and kernel
-space) will be done to check if socket contains received data permanently (main loop).
+space) will be done to check if socket contains received data permanently.
 
 Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will tell user space which
 filedescriptors have waiting data. With optimized 64bit server CPU and a good implementation: go lightspeed.
