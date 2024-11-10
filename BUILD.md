@@ -36,7 +36,7 @@ If not done by Boost Python Library, the Python Interpreter Source Code is requi
 We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
 
 ```bash
-pip3 install xmlmicroparser
+# pip3 install xmlmicroparser
 ```
 
 Or either download package from https://github.com/clauspruefer/python-xml-microparser/archive/refs/tags/0.54beta.tar.gz
