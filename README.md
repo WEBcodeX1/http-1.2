@@ -79,8 +79,8 @@ Details at **Der IT Prüfer** / [Exemplary (HTTP) Network Processing](http://der
 
 We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including these components:
 
-- Static-Content-Server Component
-- Applicaton-Server Component using Python Scripting Language
+- Static-Content-Server
+- Applicaton-Server using Python Scripting Language
 
 The Proxy-Server Component has been engineered and will be published later on.
 
