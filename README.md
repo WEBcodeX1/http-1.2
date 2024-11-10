@@ -8,7 +8,7 @@ solution: **HTTP/1.2**.
 
 See [BUILD.md](BUILD.md) to compile, tests: [/test/README.md](/test/README.md), specs: [/specs/md/README.md](/specs/md/README.md).
 
-CI generated doc: [/doc/README.md](/doc/README.md) or http://docs.webcodex.de/wacp.
+CI generated doc: [/doc/README.md](/doc/README.md) or http://docs.webcodex.de/wacp/rfp/.
 
 ## 2. Features
 
