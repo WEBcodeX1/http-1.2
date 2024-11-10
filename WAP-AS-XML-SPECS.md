@@ -1,4 +1,4 @@
-# 1. XML Specifications (WAP-AS Protocol)
+# 1. XML Specifications (WACP-AS Protocol)
 
 ## 1.1. Examples
 
