@@ -27,7 +27,7 @@ All Tests will be repeated on the following web-server products:
 - Apache2 Event Driven Model
 - nginX
 
-# 3. Detailed  Workflow
+# 3. Detailed  Workflow (SQL Database)
 
 1. Insert (TestID, TestIDRepeat) INTO "Test" table
 2. Insert Server Test Parameter into "TestParameter" table
