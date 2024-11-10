@@ -3,6 +3,8 @@
 The following documentation will be rendered by Doxygen and a Python
 Doxygen-Sphinx bridge (breathe).
 
+Online https://docs.webcodex.de/developer/doxygen/ and https://docs.webcodex.de/developer/sphinx/.
+
 # 1. Prerequisites
 
 The following packages (Ubuntu 22.04) need to be installed:
