@@ -35,33 +35,19 @@ If not done by Boost Python Library, the Python Interpreter Source Code is requi
 
 We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
 
-### 1.3.1. Clone Repository
+Either download package from https://github.com/clauspruefer/python-xml-microparser/archive/refs/tags/0.54beta.tar.gz
+or build manually (see [XML Parser Documentation](https://github.com/clauspruefer/python-xml-microparser/blob/master/README.md)).
 
-```bash
-# cd repodir
-# git clone https://github.com/clauspruefer/python-xml-microparser.git
-```
-
-### 1.3.2. Build / Install Globally
-
-Build as normal user.
-
-```bash
-# python3 setup.py sdist
-```
+### 1.3.1. Install Downloaded Package
 
 Install globally as root.
 
 ```bash
-# sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz
+# sudo pip3 install ./python-xml-microparser-0.54beta.tar.gz --break-system-packages
 ```
 
->[!IMPORTANT]  
+>[!IMPORTANT]
 > Some python3 pip versions do not allow installing packages globally anymore, the --break-system-packages flag is mandatory.
-
-```bash
-# sudo pip3 install dist/xmlmicroparser-0.50b0.tar.gz --break-system-packages
-```
 
 ## 1.4. Compile / Install
 
