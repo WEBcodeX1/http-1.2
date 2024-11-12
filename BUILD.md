@@ -3,11 +3,10 @@
 Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - git
 - cmake
-- python setup-tools
 - python pip
 
 ```bash
-# apt-get install git cmake python3-setuptools python3-pip
+# apt-get install git cmake python3-pip
 ```
 
 ## 1.1. C++ Boost Libraries
