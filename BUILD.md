@@ -38,19 +38,7 @@ We use our external Python XML Parser to bridge XML config to C++ using Boost Py
 # pip3 install xmlmicroparser
 ```
 
-Or either download package from https://github.com/clauspruefer/python-xml-microparser/archive/refs/tags/0.54beta.tar.gz
-or build manually (see [XML Parser Documentation](https://github.com/clauspruefer/python-xml-microparser/blob/master/README.md)).
-
-### 1.3.1. Install Downloaded Package
-
-Install globally as root.
-
-```bash
-# sudo pip3 install ./python-xml-microparser-0.54beta.tar.gz --break-system-packages
-```
-
->[!IMPORTANT]
-> Some python3 pip versions do not allow installing packages globally anymore, the --break-system-packages flag is mandatory.
+Details (e.g. building module) see [XML Parser Documentation](https://github.com/clauspruefer/python-xml-microparser/blob/master/README.md).
 
 ## 1.4. Compile / Install
 
