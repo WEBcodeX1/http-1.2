@@ -100,6 +100,3 @@ space) will be done to check if socket contains received data permanently.
 Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will tell user space about
 multiple filedescriptors having waiting data. With optimized 64bit server CPU and a good implementation:
 go lightspeed.
-
->[!WARNING]
-> Coroutines in C++ should be used for Generators exclusively.
