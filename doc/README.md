@@ -3,7 +3,8 @@
 The following documentation will be rendered by Doxygen and a Python
 Doxygen-Sphinx bridge (breathe).
 
-Online https://docs.webcodex.de/developer/doxygen/ and https://docs.webcodex.de/developer/sphinx/.
+Online https://docs.webcodex.de/developer/falconas/doxygen/index.html and
+https://docs.webcodex.de/developer/falconas/sphinx/index.html.
 
 # 1. Prerequisites
 
