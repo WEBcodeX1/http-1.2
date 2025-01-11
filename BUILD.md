@@ -6,7 +6,8 @@ Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - python pip
 
 ```bash
-# apt-get install git cmake python3-pip
+# install base requirements
+apt-get install git cmake python3-pip
 ```
 
 ## 1.1. C++ Boost Libraries
@@ -19,7 +20,8 @@ The following Boost Libraries ```libboost1.74-dev``` (Ubuntu 22.04) are used.
 To install complete boost development files under Ubuntu 22.04 do:
 
 ```bash
-# apt-get install libboost-all-dev
+# install all boost components
+apt-get install libboost-all-dev
 ```
 
 ## 1.2. Python Dev (Interpreter Source)
@@ -27,7 +29,8 @@ To install complete boost development files under Ubuntu 22.04 do:
 If not done by Boost Python Library, the Python Interpreter Source Code is required for embedding. 
 
 ```bash
-# apt-get install python3-dev
+# install python dev headers / source
+apt-get install python3-dev
 ```
 
 ## 1.3. Python XML Microparser
@@ -35,7 +38,8 @@ If not done by Boost Python Library, the Python Interpreter Source Code is requi
 We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
 
 ```bash
-# pip3 install xmlmicroparser
+# install xmlmicroparser python module
+pip3 install xmlmicroparser
 ```
 
 Details (e.g. building module) see [XML Parser Documentation](https://github.com/clauspruefer/python-xml-microparser/blob/master/README.md).
@@ -43,9 +47,10 @@ Details (e.g. building module) see [XML Parser Documentation](https://github.com
 ## 1.4. Compile / Install
 
 ```bash
-# cmake CMakeLists.txt
-# make
-# make install
+# compile / install
+cmake CMakeLists.txt
+make
+make install
 ```
 
 On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
@@ -57,8 +62,9 @@ Raise ulimit for open files before starting server. This will be put inside serv
 script later.
 
 ```bash
-# . ./scripts/ulimit.sh
-# /usr/local/bin/falcon-as
+# start server
+. ./scripts/ulimit.sh
+/usr/local/bin/falcon-as
 ```
 
 Stop server with signal SIGTERM (```kill http-1.2```).
@@ -73,5 +79,6 @@ installation has succeeded.
 ### 1.6.2. Check POST requests
 
 ```bash
-# wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/python/test
+# test post request
+wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/python/test
 ```
