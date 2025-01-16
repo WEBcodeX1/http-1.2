@@ -8,6 +8,7 @@ modules.order
 *.mod
 *.mod.c
 *.kdev4
+*.swp
 __pycache__
 *.tar
 *.tar.gz
