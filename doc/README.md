@@ -14,7 +14,8 @@ https://docs.webcodex.de/developer/falconas/sphinx/index.html.
 The following packages (Ubuntu 22.04) need to be installed:
 
 ```bash
-# apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe
+# install base requirements
+apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe
 ```
 
 # 2. Continuous Integration
@@ -25,8 +26,11 @@ triggered regulary.
 # 3. Render Documentation
 
 ```bash
-# doxygen
-# sphinx-build -b html -Dbreathe_projects.falconas=doc_render/xml . doc_render/sphinx/
+# run doxygen
+doxygen
+
+# run sphinx-build
+sphinx-build -b html -Dbreathe_projects.falconas=doc_render/xml . doc_render/sphinx/
 ```
 
 # 4. Rendered Content
