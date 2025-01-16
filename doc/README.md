@@ -3,6 +3,9 @@
 The following documentation will be rendered by Doxygen and a Python
 Doxygen-Sphinx bridge (breathe).
 
+Class hierarchy (doxygen):
+https://docs.webcodex.de/developer/falconas/doxygen/inherits.html
+
 Online https://docs.webcodex.de/developer/falconas/doxygen/index.html and
 https://docs.webcodex.de/developer/falconas/sphinx/index.html.
 
