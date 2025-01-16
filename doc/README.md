@@ -6,7 +6,7 @@ Doxygen-Sphinx bridge (breathe).
 Class hierarchy (Doxygen):
 https://docs.webcodex.de/developer/falconas/doxygen/inherits.html.
 
-Sphinx documentation:
+Sphinx documentation (C++ members):
 https://docs.webcodex.de/developer/falconas/sphinx/index.html.
 
 # 1. Prerequisites
