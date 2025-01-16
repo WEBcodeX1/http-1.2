@@ -1,12 +1,22 @@
 <config>
     <namespaces>
-        <namespace hostname="testapp1.local" path="/app1" interpreters="10"></namespace>
-        <namespace hostname="testapp2.local" path="/app2" interpreters="20"></namespace>
+        <namespace>
+            <id>app1</id>
+            <hostname>testapp1.local</hostname>
+            <path>/app1</path>
+            <interpreters>2</interpreters>
+        </namespace>
+        <namespace>
+            <id>app2</id>
+            <hostname>testapp2.local"</hostname>
+            <path>/app2</path>
+            <interpreters>2</interpreters>
+        </namespace>
     </namespaces>
     <global>
         <run>
-            <user>falcon-http</user>
-            <group>falcon-http</group>
+            <user>x0-http</user>
+            <group>x0-http</group>
         </run>
         <path>
             <base>/var/www</base>
