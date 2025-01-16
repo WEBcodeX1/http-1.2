@@ -82,7 +82,7 @@ We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server inc
 - Static-Content-Server
 - Applicaton-Server using Python Scripting Language
 
-The Proxy-Server Component has been engineered and will be published later on.
+The Proxy-Server component has been engineered and will be published later on.
 
 # 6. Libevent / Epoll / Coroutines
 
