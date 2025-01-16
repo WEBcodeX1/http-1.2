@@ -22,7 +22,7 @@ Makefile
 cmake_install*
 compile_commands.json
 install_manifest.txt
-http1.2
+falcon-as
 test/eval/test-boost-python
 test/integration/boost-regex/test-boost-regex
 test/integration/event/test-event
