@@ -22,7 +22,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 ## 4. Operating System
-Currently just Linux x64 is supported. You are welcome to port to another architecture.
+Currently only Linux x64 is supported. You are welcome to port to another architecture.
 
 ## 5. Additional context
 Add any other context about the problem here.
