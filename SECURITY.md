@@ -8,8 +8,7 @@ The following table outlines the versions of the project currently supported wit
 
 | Version      | Supported          |
 |--------------|--------------------|
-| 1.x.x        | ✅ Supported       |
-| < 1.x.x      | ❌ Unsupported     |
+| 0.x          | ❌ Unsupported     |
 
 We recommend always using the latest version of the project to ensure you receive the latest security updates and features.
 
