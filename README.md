@@ -1,102 +1,120 @@
-# Abstract, HTTP/1.2, HTTP/3
+# Abstract: HTTP/1.2, HTTP/2 and HTTP/3
 
-Currently Google-Engineers plan pushing HTTP/3. As HTTP/2 still is not used commonly worldwide and
-major implementation flaws, even performance issues exist we try to build a much simpler and secure
-solution: **HTTP/1.2**.
+Currently, Google engineers are planning to push HTTP/3. As HTTP/2 is still
+not widely adopted globally and has major implementation flaws, including
+performance issues, we aim to build a much simpler and more secure solution:
+**HTTP/1.2**.
 
 ## 1. Build / Test
 
-See [BUILD.md](BUILD.md) to compile, tests: [/test/README.md](/test/README.md), specs: [/specs/md/README.md](/specs/md/README.md).
+Refer to [BUILD.md](BUILD.md) for compilation instructions, [test documentation](/test/README.md)
+for testing, and [specifications documentation](/specs/md/README.md) for specs.
 
-CI generated doc: [/doc/README.md](/doc/README.md) or http://docs.webcodex.de/wacp/rfp/.
+CI-generated documentation is available at [/doc/README.md](/doc/README.md) or
+[http://docs.webcodex.de/wacp/rfp/](http://docs.webcodex.de/wacp/rfp/).
 
 ## 2. Features
 
-It will provide the following features:
+The following features are planned:
 
-- Much more leightweight
-- Much more secure
-- Much faster
-- Drop bloating features
-- Logical separated (TCP ports)
+- Lightweight
+- Secure
+- Fast
+- Avoids bloated features
+- Logical separation (TCP ports)
 - Easy to implement
-- Low cost maintainable
-- Application Server friendly
-- Proxy Server friendly
-- Scalable to infinity
+- Low-cost maintenance
+- Application server-friendly
+- Proxy server-friendly
+- Infinitely scalable
 
-Also the part "HyperText" or even a complete renaming could be thought over. Its representation is by far not
-more appropriate these days.
+Additionally, reconsidering the term "HyperText" or even renaming it might be
+appropriate, as its representation is no longer accurate today.
 
-We will publish detailed RFP / RFC in the near future on http://der-it-pruefer.de.
+Detailed RFP/RFC documentation will be published in the near future on
+[http://der-it-pruefer.de](http://der-it-pruefer.de).
 
-A detailed feature comparison see: [HTTP Feature Matrix](FEATURE-MATRIX.md).
+For a detailed feature comparison, see: [HTTP Feature Matrix](FEATURE-MATRIX.md).
 
 ## 3. Primary Milestone
 
-The primary projects goal is to provide a lightning-fast, rock solid and secure Python Application Server component
-especially adapted for Modern-Browser-Applications (SPA).
+The primary goal of this project is to provide a lightning-fast, rock-solid, and secure
+Python application server component, specifically adapted for modern browser applications (SPA).
 
-Also the FalconAS Python Application Server will be a main-component of the [x0 JavaScript Framework](https://github.com/WEBcodeX1/x0) in the near future.
+The FalconAS Python application server will also serve as a key component of the
+[x0 JavaScript Framework](https://github.com/WEBcodeX1/x0) in the near future.
 
-## 4. HTTP/2, HTTP/3
+## 4. HTTP/2 and HTTP/3
 
 ### 4.1. HTTP/2 Complexity
 
-HTTP/2 adds too much complexity. The HTTP/1.1 simplicity is lost completely, especially OpenSource libraries
-tend to be confusing and ununderstandable even using libevent.
+HTTP/2 introduces excessive complexity. The simplicity of HTTP/1.1 is completely
+lost. Open-source libraries are often confusing and difficult to understand, even
+when using libevent.
 
-Its everything packed in one really big box. Logical separation? Security? All going unfiltered over a single
-TCP port. Ah, just use your IPS correctly! Bam: IPS process killed by 0day inside TCP packet.
+Everything is packed into one large box, lacking logical separation and security.
+All traffic is transmitted over a single TCP port, which poses significant risks.
+For instance, an IPS process can be killed by a zero-day vulnerability inside a
+TCP packet.
 
-Also adding TLS / SSL handling inside the protocol is not appropriate anymore. Let this handle a separated
-component like nginx (reverse proxy), ingress-nginx on Kubernetes, stunnel or a Hardware-Loadbalancer.
+Additionally, incorporating TLS/SSL handling directly into the protocol is no
+longer appropriate. Instead, this should be handled by separate components like
+nginx (reverse proxy), ingress-nginx on Kubernetes, stunnel, or a hardware
+load balancer.
 
-Do not duplicate things you are not familiar with especially when other products exist which do the same
-for decades much smarter.
+Avoid duplicating functionality when better solutions have existed for decades.
 
 ### 4.2. HTTP/1.1 Pipelined Connections
 
-HTTP/2 fixes the HTTP/1.1 Pipelined Connections problem. Due to a bug in asynchronously handling the responses
-(wrong Request / Reply order) the complete feature was removed from *ALL* browsers worldwide.
+HTTP/2 resolves the issue of HTTP/1.1 pipelined connections. However, due to a
+bug in asynchronous response handling (misordered request/reply pairs), this feature
+was removed from *all* browsers worldwide.
 
-Our HTTP/1.2 implementation also fixes the problem by extending the HTTP/1.1 protocol by just some lines of code.
-A unique identifier (UUID) will be added for each Request so Response-Ordering will be obsolete.
+Our HTTP/1.2 implementation fixes this issue by extending the HTTP/1.1 protocol with minimal
+changes. Specifically, a unique identifier (UUID) is added to each request, making response
+ordering unnecessary.
 
->[!CAUTION]
-> Our HTTP/1.2 implementation makes HTTP/2 and HTTP/3 obsolete and reduces complexity by far.
+> **Caution**
+> Our HTTP/1.2 implementation renders HTTP/2 and HTTP/3 obsolete, drastically
+> reducing complexity.
 
-### 4.3. Thoughts about HTTP/3
+### 4.3. Thoughts on HTTP/3
 
-HTTP/3 has been implemented using UDP, switching from TCP/IP. A possible solution for precalculated (non-realtime) CDN data, not realtime-applications.
+HTTP/3 is implemented using UDP instead of TCP/IP. While this might work for precalculated
+(non-realtime) CDN data, it is unsuitable for real-time applications.
 
-Details at **Der IT Prüfer** / [Exemplary (HTTP) Network Processing](http://der-it-pruefer.de/).
+Details are available at **Der IT Prüfer** / [Exemplary (HTTP) Network Processing](http://der-it-pruefer.de/).
 
->[!NOTE]
-> All rumours telling HTTP/2 streams can get blocked by TCP/IP retransmissions is a hoax! If something gets blocked its caused by something in the OSI upper Layers, not Layer-3.
+> **Note**
+> Claims that HTTP/2 streams can be blocked by TCP/IP retransmissions are false. Any
+> blocking issues arise from the OSI upper layers, not Layer-3.
 
-# 5. Proof Of Concept
+## 5. Proof of Concept
 
-We provide Proof Of Conecept Code and our working "FalconAS" HTTP/1.2 Server including these components:
+We provide proof-of-concept code and a working "FalconAS" HTTP/1.2 server, which
+includes the following components:
 
-- Static-Content-Server
-- Applicaton-Server using Python Scripting Language
+- Static content server
+- Application server using Python scripting
 
-The Proxy-Server component has been engineered and will be published later on.
+The proxy server component has been designed and will be published later.
 
-# 6. Libevent / Epoll / Coroutines
+## 6. Libevent / Epoll / Coroutines
 
-Currently Coroutines is the word of interest in the Coding-Community. Libevent uses Coroutines.
-Multiple Server Products use Libevent for client connection handling. 
+Coroutines are currently a trending topic in the coding community. Libevent uses
+coroutines, and many server products rely on Libevent for client connection handling.
 
-But **beware**: Coroutines could be contraproductive considering scaling aspects. If you are not familiar
-with Kernel Socket Programming and implement the socket in a blocking way: Each client filedescriptor will
-be monitored by the kernel separetely: *Welcome to the 90s*.
+However, **beware**: Coroutines can be counterproductive for scalability. Without
+expertise in kernel socket programming, blocking socket implementations can result
+in performance bottlenecks. Each client file descriptor is monitored separately by
+the kernel, leading to inefficiencies reminiscent of the 1990s.
 
-Concrete: the main loop in user space iterates over **ALL** current connection filedescriptors. If we have
-10000 active or sleeping Keep-Alive connections: 10000 syscalls (context switches between user and kernel
-space) will be done to check if socket contains received data permanently.
+Specifically, the main loop in user space iterates over **all** active or idle
+connection file descriptors. For example, 10,000 active or idle keep-alive
+connections require 10,000 syscalls (context switches between user and kernel
+space) to check for received data.
 
-Unlike (e.g. nginX) using epoll (also HTTP/1.2 uses epoll) a single syscall will tell user space about
-multiple filedescriptors having waiting data. With optimized 64bit server CPU and a good implementation:
-go lightspeed.
+In contrast, technologies like nginx and our HTTP/1.2 implementation use epoll.
+A single syscall informs user space about multiple file descriptors with pending
+data. With optimized 64-bit server CPUs and a well-designed implementation, this
+approach achieves lightning-fast performance.
