@@ -1,3 +1,4 @@
+[![CodeQL](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql)
 # Abstract: HTTP/1.2, HTTP/2 and HTTP/3
 
 Currently, Google engineers are planning to push HTTP/3. As HTTP/2 is still
