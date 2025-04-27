@@ -54,7 +54,7 @@ int main()
     string result = "";
 
     bp::list items = mn_dict.items();
-    for (uint8_t i=0; i<len(items); ++i) {
+    for (auto i=0; i<len(items); ++i) {
         string dict_key = bp::extract<string>(items[i][0]);
         cout << "Root dict key:" << dict_key << endl;
         result = dict_key;

@@ -41,14 +41,14 @@ Configuration::Configuration() :
     TmpPyObject = PyMapping_GetItemString(MainDict, "mimetypes");
     bp::list TmpMimetypes = bp::extract<bp::list>(TmpPyObject);
 
-    for (uint16_t i=0; i<len(TmpMimetypes); ++i) {
+    for (auto i=0; i<len(TmpMimetypes); ++i) {
         Mimetypes.push_back(bp::extract<string>(TmpMimetypes[i]));
     }
 
     TmpPyObject = PyMapping_GetItemString(MainDict, "namespaces");
     bp::list TmpNamespaces = bp::extract<bp::list>(TmpPyObject);
 
-    for (uint16_t i=0; i<len(TmpNamespaces); ++i) {
+    for (auto i=0; i<len(TmpNamespaces); ++i) {
 
         string NamespaceID;
         NamespaceProps_t NamespaceProps;
@@ -61,7 +61,7 @@ Configuration::Configuration() :
 
         NamespaceProps.FilesystemRef = nullptr;
 
-        for (uint16_t x=0; x<len(DictAttributes)-1; ++x) {
+        for (auto x=0; x<len(DictAttributes)-1; ++x) {
 
             DBG(-1, "Attribute Nr:" << x);
 

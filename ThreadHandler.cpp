@@ -126,7 +126,7 @@ void ClientThread::startThread()
 
 void ClientThread::processRequests()
 {
-    for (uint16_t i=0; i<_ClientRequests.size(); ++i) {
+    for (auto i=0; i<_ClientRequests.size(); ++i) {
 
         if (_ClientRequests[i].ASIndex == -1)
         {
