@@ -122,7 +122,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
                 ClientRef_t ClientRef = Clients.at(ReadFD);
                 ClientRef->appendBuffer(Buffer, RcvBytes);
 
-                if (ClientRef->parseRequestsBasic(SHMGetRequests, _ASRequestHandlerRef) > 0) {
+                if (ClientRef->processRequests(SHMGetRequests, _ASRequestHandlerRef) > 0) {
                     ++ProcessedClients;
                 }
             }
