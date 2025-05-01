@@ -8,7 +8,12 @@ aux_source_directory(. SRC_LIST_LIBHTTP)
 add_library(libhttp STATIC ${SRC_LIST_LIBHTTP})
 
 # add lib parser and network
-add_custom_target(libhttpheader SOURCES ./httpparser.hpp ./httpnet.hpp)
+add_custom_target(
+    libhttpheader
+    SOURCES
+    ./httpparser.hpp
+    ./httpnet.hpp
+)
 
 # set target link libraries
 target_link_libraries(libhttp ${Boost_LIBRARIES})

@@ -126,7 +126,7 @@ void ClientThread::startThread()
 
 void ClientThread::processRequests()
 {
-    for (auto i=0; i<_ClientRequests.size(); ++i) {
+    for (unsigned long i=0; i<_ClientRequests.size(); ++i) {
 
         if (_ClientRequests[i].ASIndex == -1)
         {
@@ -135,14 +135,14 @@ void ClientThread::processRequests()
 
             DBG(80, "Processing Request inside Thread with Index:'" << i << "' StartNanoseconds:" << StartNanoseconds.tv_nsec);
             BasePropsResult_t BaseProps;
-            _parseBasePropsRV(_ClientRequests[i].HTTPPayload, BaseProps);
+            _parseRequestProperties(_ClientRequests[i].HTTPPayload, BaseProps);
 
             DBG(120, "RequestType:'" << BaseProps.at(2) << "'");
             DBG(120, "RequestPath:'" << BaseProps.at(1) << "'");
             DBG(120, "HTTPVersion:'" << BaseProps.at(0) << "'");
 
             RequestHeaderResult_t Headers;
-            _parseHeadersRV(_ClientRequests[i].HTTPPayload, Headers);
+            _parseRequestHeaders(_ClientRequests[i].HTTPPayload, Headers);
 
             const string NamespaceID = Headers.at("Host");
             DBG(120, "NamespaceID:'" << NamespaceID << "'");
