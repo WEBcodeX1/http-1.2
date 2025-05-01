@@ -6,8 +6,10 @@ using namespace std;
 HTTPParser::HTTPParser(ClientFD_t ClientFD) :
     Client(ClientFD),
     _RequestCount(0),
-    _HTTPRequest(""),
-    _RegexContentLength(regex(".*Content-Length: ([0-9]+).*", regex::extended))
+    _RequestCountGet(0),
+    _RequestCountPost(0),
+    _RequestCountPostAS(0),
+    _HTTPRequest("")
 {
     DBG(120, "Constructor");
 }
@@ -19,127 +21,100 @@ HTTPParser::~HTTPParser()
 
 void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
 {
-    _HTTPRequest = _HTTPRequest + std::string(&BufferRef[0], BufferSize);
+    _HTTPRequest = _HTTPRequest + string(&BufferRef[0], BufferSize);
     DBG(250, "Buffer:'" << _HTTPRequest << "'");
     _splitRequests();
 }
 
 void HTTPParser::_splitRequests()
 {
-    DBG(200, "splitRequests Buffer:'" << _HTTPRequest << "'");
+    DBG(180, "splitRequests Buffer:'" << _HTTPRequest << "'");
 
+    //-> reset incomplete request string
+    string incompleteRequest("");
+
+    //-> cut from last found \n\r (last valid request end marker) until string end
+    size_t LastDelimiterPos = _HTTPRequest.rfind("\n\r");
+
+    //-> if min 1 full valid request && rest without end marker
+    if (LastDelimiterPos != string::npos && LastDelimiterPos != _HTTPRequest.length()) {
+
+        //-> put incomplete last request into tmp string
+        incompleteRequest = _HTTPRequest.substr(LastDelimiterPos);
+
+        //-> remove "\n\r"
+        incompleteRequest.replace(0, 2, "");
+    }
+
+    //-> split requests into _SplittedRequests vector
     _SplittedRequests.clear();
-
-    size_t ContentLengthFoundPos = _HTTPRequest.find("Content-Length");
-    size_t EndMarkerFoundPos = _HTTPRequest.find("\n\r");
-
-    cmatch RegexMatch;
-
-    uint SplitPosition = 0;
-
-    while(
-        (ContentLengthFoundPos < EndMarkerFoundPos) ||
-        (ContentLengthFoundPos == string::npos && EndMarkerFoundPos != string::npos)
-    )
-    {
-        if (ContentLengthFoundPos < EndMarkerFoundPos) {
-            if (regex_match(_HTTPRequest.c_str(), RegexMatch, _RegexContentLength)) {
-                DBG(140, "Content-Length header found.");
-                int ContentLength = stoi(RegexMatch[1]);
-                SplitPosition = EndMarkerFoundPos+ContentLength+3;
-            }
-        }
-        else if (ContentLengthFoundPos == string::npos && EndMarkerFoundPos != string::npos)
-        {
-            SplitPosition = EndMarkerFoundPos+3;
-        }
-
-        _SplittedRequests.push_back(
-            _HTTPRequest.substr(0, SplitPosition)
-        );
-
-        _HTTPRequest.erase(0, SplitPosition);
-
-        ContentLengthFoundPos = _HTTPRequest.find("Content-Length");
-        EndMarkerFoundPos = _HTTPRequest.find("\n\r");
-    }
-
+    String::split(_HTTPRequest, "\n\r", _SplittedRequests);
     _RequestCount = _SplittedRequests.size();
-    DBG(120, "splitRequests after split Vector Element count:" << _RequestCount);
+    DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
+
+    //-> "restore" incomplete last request buffer
+    _HTTPRequest = incompleteRequest;
 }
 
-void HTTPParser::parseRequestsComplete()
-{
-    for (auto &Request:_SplittedRequests) {
-        vector<std::string> RequestLines;
-        String::split(Request, "\n", RequestLines);
-    }
-}
-
-uint HTTPParser::parseRequestsBasic(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t ASRequestHandlerRef)
+uint HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
     setBaseAddress(SHMGetRequests);
 
-    uint16_t PythonRequestCount = 0;
-
     for (auto &Request:_SplittedRequests) {
-        PythonRequestCount += _parseBaseProps(Request, ASRequestHandlerRef);
+        _processRequestProperties(Request, ASRequestHandlerRef);
     }
 
-    return _SplittedRequests.size() - PythonRequestCount;
+    return _RequestCountGet;
 }
 
-uint16_t HTTPParser::_parseBaseProps(string& Request, const ASRequestHandlerRef_t ASRequestHandlerRef)
+void HTTPParser::_processRequestProperties(string& Request, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
     DBG(180, "HTTP Request:'" << Request << "'");
 
-    //- find first line endline
-    size_t StartPos = Request.find("\n");
-
-    //- set result vector
-    vector<std::string> BasePropsFound;
-
-    //- reverse split
-    String::rsplit(Request, StartPos, " ", BasePropsFound);
+    BasePropsResult_t BasePropsFound;
+    this->_parseRequestProperties(Request, BasePropsFound);
 
     DBG(140, "HTTP Version:" << BasePropsFound.at(0) << " File:" << BasePropsFound.at(1) << " Method:" << BasePropsFound.at(2));
     DBG(140, "HTTP Payload (c_str):" << Request.c_str());
 
-    uint16_t HTTPMethod = (BasePropsFound.at(2).find("POST") != string::npos) ? 2 : 1;
-    uint16_t HTTPVersion = (BasePropsFound.at(0).find("HTTP/1.1") != string::npos) ? 1 : 2;
+    //- check HTTP/1.2 (currently unimplemented)
+    const size_t HTTPVersion1_2Found = BasePropsFound.at(0).find("HTTP/1.2");
 
-    size_t PythonReqFound = BasePropsFound.at(1).find("/python/");
+    //- if not HTTP/1.1, do not process further
+    const size_t HTTPVersion1_1Found = BasePropsFound.at(0).find("HTTP/1.1");
 
+    const uint16_t HTTPMethod = (BasePropsFound.at(2).find("POST") != string::npos) ? 2 : 1;
+    const uint16_t HTTPVersion = (BasePropsFound.at(0).find("HTTP/1.1") != string::npos) ? 1 : 2;
+
+    //- check if POST request is an AS request
+    const size_t PythonReqFound = BasePropsFound.at(1).find("/python/");
+
+    //- get unique request nr
     uint16_t RequestNr = getNextReqNr();
 
-    DBG(140, "HTTP RequestNr:" << RequestNr << " HTTPVersion:" << HTTPVersion);
+    DBG(140, "HTTP RequestNr:" << RequestNr << " HTTPVersion:" << HTTPVersion << " HTTPMethod:" << HTTPMethod);
 
-    cmatch RegexMatch;
+    if (HTTPMethod == 2) {
+        ++this->_RequestCountPost;
+    }
 
-    if (PythonReqFound != BasePropsFound.at(1).npos) {
+    if (HTTPMethod == 2 && PythonReqFound != BasePropsFound.at(1).npos) {
 
         DBG(140, "Python Request:" << Request);
 
-        string Payload = "";
+        ++this->_RequestCountPostAS;
 
-        size_t ContentLengthFoundPos = Request.find("Content-Length");
-        size_t EndMarkerFoundPos = Request.find("\n\r");
+        //-> cut first properties line from request
+        size_t FirstLineEndMarker = Request.find("\n");
+        Request.replace(0, FirstLineEndMarker+1, "");
 
-        if (ContentLengthFoundPos != string::npos && EndMarkerFoundPos != string::npos) {
-            if (regex_match(Request.c_str(), RegexMatch, _RegexContentLength)) {
-                DBG(140, "Content-Length header found.");
-                int ContentLength = stoi(RegexMatch[1]);
-                uint SubStrStart = EndMarkerFoundPos+3;
-                uint SubStrEnd = EndMarkerFoundPos+ContentLength+3;
-                Payload = Request.substr(SubStrStart, SubStrEnd);
-            }
-        }
-
-        //- get Host header
-        BasePropsResult_t BaseProps;
         RequestHeaderResult_t Headers;
-        this->_parseBasePropsRV(Request, BaseProps);
-        this->_parseHeadersRV(Request, Headers);
+        this->_parseRequestHeaders(Request, Headers);
+
+        auto ContentBytes = stoi(Headers.at("Content-Length"));
+        string Payload = Request.substr(Request.length()-ContentBytes, ContentBytes);
+
+        DBG(140, "HTTP POST-AS payload:" << Payload);
 
         //- add ASRequestHandler request
         ASRequestHandlerRef->addRequest({
@@ -150,9 +125,12 @@ uint16_t HTTPParser::_parseBaseProps(string& Request, const ASRequestHandlerRef_
             RequestNr,
             Payload
         });
-        return 1;
     }
-    else {
+
+    if (HTTPMethod == 1) {
+
+        ++this->_RequestCountGet;
+
         //- set values in get requests shared memory
         const char* MsgCString = Request.c_str();
 
@@ -173,32 +151,33 @@ uint16_t HTTPParser::_parseBaseProps(string& Request, const ASRequestHandlerRef_
 
         void* NextSegmentAddr = getNextAddress(MsgLength);
         DBG(120, "Set SharedMem ClientFD:" << ClientFDAddr << " PayloadLength:" << MsgLengthAddr << " Payload:" << MsgAddress << " NextSegment:" << NextSegmentAddr);
-        return 0;
     }
 }
 
-void HTTPParser::_parseBasePropsRV(string& Request, BasePropsResultRef_t ResultRef)
+void HTTPParser::_parseRequestProperties(string& Request, BasePropsResultRef_t ResultRef)
 {
     DBG(120, "HTTP Request:'" << Request << "'");
 
     //- find first line endline
     size_t StartPos = Request.find("\n");
 
+    //-> if no headers (no \n), set start pos to end of string
+    if (StartPos == string::npos) {
+        StartPos = Request.length();
+    }
+
     //- reverse split
     String::rsplit(Request, StartPos, " ", ResultRef);
-
-    //- remove first line from Request
-    Request = Request.substr(StartPos+1, Request.length());
 
     DBG(120, "HTTP Version:" << ResultRef.at(0) << " File:" << ResultRef.at(1) << " Method:" << ResultRef.at(2) << " Request:" << Request);
 }
 
-void HTTPParser::_parseHeadersRV(string& Request, RequestHeaderResultRef_t ResultRef)
+void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t ResultRef)
 {
     DBG(120, "HTTP Request:'" << Request << "'");
 
     //- reverse split header lines
-    vector<std::string> Lines;
+    vector<string> Lines;
     String::split(Request, "\n", Lines);
 
     //- loop over lines, split, put into result map
@@ -208,12 +187,12 @@ void HTTPParser::_parseHeadersRV(string& Request, RequestHeaderResultRef_t Resul
 
         DBG(120, "Line:'" << Line << "'");
 
-        vector<std::string> HeaderPair;
+        vector<string> HeaderPair;
         if (Line.find(':') != string::npos) {
             String::rsplit(Line, Line.length(), ": ", HeaderPair);
 
-            std::string HeaderID = HeaderPair.at(1);
-            std::string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length()-1);
+            string HeaderID = HeaderPair.at(1);
+            string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length());
 
             DBG(120, "HeaderID:'" << HeaderID << "'");
             DBG(120, "HeaderValue:'" << HeaderValue << "'");

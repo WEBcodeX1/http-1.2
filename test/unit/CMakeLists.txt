@@ -1,2 +1,2 @@
-# add source dir
-aux_source_directory(. SRC_LIST_TEST_UNIT)
+# add subdirs
+add_subdirectory(http-parser)
