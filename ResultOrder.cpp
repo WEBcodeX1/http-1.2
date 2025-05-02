@@ -78,8 +78,8 @@ void ResultOrder::processRequests(const HTTPType_t HTTPType)
                 DBG(200, "ReqIndex:" << ReqIndex << " ReqNr:" << ReqNr);
 
                 //- if first ReqNr is not next (LastRequest+1) do not process
-                if (ReqProps.HTTPVersion == HTTP1_1 && ReqIndex == 0 && ReqNr != LastRequestNrCheck) { break; }
-                if (ReqProps.HTTPVersion == HTTP1_1 && ReqNr == LastRequestNrCheck) {
+                //if (ReqProps.HTTPVersion == HTTP1_1 && ReqIndex == 0 && ReqNr != LastRequestNrCheck) { break; }
+                if (ReqProps.HTTPVersion == HTTP1_1 && ReqNr >= LastRequestNrCheck) {
                     DBG(200, "HTTP1_1 RequestProps ClientFD:" << ReqProps.ClientFD << " HTTPType:" << ReqProps.HTTPVersion);
                     ResultData.push_back(ReqProps);
                 }

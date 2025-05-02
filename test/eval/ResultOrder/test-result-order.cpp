@@ -19,7 +19,6 @@ BOOST_AUTO_TEST_CASE( test_basic_non_ordered_http12 )
     BOOST_TEST(TestData[0].SendfileFD == 100);
     BOOST_TEST(TestData[1].SendfileFD == 102);
     BOOST_TEST(TestData[2].SendfileFD == 105);
-
 }
 
 BOOST_AUTO_TEST_CASE( test_basic_ordered_http11 )
@@ -40,7 +39,6 @@ BOOST_AUTO_TEST_CASE( test_basic_ordered_http11 )
     BOOST_TEST(TestData[0].SendfileFD == 100);
     BOOST_TEST(TestData[1].SendfileFD == 300);
     BOOST_TEST(TestData[2].SendfileFD == 102);
-
 }
 
 BOOST_AUTO_TEST_CASE( test_unordered_http11_1 )

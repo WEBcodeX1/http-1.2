@@ -15,6 +15,6 @@ using namespace std;
         }
 
 #define ERR(errmsg) \
-            cerr << __func__ << "(), " << __LINE__ << " - " << errmsg << endl; \
+        cerr << __func__ << "(), " << __LINE__ << " - " << errmsg << endl; \
 
 #endif

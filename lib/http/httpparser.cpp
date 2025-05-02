@@ -22,33 +22,40 @@ HTTPParser::~HTTPParser()
 void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
 {
     _HTTPRequest = _HTTPRequest + string(&BufferRef[0], BufferSize);
-    DBG(250, "Buffer:'" << _HTTPRequest << "'");
+    String::hexout(_HTTPRequest);
+    //DBG(250, "HTTPRequest:'" << _HTTPRequest << "'");
     _splitRequests();
 }
 
 void HTTPParser::_splitRequests()
 {
-    DBG(180, "splitRequests Buffer:'" << _HTTPRequest << "'");
+    //DBG(180, "splitRequests Buffer:'" << _HTTPRequest << "'");
+
+    //- reset request counters
+    _RequestCountGet = 0;
+    _RequestCountPost = 0;
+    _RequestCountPostAS = 0;
 
     //-> reset incomplete request string
     string incompleteRequest("");
 
-    //-> cut from last found \n\r (last valid request end marker) until string end
-    size_t LastDelimiterPos = _HTTPRequest.rfind("\n\r");
+    //-> check for existing valid request end marker
+    size_t LastDelimiterPos = _HTTPRequest.rfind("\r\n\r\n");
+    DBG(120, "LastDelimiterPos:" << LastDelimiterPos);
 
     //-> if min 1 full valid request && rest without end marker
-    if (LastDelimiterPos != string::npos && LastDelimiterPos != _HTTPRequest.length()) {
+    if (LastDelimiterPos != string::npos && LastDelimiterPos != _HTTPRequest.length()-4) {
 
         //-> put incomplete last request into tmp string
-        incompleteRequest = _HTTPRequest.substr(LastDelimiterPos);
+        incompleteRequest = _HTTPRequest.substr(LastDelimiterPos+4);
 
-        //-> remove "\n\r"
-        incompleteRequest.replace(0, 2, "");
+        //-> remove incomplete last request from _HTTPRequest
+        _HTTPRequest.replace(_HTTPRequest.begin()+LastDelimiterPos+4, _HTTPRequest.end(), "");
     }
 
     //-> split requests into _SplittedRequests vector
     _SplittedRequests.clear();
-    String::split(_HTTPRequest, "\n\r", _SplittedRequests);
+    String::split(_HTTPRequest, "\r\n\r\n", _SplittedRequests);
     _RequestCount = _SplittedRequests.size();
     DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
 
@@ -69,7 +76,7 @@ uint HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequ
 
 void HTTPParser::_processRequestProperties(string& Request, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
-    DBG(180, "HTTP Request:'" << Request << "'");
+    //DBG(180, "HTTP Request:'" << Request << "'");
 
     BasePropsResult_t BasePropsFound;
     this->_parseRequestProperties(Request, BasePropsFound);
@@ -105,8 +112,8 @@ void HTTPParser::_processRequestProperties(string& Request, const ASRequestHandl
         ++this->_RequestCountPostAS;
 
         //-> cut first properties line from request
-        size_t FirstLineEndMarker = Request.find("\n");
-        Request.replace(0, FirstLineEndMarker+1, "");
+        size_t FirstLineEndMarker = Request.find("\n\r");
+        Request.replace(0, FirstLineEndMarker+2, "");
 
         RequestHeaderResult_t Headers;
         this->_parseRequestHeaders(Request, Headers);
@@ -159,7 +166,7 @@ void HTTPParser::_parseRequestProperties(string& Request, BasePropsResultRef_t R
     DBG(120, "HTTP Request:'" << Request << "'");
 
     //- find first line endline
-    size_t StartPos = Request.find("\n");
+    size_t StartPos = Request.find("\r\n");
 
     //-> if no headers (no \n), set start pos to end of string
     if (StartPos == string::npos) {
@@ -178,19 +185,17 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
 
     //- reverse split header lines
     vector<string> Lines;
-    String::split(Request, "\n", Lines);
+    String::split(Request, "\r\n", Lines);
 
     //- loop over lines, split, put into result map
     for (auto &Line:Lines) {
-
-        if ( Line.find("\n\r") != string::npos ) { break; }
 
         DBG(120, "Line:'" << Line << "'");
 
         vector<string> HeaderPair;
         if (Line.find(':') != string::npos) {
-            String::rsplit(Line, Line.length(), ": ", HeaderPair);
 
+            String::rsplit(Line, Line.length(), ": ", HeaderPair);
             string HeaderID = HeaderPair.at(1);
             string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length());
 

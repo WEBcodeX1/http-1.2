@@ -5,6 +5,7 @@
 
 #include <boost/filesystem.hpp>
 #include <string.h>
+#include <iomanip>
 
 #include "fcntl.h"
 
@@ -66,8 +67,6 @@ public:
             ResultRef.push_back(Token);
             String.erase(0, FindPos + Delimiter.length());
         }
-        //ResultRef.push_back(String);
-        //String.erase(0, Delimiter.length());
         DBG(200, "String:'" << String << "'");
     }
 
@@ -91,6 +90,12 @@ public:
         ResultRef.push_back(Token);
     }
 
+    static void hexout(string& String)
+    {
+        for (auto i = String.begin(); i != String.end(); ++i) {
+            std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*i) << ' ';
+        }
+    }
 };
 
 #endif

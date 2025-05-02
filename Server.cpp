@@ -51,9 +51,6 @@ void Server::init()
     ResultProcessor::setVHostOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
     forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
-    //- set base memory addresses
-    //ASRequestHandlerRef->setBaseAddresses( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
-
     //- fork application server proesses
     setASProcessHandlerNamespaces(Namespaces);
     setASProcessHandlerOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
@@ -215,5 +212,4 @@ void Server::setupSharedMemory()
     madvise(_SHMPythonASResults, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
 
     DBG(120, "SharedMemAddress:" << _SHMStaticFS);
-    //return { SHMStaticFSPtr, SHMPOstASStatusPtr, SHMPOstASRequestsPtr,  SHMPOstASResultsPtr };
 }
