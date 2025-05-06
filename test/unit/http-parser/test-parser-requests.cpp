@@ -146,7 +146,12 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
 
     std::string Request("GET /t/tA.png HTTP/1.1\r\nCustomHeader: a\r\n\r\nGET /t/tB.png HTTP/1.1\r\nCustomHeader: b\r\n\r\nGET /t/tC.png HT");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
-    auto r = ClientObj->processRequests(SHMGetRequests, ASRequestHandlerRef);
+    auto r1 = ClientObj->processRequests(SHMGetRequests, ASRequestHandlerRef);
 
-    BOOST_TEST(r == 2);
+    std::string Request2("TP/1.1\r\nCustomHeader: c\r\n\r\n");
+    ClientObj->appendBuffer(Request2.c_str(), Request2.length());
+    auto r2 = ClientObj->processRequests(SHMGetRequests, ASRequestHandlerRef);
+
+    BOOST_TEST(r1 == 2);
+    BOOST_TEST(r2 == 1);
 }

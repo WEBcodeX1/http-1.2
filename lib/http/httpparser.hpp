@@ -40,12 +40,12 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    uint processRequests(SharedMemAddress_t, const ASRequestHandlerRef_t);
+    size_t processRequests(SharedMemAddress_t, const ASRequestHandlerRef_t);
 
 private:
 
     void _splitRequests();
-    void _processRequestProperties(string&, const ASRequestHandlerRef_t);
+    void _processRequestProperties(const size_t, const ASRequestHandlerRef_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
@@ -55,7 +55,7 @@ private:
     size_t _RequestCountPost;
     size_t _RequestCountPostAS;
 
-    string _HTTPRequest;
+    string _HTTPRequestBuffer;
 
 protected:
 
