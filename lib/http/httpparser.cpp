@@ -85,6 +85,8 @@ size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRe
 
 void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
+    DBG(140, "Processing Index:" << Index);
+
     //- get request ref at vector index
     auto Request = _SplittedRequests.at(Index);
 
@@ -177,12 +179,12 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
         //- try get next request +payload at vector index +1
         try {
-            auto NextRequest = _SplittedRequests.at(Index+1);
+            auto &NextRequest = _SplittedRequests.at(Index+1);
 
             if (NextRequest.length() >= ContentBytes) {
                 string Payload = NextRequest.substr(0, ContentBytes);
                 NextRequest.replace(0, ContentBytes, "");
-                DBG(140, "HTTP POST-AS Payload:" << Payload << " NextRequest:" << NextRequest);
+                DBG(140, "HTTP POST-AS Payload:" << Payload << " NextRequest:'" << NextRequest << "'");
 
                 //- increment request count
                 ++this->_RequestCountPostAS;
