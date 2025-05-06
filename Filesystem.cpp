@@ -94,6 +94,14 @@ void Filesystem::processFileProperties()
     }
 }
 
+bool Filesystem::checkFileExists(string File)
+{
+    if (_FilesExtended.find(File) == _FilesExtended.end()) {
+        return false;
+    }
+    return true;
+}
+
 FileProperties_t Filesystem::getFilePropertiesByFile(string File)
 {
     return _FilesExtended.at(File);

@@ -11,7 +11,7 @@ Configuration::Configuration() :
 
     namespace bp = boost::python;
 
-    const string PScript = "/home/cpruefer/Documents/Repos/data-gateway/python/config.py";
+    const string PScript = "/etc/falcon-http/config.py";
 
     FILE* fp = fopen(PScript.c_str(), "r");
     PyObject *MainModule, *MainDict, *TmpPyObject;

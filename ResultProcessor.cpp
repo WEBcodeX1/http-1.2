@@ -90,7 +90,7 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
         //- main loop until terminate signal raised
         while(RunServer) {
 
-            DBG(250, "ResultProcessor Address:" << StaticFSLock << " Atomic Lock = " << *(StaticFSLock));
+            DBG(320, "ResultProcessor Address:" << StaticFSLock << " Atomic Lock = " << *(StaticFSLock));
 
             bool WorkDone = false;
 
@@ -169,7 +169,7 @@ void ResultProcessor::_processStaticFSRequests(uint16_t RequestCount)
         string ClientPayloadString(ClientPayload, ClientPayloadLength);
 
         getNextAddress(ClientPayloadLength);
-        DBG(120, "ClientFD:" << ClientFD << " ReqNr:" << ReqNr << " HTTpVersion:" << HTTPVersion << " PayloadLength:" << ClientPayloadLength << " Payload:'" << ClientPayloadString << "'");
+        DBG(120, "ClientFD:" << ClientFD << " ReqNr:" << ReqNr << " HTTPVersion:" << HTTPVersion << " PayloadLength:" << ClientPayloadLength << " Payload:'" << ClientPayloadString << "'");
 
         ClientFD_t ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, ClientFD, 0);
 

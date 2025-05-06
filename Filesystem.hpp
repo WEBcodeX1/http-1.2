@@ -54,6 +54,7 @@ public:
     void initFiles();
     void processFileProperties();
     FileProperties_t getFilePropertiesByFile(string File);
+    bool checkFileExists(string File);
 
     string Hostname;
     string BasePath;

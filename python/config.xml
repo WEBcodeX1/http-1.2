@@ -8,7 +8,7 @@
         </namespace>
         <namespace>
             <id>app2</id>
-            <hostname>testapp2.local"</hostname>
+            <hostname>testapp2.local</hostname>
             <path>/app2</path>
             <interpreters>2</interpreters>
         </namespace>

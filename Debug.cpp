@@ -11,10 +11,10 @@ using namespace std;
 
 #define DBG(level, debugmsg) \
         if (LOG_LEVEL > level) { \
-            cout << __func__ << "(), " << __LINE__ << " - " << debugmsg << endl; \
+            cout << dec << __func__ << "(), " << __LINE__ << " - " << debugmsg << endl; \
         }
 
 #define ERR(errmsg) \
-            cerr << __func__ << "(), " << __LINE__ << " - " << errmsg << endl; \
+        cerr << dec << __func__ << "(), " << __LINE__ << " - " << errmsg << endl; \
 
 #endif
