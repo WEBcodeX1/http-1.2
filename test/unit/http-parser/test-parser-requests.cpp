@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     ClientFD_t ClientFD = 1;
     ClientRef_t ClientObj(new HTTPParser(ClientFD));
 
-    std::string Request("POST /python/test1.py HTTP/1.1\r\nHost: test.localnet\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}\r\n\r\n");
+    std::string Request("POST /python/test1.py HTTP/1.1\r\nHost: test.loalnet\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
     auto r = ClientObj->processRequests(SHMGetRequests, ASRequestHandlerRef);
 

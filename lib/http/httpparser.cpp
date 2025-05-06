@@ -47,6 +47,8 @@ void HTTPParser::_splitRequests()
 
     //-> split requests into _SplittedRequests vector
     String::split(_HTTPRequestBuffer, "\r\n\r\n", _SplittedRequests);
+    _SplittedRequests.push_back(_HTTPRequestBuffer);
+
     _RequestCount = _SplittedRequests.size();
     DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
 }
@@ -88,7 +90,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
     DBG(140, "Processing Index:" << Index);
 
     //- get request ref at vector index
-    auto Request = _SplittedRequests.at(Index);
+    auto &Request = _SplittedRequests.at(Index);
 
     //- on empty request return
     if (Request.empty()) { return; }
