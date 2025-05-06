@@ -182,7 +182,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
             if (NextRequest.length() >= ContentBytes) {
                 string Payload = NextRequest.substr(0, ContentBytes);
                 NextRequest.replace(0, ContentBytes, "");
-                DBG(140, "HTTP POST-AS Payload:" << Payload);
+                DBG(140, "HTTP POST-AS Payload:" << Payload << " NextRequest:" << NextRequest);
 
                 //- increment request count
                 ++this->_RequestCountPostAS;
@@ -259,11 +259,8 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
     vector<string> Lines;
     String::split(Request, "\r\n", Lines);
 
-    //- add last line (unsplitted)
-    const size_t LastDelimiter = Request.rfind("\r\n");
-    if (LastDelimiter != string::npos) {
-        Lines.push_back(Request.substr(LastDelimiter+2, Request.length()));
-    }
+    DBG(120, "Last Header Line:'" << Request << "'");
+    Lines.push_back(Request);
 
     //- loop over lines, split, put into result map
     for (auto &Line:Lines) {

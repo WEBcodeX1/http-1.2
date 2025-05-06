@@ -9,7 +9,7 @@ using namespace std;
 
 BOOST_AUTO_TEST_CASE( test_single_get_request )
 {
-    cout << "Check single get request." << endl;
+    cout << "Check single GET request." << endl;
 
     void* SHMBase = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMGetRequests = static_cast<char*>(SHMBase) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
 
 BOOST_AUTO_TEST_CASE( test_multiple_get_request )
 {
-    cout << "Check multiple (2) get requests." << endl;
+    cout << "Check multiple (2) GET requests." << endl;
 
     void* SHMBase = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMGetRequests = static_cast<char*>(SHMBase) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
 
 BOOST_AUTO_TEST_CASE( test_single_post_request )
 {
-    cout << "Check single post request." << endl;
+    cout << "Check single POST request." << endl;
 
     void* SHMBase = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMGetRequests = static_cast<char*>(SHMBase) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     ClientFD_t ClientFD = 1;
     ClientRef_t ClientObj(new HTTPParser(ClientFD));
 
-    std::string Request("POST /python/test1.py HTTP/1.1\r\nHost: test.lcoalnet\r\nContent-Type: application/json\r\nContent-Length: 2\r\n{}\r\n\r\n");
+    std::string Request("POST /python/test1.py HTTP/1.1\r\nHost: test.localnet\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}\r\n\r\n");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
     auto r = ClientObj->processRequests(SHMGetRequests, ASRequestHandlerRef);
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
 
 BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
 {
-    cout << "Check multiple (3) get requests, last truncated." << endl;
+    cout << "Check multiple (3) GET requests, truncated over 2 requests." << endl;
 
     void* SHMBase = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMGetRequests = static_cast<char*>(SHMBase) + sizeof(atomic_uint16_t) + sizeof(uint16_t);
