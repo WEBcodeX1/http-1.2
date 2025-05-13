@@ -39,7 +39,7 @@ typedef struct {
 } ThreadHandlerGlobals_t;
 
 
-class ClientThread: private HTTPParser, private SHMPythonAS
+class ClientThread: private HTTPParser
 {
 
 public:

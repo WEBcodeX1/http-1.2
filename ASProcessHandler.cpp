@@ -73,10 +73,12 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 DBG(20, "ASIndex:" << Index << " Process UID:" << getuid() << " GID:" << getgid());
 
+                /*
                 //- set process name
-                std::string ProcessNameDyn = "python-as" + std::to_string(Index);
+                std::string ProcessNameDyn = "falcon-as-python" + std::to_string(Index);
                 const char* ProcessName = ProcessNameDyn.c_str();
                 prctl(PR_SET_NAME, (unsigned long) ProcessName);
+                */
 
                 //- drop privileges
                 Permission::dropPrivileges(2000, 2000);
@@ -125,10 +127,10 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                 //- main loop
                 while(true) {
 
-                    DBG(200, "PythonAS Main Loop Index:" << Index);
+                    DBG(300, "PythonAS Main Loop Index:" << Index);
                     atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
                     atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));
-                    DBG(200, " CanReadAddr:" << CanReadAddr << " Val:" << *(CanReadAddr) << " WriteReadyAddr:" << WriteReadyAddr << " Val:" << *(WriteReadyAddr));
+                    DBG(300, " CanReadAddr:" << CanReadAddr << " Val:" << *(CanReadAddr) << " WriteReadyAddr:" << WriteReadyAddr << " Val:" << *(WriteReadyAddr));
 
                     if (*(CanReadAddr) == 1 && *(WriteReadyAddr) == 0) {
                         DBG(-1, "PythonAS invoking!");

@@ -73,8 +73,8 @@ Stop server with signal SIGTERM (```kill http-1.2```).
 
 ### 1.6.1. Check GET requests
 
-Open http://testapp1.local or http://testapp2.local in a local browser to check if
-installation has succeeded.
+Open http://testapp1.local/index.html or http://testapp2.local/index.html in a local browser
+to check if setup is working correctly.
 
 ### 1.6.2. Check POST requests
 

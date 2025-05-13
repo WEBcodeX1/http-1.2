@@ -130,19 +130,21 @@ void ClientThread::processRequests()
 
         if (_ClientRequests[i].ASIndex == -1)
         {
+            /*
             struct timespec StartNanoseconds;
             clock_gettime(CLOCK_REALTIME, &StartNanoseconds);
-
             DBG(80, "Processing Request inside Thread with Index:'" << i << "' StartNanoseconds:" << StartNanoseconds.tv_nsec);
+            */
+
             BasePropsResult_t BaseProps;
             _parseRequestProperties(_ClientRequests[i].HTTPPayload, BaseProps);
+
+            RequestHeaderResult_t Headers;
+            _parseRequestHeaders(_ClientRequests[i].HTTPPayload, Headers);
 
             DBG(120, "RequestType:'" << BaseProps.at(2) << "'");
             DBG(120, "RequestPath:'" << BaseProps.at(1) << "'");
             DBG(120, "HTTPVersion:'" << BaseProps.at(0) << "'");
-
-            RequestHeaderResult_t Headers;
-            _parseRequestHeaders(_ClientRequests[i].HTTPPayload, Headers);
 
             const string NamespaceID = Headers.at("Host");
             DBG(120, "NamespaceID:'" << NamespaceID << "'");
@@ -154,12 +156,18 @@ void ClientThread::processRequests()
             struct std::tm * ptm = std::localtime(&tt);
             current_date << std::put_time(ptm, "%a, %d %b %Y %T") << '\n';
 
-            try {
-                NamespaceProps_t NamespaceProps = _Namespaces.at(NamespaceID);
+            /*
+            for (const auto &Namespace:_Namespaces) {
+                DBG(120, "ThreadHandler NamespaceID:'" << Namespace.first << "' PathRel:'" << Namespace.second.PathRel << "'");
+            }
+            */
 
-                DBG(120, "NamespacePath:'" << NamespaceProps.FilesystemRef->Path << "'");
-                DBG(120, "NamespaceBasePath:'" << NamespaceProps.FilesystemRef->BasePath << "'");
+            NamespaceProps_t NamespaceProps = _Namespaces.at(NamespaceID);
 
+            DBG(120, "NamespacePath:'" << NamespaceProps.FilesystemRef->Path << "'");
+            DBG(120, "NamespaceBasePath:'" << NamespaceProps.FilesystemRef->BasePath << "'");
+
+            if (NamespaceProps.FilesystemRef->checkFileExists(BaseProps.at(1))) {
                 FileProps = NamespaceProps.FilesystemRef->getFilePropertiesByFile(BaseProps.at(1));
 
                 //DBG(80, "ParentPidFD:" << _Globals.ParentPidFD);
@@ -203,8 +211,7 @@ void ClientThread::processRequests()
                 }
                 DBG(50, "sendfile() wrote bytes:" << SumBytes);
             }
-            catch(...) {
-
+            else {
                 string Response = "HTTP/1.1 404 Not Found\n";
                 Response.append("Date: ");
                 Response.append(current_date.str());
@@ -221,11 +228,13 @@ void ClientThread::processRequests()
                 int res1 = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
             }
 
+            /*
             struct timespec EndNanoseconds;
             clock_gettime(CLOCK_REALTIME, &EndNanoseconds);
 
             uint64_t DurationNanoseconds = EndNanoseconds.tv_nsec - StartNanoseconds.tv_nsec;
             DBG(80, "Thread processing took Nanoseconds:" << DurationNanoseconds);
+            */
         }
 
         if (_ClientRequests[i].ASIndex >= 0)
