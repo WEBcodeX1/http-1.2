@@ -1,43 +1,75 @@
-## How to contribute to HTTP/1.2
+# Contributing to HTTP/1.2
 
-Basically:
+Welcome to the HTTP/1.2 project! We appreciate your interest in improving our codebase. Whether you’re fixing a typo, reporting a bug, or proposing a new feature, your contribution is highly valued.
 
-1. Clone repository
-2. Create branch (local or remote)
-3. Create pull request (PR)
-4. Reviewers will merge or decline
+---
 
-### Clean Code
+## 🚀 Getting Started
 
-I am a big fan of the clean code paradigm. So you should:
+1. **Fork & Clone** the repository.
+2. **Create a branch** for your work (`feature/xyz`, `fix/bug-abc`, etc.).
+3. **Push your changes** to your branch.
+4. **Create a Pull Request (PR)** describing your changes.
+5. Wait for your PR to be **reviewed** and merged.
 
-1. Blame non-clean-code
-2. Code with the clean code paradigm in mind
+---
 
-### Signing Key / pkcs11
+## 🧹 Clean Code Matters
 
-It is adviced to add a public signing key to GitHub and use Smartcards with openssh / ssh-agent.
+We are passionate about clean code! Please:
 
-Details about configuration see: [GitHub Documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification).
+- **Strive for clarity:** Write readable, maintainable code.
+- **Refactor** where necessary.
+- **Call out** and improve non-clean-code if you spot it.
 
-### Questions / Feature Requests / Improvements
+Recommended reading: [Clean Code by Robert C. Martin](https://www.goodreads.com/book/show/3735293-clean-code)
 
-Send questions regarding HTTP/1.2 to [http1-2@webcodex.de](http1-2@webcodex.de)
+---
 
-### Bugs / Issues
+## 🔏 Commit Signing & Security
 
-* Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/WEBcodeX1/http-1.2/issues).
-* If not already reported, open a new issue addressing the problem [New Issue](https://github.com/WEBcodeX1/http-1.2/issues/new).
-  Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior.
+- Add a **public signing key** to GitHub.
+- Prefer using **Smartcards** with `openssh` / `ssh-agent` for commit signing.
+- See [GitHub: Commit Signature Verification](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) for setup instructions.
 
-Issue templates follow.
+---
 
-### Cosmetical Fixing
+## ❓ Questions, Feature Requests & Improvements
 
-Cosmetical changes (whitespace, indentation, etc.) are welcome.
+- Email us at [http1-2@webcodex.de](mailto:http1-2@webcodex.de) for questions, feature requests, or improvement ideas.
+- For technical discussions, use [GitHub Discussions](https://github.com/WEBcodeX1/http-1.2/discussions) if enabled.
 
-### Happy Hacking
+---
 
-Feel free to contribute.
+## 🐞 Reporting Bugs & Issues
 
-HTTP/1.2 Lead Developer "Claus Prüfer"
+1. **Search existing issues** [here](https://github.com/WEBcodeX1/http-1.2/issues) before opening a new one.
+2. If your bug is new, [create an issue](https://github.com/WEBcodeX1/http-1.2/issues/new) and include:
+   - A **descriptive title**
+   - A **clear explanation** of the problem
+   - Steps to **reproduce**
+   - **Expected vs. actual behavior**
+   - Relevant **code sample** or **test case**
+
+---
+
+## 💄 Cosmetical Fixes
+
+- Whitespace, indentation, comments, typo corrections, and other cosmetic changes are always welcome!
+
+---
+
+## 🔗 Issue & PR Templates
+
+- Please use the provided **issue templates** and **PR templates** for a streamlined process.
+
+---
+
+## 🌟 Happy Hacking!
+
+We’re excited to see your contributions. Thank you for making HTTP/1.2 better!
+
+HTTP/1.2 Lead Developer  
+**Claus Prüfer**
+
+---
