@@ -17,6 +17,6 @@ target_link_libraries(test-boost-python ${Boost_LIBRARIES})
 
 target_link_libraries(test-pointer-ref ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-#target_link_libraries(test-staticfs-thread-processing ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
+# add subdirs
 add_subdirectory(ResultOrder)
+add_subdirectory(JavaJNI)
