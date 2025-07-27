@@ -24,6 +24,7 @@ add_executable(test-run-jni test-run-jni.cpp)
 
 # boost / java jni libs
 target_link_libraries(test-run-jni ${JNI_LIBRARIES})
+target_link_libraries(test-run-jni ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 # add custom targets
 add_custom_target(
