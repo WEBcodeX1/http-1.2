@@ -46,7 +46,12 @@ public:
     string ReqPayloadString;
     string ResultString;
 
+#if defined(JAVA_BACKEND)
+    JavaVM *jvm;
+    JNIEnv *jnienv;
+#else
     boost::python::object PyClass;
+#endif
 
     private:
 
