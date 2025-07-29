@@ -5,7 +5,6 @@ aux_source_directory(. SRC_LIST_JAVA_JNI)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 
-message("JAVA_HOME = ${JAVA_HOME}")
 message("Java_JAVA_EXECUTABLE = ${Java_JAVA_EXECUTABLE}")
 message("Java_JAVAC_EXECUTABLE = ${Java_JAVAC_EXECUTABLE}")
 message("Java_JAVAH_EXECUTABLE = ${Java_JAVAH_EXECUTABLE}")
@@ -26,9 +25,3 @@ add_executable(test-run-jni test-run-jni.cpp)
 target_link_libraries(test-run-jni ${JNI_LIBRARIES})
 target_link_libraries(test-run-jni ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-# add custom targets
-add_custom_target(
-    test-run-jni-header
-    SOURCES
-    ./test-run-jni.hpp
-)
