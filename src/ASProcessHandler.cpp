@@ -1,5 +1,11 @@
 #include "ASProcessHandler.hpp"
 
+#if defined(JAVA_BACKEND)
+#include "../src/ASBackend/JavaBackend.hpp"
+#else
+#include "../src/ASBackend/PythonBackend.hpp"
+#endif
+
 using namespace std;
 
 static bool RunServer = true;
@@ -107,22 +113,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 DBG(120, "Python Path:" << PythonPath.c_str());
 
-                Py_InitializeEx(0);
-
-                int rc = Py_IsInitialized();
-                DBG(120, "Python Interpreter initialized:" << rc);
-
-                bp::object PyModule;
-                bp::object PyClass;
-
-                try{
-                    PyModule = bp::import("WebApp");
-                    PyClass = PyModule.attr("BaseClass")();
-                } catch(const bp::error_already_set&) {
-                    PyErr_Print();
-                    DBG(120, "Python Module Import Error.");
-                    //std::exit(1);
-                }
+                Backend::Processor::init(this);
 
                 //- main loop
                 while(true) {
@@ -135,34 +126,14 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                     if (*(CanReadAddr) == 1 && *(WriteReadyAddr) == 0) {
                         DBG(-1, "PythonAS invoking!");
 
-                        string ReqJSON = "{\"payload\": 32}";
-
                         HTTPPayloadLength_t ReqPayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 6)));
-
                         char ReqPayload[ReqPayloadLength];
                         memcpy(&ReqPayload[0], static_cast<char*>(getRequestAddress(Index)), ReqPayloadLength);
                         string ReqPayloadString(ReqPayload, ReqPayloadLength);
 
-                        uint r = ReqPayloadString.compare(ReqJSON);
-                        DBG(140, "PythonAS Payload:'" << ReqPayloadString << "' ReqJSON:'" << ReqJSON << "' Compare:" << r);
+                        string ResultString = "";
 
-                        string PyResultString = "";
-                        try{
-                            bp::object PyResult = PyClass.attr("invoke")(ReqPayloadString);
-                             PyResultString = to_string(bp::extract<int>(PyResult));
-                            DBG(-1, "PythonAS Result:" << PyResultString);
-                        } catch(const bp::error_already_set&) {
-                            PyErr_Print();
-                            DBG(120, "Python call 'invoke()' method Error.");
-                        }
-
-                        //- set result payload
-                        const char* ResultCString = PyResultString.c_str();
-                        char* Payload = new(getResultAddress(Index)) char[PyResultString.length()];
-                        memcpy(Payload, &ResultCString[0], PyResultString.length());
-
-                        //- set result payload length
-                        new(getMetaAddress(Index, 7)) HTTPPayloadLength_t(PyResultString.length());
+                        Backend::Processor::process(this, Index);
 
                         //- set CanRead and WriteReady
                         new(getMetaAddress(Index, 0)) uint16_t(0);

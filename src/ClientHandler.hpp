@@ -17,7 +17,7 @@
 #include "MemoryManager.hpp"
 #include "ASRequestHandler.hpp"
 
-#include "lib/http/httpparser.hpp"
+#include "../lib/http/httpparser.hpp"
 
 
 typedef std::shared_ptr<HTTPParser> ClientRef_t;

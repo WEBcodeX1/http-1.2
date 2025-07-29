@@ -1,7 +1,7 @@
 #ifndef LibEvent_hpp
 #define LibEvent_hpp
 
-#include "../../Debug.cpp"
+#include "../../src/Debug.cpp"
 
 #include <memory>
 #include <string>

@@ -1,7 +1,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "../../../Helper.hpp"
+#include "../../../src/Helper.hpp"
 
 
 using namespace std;

@@ -1,11 +1,11 @@
 #ifndef LibHTTP_parser_hpp
 #define LibHTTP_parser_hpp
-#include "../../Debug.cpp"
-#include "../../Helper.hpp"
-#include "../../IPCHandler.hpp"
-#include "../../IPCHandlerAS.hpp"
-#include "../../ASRequestHandler.hpp"
-#include "../../Client.hpp"
+#include "../../src/Debug.cpp"
+#include "../../src/Helper.hpp"
+#include "../../src/IPCHandler.hpp"
+#include "../../src/IPCHandlerAS.hpp"
+#include "../../src/ASRequestHandler.hpp"
+#include "../../src/Client.hpp"
 
 #include <string>
 

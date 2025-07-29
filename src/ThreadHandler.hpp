@@ -13,7 +13,7 @@
 #include <chrono>
 #include <thread>
 
-#include "./lib/http/httpparser.hpp"
+#include "../lib/http/httpparser.hpp"
 
 #include "Helper.hpp"
 #include "Global.hpp"

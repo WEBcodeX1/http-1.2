@@ -1,7 +1,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "../../../Vector.hpp"
+#include "../../../src/Vector.hpp"
 
 
 BOOST_AUTO_TEST_CASE( test_vector_erase )

@@ -27,7 +27,7 @@ typedef struct {
 } ASProcessHandlerSHMPointer_t;
 
 
-class ASProcessHandler : private SHMPythonAS, private CPU
+class ASProcessHandler : public SHMPythonAS, private CPU
 {
 
 public:
@@ -43,11 +43,20 @@ public:
 
     static void terminate(int);
 
-private:
+    string ReqPayloadString;
+    string ResultString;
+
+#if defined(JAVA_BACKEND)
+    JavaVM *jvm;
+    JNIEnv *jnienv;
+#else
+    boost::python::object PyClass;
+#endif
+
+    private:
 
     Namespaces_t _Namespaces;
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
-
 };
 
 #endif

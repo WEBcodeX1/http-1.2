@@ -4,10 +4,10 @@ aux_source_directory(. SRC_LIST_TEST_HTTPPARSER)
 add_executable(
     test-parser-requests
     "test-parser-requests.cpp"
-    ../../../Client.cpp
-    ../../../IPCHandler.cpp
-    ../../../IPCHandlerAS.cpp
-    ../../../ASRequestHandler.cpp
+    ../../../src/Client.cpp
+    ../../../src/IPCHandler.cpp
+    ../../../src/IPCHandlerAS.cpp
+    ../../../src/ASRequestHandler.cpp
 )
 
 # add custom targets
