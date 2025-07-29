@@ -93,15 +93,6 @@ add_custom_target(
     ./src//Vector.hpp
 )
 
-# add java jni header
-if ( DEFINED JAVA_BACKEND )
-    add_custom_target(
-        JavaJNIHeaderFile
-        SOURCES
-        ./src/JavaAS.hpp
-    )
-endif()
-
 # add subdirs
 add_subdirectory(lib)
 add_subdirectory(test)
