@@ -3,8 +3,8 @@
 
 #include <boost/regex.hpp>
 
-#include "../../Debug.cpp"
-#include "../../Helper.hpp"
+#include "../../src/Debug.cpp"
+#include "../../src/Helper.hpp"
 
 #include <string>
 

@@ -1,8 +1,8 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "../../../Client.hpp"
-#include "../../../ClientHandler.hpp"
+#include "../../../src/Client.hpp"
+#include "../../../src/ClientHandler.hpp"
 
 
 using namespace std;
