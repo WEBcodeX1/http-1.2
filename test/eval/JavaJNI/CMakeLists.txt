@@ -5,7 +5,6 @@ aux_source_directory(. SRC_LIST_JAVA_JNI)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 
-message("JAVA_HOME = ${JAVA_HOME}")
 message("Java_JAVA_EXECUTABLE = ${Java_JAVA_EXECUTABLE}")
 message("Java_JAVAC_EXECUTABLE = ${Java_JAVAC_EXECUTABLE}")
 message("Java_JAVAH_EXECUTABLE = ${Java_JAVAH_EXECUTABLE}")

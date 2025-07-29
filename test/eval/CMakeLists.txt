@@ -19,4 +19,8 @@ target_link_libraries(test-pointer-ref ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 # add subdirs
 add_subdirectory(ResultOrder)
-add_subdirectory(JavaJNI)
+
+# only include java jni test when JAVA_BACKEND=1
+if ( DEFINED JAVA_BACKEND )
+    add_subdirectory(JavaJNI)
+endif()
