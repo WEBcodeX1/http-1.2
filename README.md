@@ -16,8 +16,6 @@ CI-generated documentation is available at [/doc/README.md](/doc/README.md) or
 
 ## 2. Features
 
-The following features are planned:
-
 - Lightweight
 - Secure
 - Fast
