@@ -32,6 +32,11 @@ void Server::init()
     //- disable OS signals SIGINT, SIGPIPE
     Signal::disableSignals();
 
+    #if defined(DEBUG_BUILD)
+    //- overwrite termination handler (display backtrace)
+    std::set_terminate(SigHandler::myterminate);
+    #endif
+
     //- setup termination handler
     setTerminationHandler();
 
