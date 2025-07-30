@@ -129,9 +129,8 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                         HTTPPayloadLength_t ReqPayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 6)));
                         char ReqPayload[ReqPayloadLength];
                         memcpy(&ReqPayload[0], static_cast<char*>(getRequestAddress(Index)), ReqPayloadLength);
-                        string ReqPayloadString(ReqPayload, ReqPayloadLength);
-
-                        string ResultString = "";
+                        string ReqPayloadStringTmp(ReqPayload, ReqPayloadLength);
+                        ReqPayloadString = ReqPayloadStringTmp;
 
                         Backend::Processor::process(this, Index);
 

@@ -1,6 +1,6 @@
 import json
 
-class BaseClass:
+class WebApp:
     def invoke(self, ReqJSON):
         Request = json.loads(ReqJSON)
-        return Request["payload"]
+        return str(Request["payload"])

@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.11)
 project(falcon-as)
 
+# do not print out warning
+set(ignoreMe "${JAVA_BACKEND}")
+
 # find python3
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 find_package(PythonLibs REQUIRED)
