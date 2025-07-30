@@ -1,6 +1,7 @@
-#include <boost/python.hpp>
 #include "../Global.hpp"
 #include "../ASProcessHandler.hpp"
+
+#include <boost/python.hpp>
 
 
 namespace bp = boost::python;
@@ -27,29 +28,30 @@ namespace Backend {
             } catch(const bp::error_already_set&) {
                 PyErr_Print();
                 DBG(120, "Python Module Import Error.");
-                //std::exit(1);
             }
         }
 
         //- process request
         static void process(ASProcessHandler* ProcessHandlerPtr, int Index)
         {
+            DBG(100, "PythonAS Index:" << Index << " call 'invoke(" << ProcessHandlerPtr->ReqPayloadString << ")'.");
+            const char* ResultCharArray = "";
+
             try{
                 bp::object PyResult = ProcessHandlerPtr->PyClass.attr("invoke")(ProcessHandlerPtr->ReqPayloadString);
-                ProcessHandlerPtr->ResultString = to_string(bp::extract<int>(PyResult));
-                DBG(-1, "PythonAS Result:" << ProcessHandlerPtr->ResultString);
+                ResultCharArray = bp::extract<const char*>(PyResult);
+                DBG(-1, "PythonAS Result:" << ResultCharArray);
             } catch(const bp::error_already_set&) {
                 PyErr_Print();
                 DBG(120, "Python call 'invoke()' method Error.");
             }
 
-            //- set result payload
-            const char* ResultCString = ProcessHandlerPtr->ResultString.c_str();
-            char* Payload = new(ProcessHandlerPtr->getResultAddress(Index)) char[ProcessHandlerPtr->ResultString.length()];
-            memcpy(Payload, &ResultCString[0], ProcessHandlerPtr->ResultString.length());
+            //- copy result into correct memory region
+            char* Payload = new(ProcessHandlerPtr->getResultAddress(Index)) char[strlen(ResultCharArray)];
+            memcpy(Payload, &ResultCharArray[0], strlen(ResultCharArray));
 
             //- set result payload length
-            new(ProcessHandlerPtr->getMetaAddress(Index, 7)) HTTPPayloadLength_t(ProcessHandlerPtr->ResultString.length());
+            new(ProcessHandlerPtr->getMetaAddress(Index, 7)) HTTPPayloadLength_t(strlen(ResultCharArray));
         }
 
     };

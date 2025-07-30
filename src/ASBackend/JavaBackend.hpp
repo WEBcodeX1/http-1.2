@@ -1,6 +1,8 @@
 #include "../Global.hpp"
 #include "../ASProcessHandler.hpp"
+
 #include <jni.h>
+
 
 namespace Backend {
 
@@ -25,17 +27,20 @@ namespace Backend {
 
             //- init jvm / jni interface
             jint rc = JNI_CreateJavaVM(&ProcessHandlerPtr->jvm, (void**)&ProcessHandlerPtr->jnienv, &vm_args);
-            cout << "JNI CreateJavaVM rc:" << rc << endl;
+            DBG(160, "JNI CreateJavaVM rc:" << rc);
             delete[] options;
         }
 
         //- process request
         static void process(ASProcessHandler* ProcessHandlerPtr, int Index)
         {
+            DBG(100, "JavaAS Index:" << Index << " call 'invoke(" << ProcessHandlerPtr->ReqPayloadString << ")'.");
+            const char* ResultCharArray = "";
+
             //- try loading compiled "WebApp" class
             jclass JavaClass = ProcessHandlerPtr->jnienv->FindClass("WebApp");
             if(JavaClass == nullptr) {
-                cerr << "ERROR: WebApp class not found!";
+                ERR("JNI WebApp class not found.");
             }
             else {
                 //- get WebApp.invoke() reference
@@ -46,22 +51,22 @@ namespace Backend {
                 );
 
                 if(JavaMethodID == nullptr) {
-                    cerr << "ERROR: String invoke(String) method not found!" << endl;
+                    ERR("JNI invoke() method not found.");
                 }
                 else {
                     jstring InputJSON = ProcessHandlerPtr->jnienv->NewStringUTF(ProcessHandlerPtr->ReqPayloadString);
                     jobject Result = (jstring)ProcessHandlerPtr->jnienv->CallStaticObjectMethod(JavaClass, JavaMethodID, InputJSON);
                     ProcessHandlerPtr->jnienv->ReleaseStringUTFChars(InputJSON, NULL);
                     if(Result != nullptr) {
-                        const char* ResultString = ProcessHandlerPtr->jnienv->GetStringUTFChars((jstring)Result, NULL);
-                        cout << "Returned payload string:" << ResultString << endl;
+                        ResultCharArray = ProcessHandlerPtr->jnienv->GetStringUTFChars((jstring)Result, NULL);
+                        DBG(160, "Returned payload string:" << ResultCharArray);
 
-                        //- set result payload
-                        char* Payload = new(ProcessHandlerPtr->getResultAddress(Index)) char[ProcessHandlerPtr->strlen(ResultString)];
-                        memcpy(Payload, &ResultString[0], ProcessHandlerPtr->strlen(ResultString));
+                        //- copy result into correct memory region
+                        char* Payload = new(ProcessHandlerPtr->getResultAddress(Index)) char[strlen(ResultCharArray)];
+                        memcpy(Payload, &ResultCharArray[0], strlen(ResultCharArray));
 
                         //- set result payload length
-                        new(ProcessHandlerPtr->getMetaAddress(Index, 7)) HTTPPayloadLength_t(ProcessHandlerPtr->strlen(ResultString));
+                        new(ProcessHandlerPtr->getMetaAddress(Index, 7)) HTTPPayloadLength_t(strlen(ResultCharArray));
                     }
                 }
             }
