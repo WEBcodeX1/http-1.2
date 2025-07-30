@@ -67,7 +67,7 @@ script later.
 /usr/local/bin/falcon-as
 ```
 
-Stop server with signal SIGTERM (```kill http-1.2```).
+Stop server with signal SIGTERM (```pkill falcon-as```).
 
 ## 1.6. Check Server Working
 
