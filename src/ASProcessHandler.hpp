@@ -44,7 +44,6 @@ public:
     static void terminate(int);
 
     string ReqPayloadString;
-    string ResultString;
 
 #if defined(JAVA_BACKEND)
     JavaVM *jvm;
