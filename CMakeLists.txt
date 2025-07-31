@@ -30,9 +30,6 @@ if ( DEFINED JAVA_BACKEND )
     message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
     message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
 
-    # set include paths
-    include_directories(${JNI_INCLUDE_DIRS})
-
 endif()
 
 # set g++ compiler flags
@@ -54,6 +51,8 @@ add_executable(${PROJECT_NAME} ${SRC_LIST})
 # java or python backend
 if ( DEFINED JAVA_BACKEND )
     add_compile_definitions(JAVA_BACKEND)
+    include_directories(${JNI_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${JNI_LIBRARIES})
     add_custom_target(
         JavaBackendHeaderFiles
         SOURCES
@@ -111,5 +110,4 @@ install(CODE "execute_process(COMMAND ./scripts/mk_www.sh)")
 install(CODE "execute_process(COMMAND ./scripts/cp_etc.sh)")
 install(CODE "execute_process(COMMAND ./scripts/set-transparent-hugepages.sh)")
 install(CODE "execute_process(COMMAND ./scripts/patch_etc_hosts.sh)")
-install(CODE "execute_process(COMMAND ./scripts/cp_pythonas_example.sh)")
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)

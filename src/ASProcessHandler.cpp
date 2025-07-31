@@ -99,9 +99,17 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 DBG(120, "Process UID:" << getuid() << " GID:" << getgid());
 
-                const std::string PythonPath = "/var/www" + Namespace.second.PathRel + STATICFS_SUBDIR + PYTHONAS_SUBDIR;
+                const string BackendRootPath = "/var/www" + Namespace.second.PathRel + BACKEND_ROOT_PATH;
+                setenv("PYTHONPATH", BackendRootPath.c_str(), 1);
+                DBG(120, "BackendRootPath Path:" << BackendRootPath.c_str());
 
-                setenv("PYTHONPATH", PythonPath.c_str(), 1);
+                //- set backend working dir
+                try {
+                    filesystem::current_path(BackendRootPath);
+                }
+                catch(exception &e) {
+                    ERR("Cannot change dir to BackendRootPath Path:" << BackendRootPath.c_str());
+                }
 
                 //- get parent pid filedescriptor
                 //pidfd_t ParentPidFD = Syscall::pidfd_open(getppid(), 0);
@@ -115,8 +123,6 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 //DBG(120, "Child ASProcessHandler Process PID:" << getpid() << " ParentPidFD:" << ParentPidFD);
                 //DBG(120, "Child ASProcessHandler SharedMemAddress:" << SharedMemBaseAddr);
-
-                DBG(120, "Python Path:" << PythonPath.c_str());
 
                 Backend::Processor::init(this);
 
@@ -148,7 +154,6 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                         //this_thread::sleep_for(chrono::seconds(1));
                         DBG(300, "Process PythonAS idle.");
                     }
-
                 }
 
                 DBG(-1, "Exit Parent ASProcessHandler Process.");

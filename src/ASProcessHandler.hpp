@@ -20,6 +20,10 @@
 #include "Configuration.hpp"
 #include "ASRequestHandler.hpp"
 
+#if defined(JAVA_BACKEND)
+#include <jni.h>
+#endif
+
 typedef struct {
     void* PostASMetaPtr;
     void* PostASRequestsPtr;
@@ -45,12 +49,12 @@ public:
 
     string ReqPayloadString;
 
-#if defined(JAVA_BACKEND)
+    #if defined(JAVA_BACKEND)
     JavaVM *jvm;
     JNIEnv *jnienv;
-#else
+    #else
     boost::python::object PyClass;
-#endif
+    #endif
 
     private:
 
