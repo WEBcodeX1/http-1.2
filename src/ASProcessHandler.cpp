@@ -79,6 +79,11 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 DBG(20, "ASIndex:" << Index << " Process UID:" << getuid() << " GID:" << getgid());
 
+                #if defined(DEBUG_BUILD)
+                //- overwrite termination handler (display backtrace)
+                std::set_terminate(SigHandler::myterminate);
+                #endif
+
                 /*
                 //- set process name
                 std::string ProcessNameDyn = "falcon-as-python" + std::to_string(Index);
@@ -138,10 +143,12 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                         new(getMetaAddress(Index, 0)) uint16_t(0);
                         new(getMetaAddress(Index, 1)) uint16_t(1);
                     }
+                    else {
+                        this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
+                        //this_thread::sleep_for(chrono::seconds(1));
+                        DBG(300, "Process PythonAS idle.");
+                    }
 
-                    this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
-                    //this_thread::sleep_for(chrono::seconds(1));
-                    DBG(300, "Process PythonAS alive:");
                 }
 
                 DBG(-1, "Exit Parent ASProcessHandler Process.");

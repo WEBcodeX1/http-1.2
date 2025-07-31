@@ -5,9 +5,12 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <exception>
+#include <cstdlib>
 
 #include <sys/syscall.h>
 #include <unistd.h>
+#include <execinfo.h>
 
 #include "Client.hpp"
 #include "Debug.cpp"
@@ -104,6 +107,47 @@ public:
             exit(EXIT_FAILURE);
         }
     }
+};
+
+
+class SigHandler {
+
+public:
+
+    #if defined(DEBUG_BUILD)
+    static void myterminate()
+    {
+        //static bool tried_throw = false;
+
+        try {
+            // try once to re-throw currently active exception
+            //if (!tried_throw++) throw;
+            throw;
+        }
+        catch (const std::exception &e) {
+            std::cerr << __FUNCTION__ << " caught unhandled exception. what(): " << e.what() << std::endl;
+        }
+        catch (...) {
+            std::cerr << __FUNCTION__ << " caught unknown/unhandled exception." << std::endl;
+        }
+
+        void * array[50];
+        int size = backtrace(array, 50);
+
+        std::cerr << __FUNCTION__ << " backtrace returned " << size << " frames\n\n";
+
+        char ** messages = backtrace_symbols(array, size);
+
+        for (int i = 0; i < size && messages != NULL; ++i) {
+            std::cerr << "[bt]: (" << i << ") " << messages[i] << std::endl;
+        }
+        std::cerr << std::endl;
+
+        free(messages);
+
+        abort();
+    }
+    #endif
 };
 
 #endif

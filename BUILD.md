@@ -46,15 +46,30 @@ Details (e.g. building module) see [XML Parser Documentation](https://github.com
 
 ## 1.4. Compile / Install
 
+On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
+be added to ```/etc/hosts```.
+
 ```bash
 # compile / install
-cmake CMakeLists.txt
+cmake CMakeLists.txt .
 make
 make install
 ```
 
-On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
-be added to ```/etc/hosts```.
+```bash
+# debug build
+cmake -DDEBUG_BUILD=1 CMakeLists.txt .
+make
+make install
+```
+
+```bash
+# java backend build
+export JAVA_HOME=/usr/lib/jvm/jdk-24.0.2-oracle-x64/
+cmake -DJAVA_BACKEND=1 CMakeLists.txt .
+make
+make install
+```
 
 ## 1.5. Start Server
 

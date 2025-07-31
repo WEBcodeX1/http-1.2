@@ -2,8 +2,8 @@
 cmake_minimum_required(VERSION 3.11)
 project(falcon-as)
 
-# do not print out warning
-set(ignoreMe "${JAVA_BACKEND}")
+# do not print out warnings about unused variables
+set(ignoreMe "${JAVA_BACKEND} ${DEBUG_BUILD}")
 
 # find python3
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -36,8 +36,12 @@ if ( DEFINED JAVA_BACKEND )
 endif()
 
 # set g++ compiler flags
-set(CMAKE_CXX_FLAGS "-I/usr/include/python3.10 -I/usr/include/python3.10 -g -fPIC -Wall -pthread -O2 -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
-#set(CMAKE_CXX_FLAGS "-I/usr/include/python3.10 -I/usr/include/python3.10 -g -fPIC -Wall -pthread -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv")
+if ( DEFINED DEBUG_BUILD )
+    add_compile_definitions(DEBUG_BUILD)
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic")
+else()
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
+endif()
 
 # set boost specs
 set(Boost_USE_STATIC_LIBS OFF)
@@ -49,6 +53,7 @@ add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 # java or python backend
 if ( DEFINED JAVA_BACKEND )
+    add_compile_definitions(JAVA_BACKEND)
     add_custom_target(
         JavaBackendHeaderFiles
         SOURCES
