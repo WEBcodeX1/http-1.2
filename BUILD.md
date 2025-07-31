@@ -65,6 +65,7 @@ make install
 
 ```bash
 # java backend build
+export JAVA_HOME=/usr/lib/jvm/jdk-24.0.2-oracle-x64/
 cmake -DJAVA_BACKEND=1 CMakeLists.txt .
 make
 make install
