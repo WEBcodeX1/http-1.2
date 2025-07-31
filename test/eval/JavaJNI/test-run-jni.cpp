@@ -54,6 +54,7 @@ BOOST_AUTO_TEST_CASE( test_java_jni_method_execution )
             jstring InputJSON = env->NewStringUTF("{\"payload\": \"test-string\" }");
             jobject Result = (jstring)env->CallStaticObjectMethod(JavaClass, JavaMethodID, InputJSON);
             env->ReleaseStringUTFChars(InputJSON, NULL);
+            cout << "Result:" << Result << endl;
             if(Result != nullptr) {
                 const char* ResultString = env->GetStringUTFChars((jstring)Result, NULL);
                 cout << "Returned payload string:" << ResultString << endl;

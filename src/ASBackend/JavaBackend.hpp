@@ -54,10 +54,14 @@ namespace Backend {
                     ERR("JNI invoke() method not found.");
                 }
                 else {
-                    jstring InputJSON = ProcessHandlerPtr->jnienv->NewStringUTF(ProcessHandlerPtr->ReqPayloadString);
+                    jstring InputJSON = ProcessHandlerPtr->jnienv->NewStringUTF(ProcessHandlerPtr->ReqPayloadString.c_str());
                     jobject Result = (jstring)ProcessHandlerPtr->jnienv->CallStaticObjectMethod(JavaClass, JavaMethodID, InputJSON);
                     ProcessHandlerPtr->jnienv->ReleaseStringUTFChars(InputJSON, NULL);
-                    if(Result != nullptr) {
+                    if(Result == nullptr) {
+                        ERR("JNI invoke() processing error.");
+                        ProcessHandlerPtr->jnienv->ExceptionDescribe();
+                    }
+                    else {
                         ResultCharArray = ProcessHandlerPtr->jnienv->GetStringUTFChars((jstring)Result, NULL);
                         DBG(160, "Returned payload string:" << ResultCharArray);
 

@@ -117,11 +117,8 @@ public:
     #if defined(DEBUG_BUILD)
     static void myterminate()
     {
-        //static bool tried_throw = false;
-
         try {
-            // try once to re-throw currently active exception
-            //if (!tried_throw++) throw;
+            // re-throw currently active exception
             throw;
         }
         catch (const std::exception &e) {
