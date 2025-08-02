@@ -103,10 +103,9 @@ The proxy server component has been designed and will be published later.
 Coroutines are currently a trending topic in the coding community. Libevent uses
 coroutines, and many server products rely on Libevent for client connection handling.
 
-However, **beware**: Coroutines can be counterproductive for scalability. Without
-expertise in kernel socket programming, blocking socket implementations can result
-in performance bottlenecks. Each client file descriptor is monitored separately by
-the kernel, leading to inefficiencies reminiscent of the 1990s.
+However, **beware**: Coroutines *can* be counterproductive for scalability if 
+implemented incorrectly. A lack of expertise in kernel / userspace layout easily 
+can lead to drastically reduced scalability.
 
 Specifically, the main loop in user space iterates over **all** active or idle
 connection file descriptors. For example, 10,000 active or idle keep-alive
