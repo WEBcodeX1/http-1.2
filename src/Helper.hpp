@@ -57,17 +57,20 @@ class String {
 
 public:
 
-    //- TODO: make erase optional, ugly
-    static void split(string& String, const string Delimiter, vector<string>& ResultRef)
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
     {
-        size_t FindPos = 0;
-        string Token;
-        while ((FindPos = String.find(Delimiter)) != String.npos) {
-            Token = String.substr(0, FindPos);
-            ResultRef.push_back(Token);
-            String.erase(0, FindPos + Delimiter.length());
+        string SplitElement;
+        auto pos = StringRef.find(Delimiter);
+
+        while (pos != string::npos) {
+            SplitElement = StringRef.substr(0, pos);
+            DBG(220, "SplitElement:'" << SplitElement << "'");
+            ResultRef.push_back(SplitElement);
+            StringRef.erase(0, pos + Delimiter.length());
+            pos = StringRef.find(Delimiter);
         }
-        DBG(200, "String:'" << String << "'");
+
+        DBG(200, "String:'" << StringRef << "'");
     }
 
     //- TODO: ugly, refactor (lambda?)

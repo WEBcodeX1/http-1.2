@@ -86,8 +86,8 @@ void ClientHandler::processClients()
     }
 
     //- process appserver queue
-    //ProcessedClients += _ASRequestHandlerRef->processQueue();
-    _ASRequestHandlerRef->processQueue();
+    ProcessedClients += _ASRequestHandlerRef->processQueue();
+    //_ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)
@@ -107,6 +107,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         // read data into buffer
         char* Buffer = BufferMemory.getNextMemPointer();
         uint16_t RcvBytes = read(ReadFD, Buffer, BUFFER_SIZE);
+        DBG(220, "RcvBytes:" << RcvBytes << " ReadFD:" << ReadFD);
 
         //- client close connection
         if (RcvBytes == 0) {

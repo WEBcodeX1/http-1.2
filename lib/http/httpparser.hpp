@@ -55,6 +55,8 @@ private:
     size_t _RequestCountPost;
     size_t _RequestCountPostAS;
 
+    uint16_t _RequestNumber;
+
     string _HTTPRequestBuffer;
 
 protected:

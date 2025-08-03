@@ -40,7 +40,8 @@ static const MimetypeRelations_t MimeRelations{
     { "svg", "image/svg+xml" },
     { "woff", "font/woff" },
     { "woff2", "font/woff2" },
-    { "ico", "image/png" }
+    { "ico", "image/png" },
+    { "txt", "text/plain" }
 };
 
 

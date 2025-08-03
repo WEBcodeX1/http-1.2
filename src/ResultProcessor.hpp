@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/prctl.h>
 
 #include <atomic>
 #include <thread>
+#include <linux/seccomp.h>
 
 #include "CPU.hpp"
 #include "Global.hpp"

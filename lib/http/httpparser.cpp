@@ -21,7 +21,15 @@ HTTPParser::~HTTPParser()
 
 void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
 {
-    _HTTPRequestBuffer = _HTTPRequestBuffer + string(&BufferRef[0], BufferSize);
+    //-> reset _SplittedRequests vector
+    _SplittedRequests.clear();
+
+    //- workaround
+    if (BufferRef[0] == 0) { return; }
+
+    const string Buffer(&BufferRef[0], BufferSize);
+    DBG(250, "size:" << Buffer.length() << "appendBuffer:'" << Buffer << "'");
+    _HTTPRequestBuffer = _HTTPRequestBuffer + move(Buffer);
     //String::hexout(_HTTPRequestBuffer);
     DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
 
@@ -41,20 +49,20 @@ void HTTPParser::_splitRequests()
     _RequestCountGet = 0;
     _RequestCountPost = 0;
     _RequestCountPostAS = 0;
-
-    //-> reset _SplittedRequests vector
-    _SplittedRequests.clear();
+    _RequestNumber = 1;
 
     //-> split requests into _SplittedRequests vector
     String::split(_HTTPRequestBuffer, "\r\n\r\n", _SplittedRequests);
-    _SplittedRequests.push_back(_HTTPRequestBuffer);
 
     _RequestCount = _SplittedRequests.size();
     DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
+    DBG(120, "_HTTPRequestBuffer after split:'" << _HTTPRequestBuffer << "'");
 }
 
 size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
+    DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
+
     //- set get requests SHM base
     setBaseAddress(SHMGetRequests);
 
@@ -63,37 +71,18 @@ size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRe
         _processRequestProperties(i, ASRequestHandlerRef);
     }
 
-    //- restore truncated requests
-    const auto LastElementIndex = _SplittedRequests.size();
-
-    if (LastElementIndex > 0) {
-        const auto LastElementVal = _SplittedRequests.at(LastElementIndex-1);
-
-        if (!LastElementVal.empty()) {
-            _HTTPRequestBuffer.append(LastElementVal);
-        }
-    }
-
-    if (LastElementIndex > 1) {
-        const auto LastElementPrevVal = _SplittedRequests.at(LastElementIndex-2);
-
-        if (!LastElementPrevVal.empty()) {
-            _HTTPRequestBuffer.append(LastElementPrevVal);
-        }
-    }
-
     return _RequestCountGet;
 }
 
 void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t ASRequestHandlerRef)
 {
-    DBG(140, "Processing Index:" << Index);
-
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
 
     //- on empty request return
     if (Request.empty()) { return; }
+
+    DBG(140, "Processing Index:" << Index << " Request:'" << Request << "'");
 
     BasePropsResult_t BasePropsFound;
     this->_parseRequestProperties(Request, BasePropsFound);
@@ -109,10 +98,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
     const size_t HTTPVersion1_2Found = BasePropsFound.at(2).find("HTTP/1.2");
 
     //- if not HTTP/1.1 set request to "" in vector element, return
-    if (HTTPVersion1_1Found == string::npos) {
-        _SplittedRequests.at(Index) = "";
-        return;
-    }
+    if (HTTPVersion1_1Found == string::npos) { return; }
 
     //- check for method GET || POST
     const size_t HTTPMethodPOST = BasePropsFound.at(2).find("POST");
@@ -126,41 +112,38 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
     DBG(140, "HTTPMethod:" << HTTPMethod);
 
-    //- if not GET || POST, set request to "" in vector element, return
-    if (HTTPMethod == 0) {
-        _SplittedRequests.at(Index) = "";
-        return;
-    }
+    //- if not GET || POST, return
+    if (HTTPMethod == 0) { return; }
 
     //- check if POST request is a POSTAS request
-    const size_t PythonReqFound = BasePropsFound.at(1).find("/python/");
+    const size_t AppServerReqFound = BasePropsFound.at(1).find("/backend/");
 
-    //- if not POSTAS, set request to "" in vector element, return
-    if (HTTPMethod == 2 && PythonReqFound == string::npos) {
+    //- if not POSTAS, return
+    if (HTTPMethod == 2 && AppServerReqFound == string::npos) {
         ++this->_RequestCountPost;
-        _SplittedRequests.at(Index) = "";
         return;
     }
 
     //- get unique request nr
-    const uint16_t RequestNr = getNextReqNr();
+    const uint16_t RequestNr = _RequestNumber;
+    ++_RequestNumber;
 
     DBG(140, "HTTP RequestNr:" << RequestNr);
 
-    if (HTTPMethod == 2 && PythonReqFound != string::npos) {
+    if (HTTPMethod == 2 && AppServerReqFound != string::npos) {
 
-        DBG(140, "Request Type PythonAS:" << Request);
+        DBG(140, "Request Type ASRequest:" << Request);
 
-        //-> check first line end exists
+        //- check first line end exists
         size_t FirstLineEndMarker = Request.find("\r\n");
 
-        //-> if not: truncated
+        //- if not truncated
         if (FirstLineEndMarker == string::npos) {
             DBG(200, "Truncated POST Request - no First Line end");
             return;
         }
 
-        //-> cut first properties line from request
+        //- cut first properties line from request
         if (FirstLineEndMarker != string::npos) {
             Request.replace(0, FirstLineEndMarker+2, "");
         }
@@ -179,32 +162,43 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
             return;
         }
 
-        //- try get next request +payload at vector index +1
+        bool PayloadFound = false;
+        string Payload = "";
+
+        //- try payload in next (vector index +1) request
         try {
             auto &NextRequest = _SplittedRequests.at(Index+1);
-
             if (NextRequest.length() >= ContentBytes) {
-                string Payload = NextRequest.substr(0, ContentBytes);
+                Payload = NextRequest.substr(0, ContentBytes);
                 NextRequest.replace(0, ContentBytes, "");
-                DBG(140, "HTTP POST-AS Payload:" << Payload << " NextRequest:'" << NextRequest << "'");
-
-                //- increment request count
-                ++this->_RequestCountPostAS;
-
-                //- add ASRequestHandler request
-                ASRequestHandlerRef->addRequest({
-                    Headers.at("Host"),
-                    _ClientFD,
-                    HTTPMethod,
-                    HTTPVersion,
-                    RequestNr,
-                    Payload
-                });
+                PayloadFound = true;
             }
         }
         catch(const std::exception& e) {
-            DBG(200, "Truncated POST Request - no Payload");
-            return;
+            DBG(200, "Next vector does not exist, trying in rest of _HTTPRequestBuffer");
+            //- try payload in _HTTPRequestBuffer
+            if (_HTTPRequestBuffer.length() >= ContentBytes) {
+                Payload = _HTTPRequestBuffer.substr(0, ContentBytes);
+                _HTTPRequestBuffer.replace(0, ContentBytes, "");
+                PayloadFound = true;
+            }
+        }
+
+        DBG(140, "HTTP POST-AS Payload:" << Payload);
+
+        if (PayloadFound) {
+            //- increment request count
+            ++this->_RequestCountPostAS;
+
+            //- add ASRequestHandler request
+            ASRequestHandlerRef->addRequest({
+                Headers.at("Host"),
+                _ClientFD,
+                HTTPMethod,
+                HTTPVersion,
+                RequestNr,
+                Payload
+            });
         }
     }
 
