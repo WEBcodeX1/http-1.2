@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <linux/seccomp.h>
 
 #include "CPU.hpp"
 #include "Global.hpp"

@@ -84,15 +84,16 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                 std::set_terminate(SigHandler::myterminate);
                 #endif
 
-                /*
                 //- set process name
-                std::string ProcessNameDyn = "falcon-as-python" + std::to_string(Index);
+                std::string ProcessNameDyn = "falcon-as-" + std::to_string(Index);
                 const char* ProcessName = ProcessNameDyn.c_str();
                 prctl(PR_SET_NAME, (unsigned long) ProcessName);
-                */
+
+                //- enable spectre userspace protection
+                prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_ENABLE, 0, 0);
 
                 //- drop privileges
-                Permission::dropPrivileges(2000, 2000);
+                Permission::dropPrivileges(RUNAS_USER_DEFAULT, RUNAS_GROUP_DEFAULT);
 
                 //- overwrite parent termination handler
                 setTerminationHandler();
@@ -112,30 +113,27 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                 }
 
                 //- get parent pid filedescriptor
-                //pidfd_t ParentPidFD = Syscall::pidfd_open(getppid(), 0);
+                pidfd_t ParentPidFD = Syscall::pidfd_open(getppid(), 0);
 
                 const char* Env1 = std::getenv("PATH");
                 const char* Env2 = std::getenv("PYTHONPATH");
 
                 DBG(120, "Process PATH:" << Env1 << " PYTHONPATH:" << Env2);
+                DBG(200, "Child ASProcessHandler Process PID:" << getpid() << " ParentPidFD:" << ParentPidFD);
 
-                //std::filesystem::current_path("/var/www/app1/python");
-
-                //DBG(120, "Child ASProcessHandler Process PID:" << getpid() << " ParentPidFD:" << ParentPidFD);
-                //DBG(120, "Child ASProcessHandler SharedMemAddress:" << SharedMemBaseAddr);
-
+                //- initialize backend
                 Backend::Processor::init(this);
 
                 //- main loop
                 while(true) {
 
-                    DBG(300, "PythonAS Main Loop Index:" << Index);
+                    DBG(300, "AppServer Main Loop Index:" << Index);
                     atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
                     atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));
                     DBG(300, " CanReadAddr:" << CanReadAddr << " Val:" << *(CanReadAddr) << " WriteReadyAddr:" << WriteReadyAddr << " Val:" << *(WriteReadyAddr));
 
                     if (*(CanReadAddr) == 1 && *(WriteReadyAddr) == 0) {
-                        DBG(-1, "PythonAS invoking!");
+                        DBG(-1, "AppServer invoking!");
 
                         HTTPPayloadLength_t ReqPayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 6)));
                         char ReqPayload[ReqPayloadLength];
@@ -152,11 +150,11 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                     else {
                         this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
                         //this_thread::sleep_for(chrono::seconds(1));
-                        DBG(300, "Process PythonAS idle.");
+                        DBG(300, "AppServer process idle.");
                     }
                 }
 
-                DBG(-1, "Exit Parent ASProcessHandler Process.");
+                DBG(-1, "Exit ASProcessHandler child process.");
                 exit(0);
 
             }

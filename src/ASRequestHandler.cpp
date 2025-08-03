@@ -77,7 +77,7 @@ AppServerID_t ASRequestHandler::_getNextFreeAppServerID(string VirtualHost) {
         for (const auto &Index:_VHostOffsetsPrecalc.at(VirtualHost)) {
             DBG(180, "Namespace:" << VirtualHost << " Index:" << Index);
             if (!_Requests.contains(Index)) {
-                DBG(140, "Requests does not contain Index, check SHM");
+                DBG(140, "Requests do not contain Index, check SHM");
                 atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
                 atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));
                 if (*(CanReadAddr) == 0 && *(WriteReadyAddr) == 0) {

@@ -201,7 +201,7 @@ void ClientThread::processRequests()
                     SentBytes = sendfile(_ClientRequests[i].ClientFDShared, FileProps.Filedescriptor, 0, FileProps.FileSize);
                     if (SentBytes < 0) {
                         uint8_t errsv = errno;
-                        DBG(50, "sendfile() err:" << strerror(errsv));
+                        DBG(300, "sendfile() err:" << strerror(errsv));
                         if (errsv != EAGAIN) { break; }
                     }
                     else {
@@ -209,7 +209,7 @@ void ClientThread::processRequests()
                     }
                     if (SumBytes == FileProps.FileSize) { break; }
                 }
-                DBG(50, "sendfile() wrote bytes:" << SumBytes);
+                DBG(300, "sendfile() wrote bytes:" << SumBytes);
             }
             else {
                 string Response = "HTTP/1.1 404 Not Found\n";
@@ -256,7 +256,6 @@ void ClientThread::processRequests()
             const char* send_buf = Response.c_str();
 
             int r = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
-
         }
     }
 }

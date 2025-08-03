@@ -69,7 +69,7 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
         exit(0);
     }
 
-    if (_ForkResult > 0) {        
+    if (_ForkResult > 0) {
         DBG(120, "Parent ResultProcessor Process PID:" << getpid());
         DBG(120, "Parent ResultProcessor Atomic Address:" << StaticFSLock);
     }
@@ -82,6 +82,9 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
 
         //- overwrite parent termination handler
         setTerminationHandler();
+
+        //- spectre userspace protection
+        prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_ENABLE, 0, 0);
 
         DBG(120, "Child ResultProcessor Process PID:" << getpid() << " ParentPidFD:" << _ParentPidFD);
         DBG(120, "Child ResultProcessor SharedMemAddress:" << SHMAdresses.StaticFSPtr);
