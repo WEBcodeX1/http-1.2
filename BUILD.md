@@ -95,5 +95,5 @@ to check if setup is working correctly.
 
 ```bash
 # test post request
-wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/python/test
+wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/backend/
 ```
