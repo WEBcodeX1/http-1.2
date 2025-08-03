@@ -73,12 +73,13 @@ make install
 
 ## 1.5. Start Server
 
-Raise ulimit for open files before starting server. This will be put inside server startup
-script later.
+Raise ulimit for open files and number of kernel hugepages before starting server.
+This will be put inside server startup script later.
 
 ```bash
 # start server
 . ./scripts/ulimit.sh
+- ./scripts/set-transparent-hugepages.sh
 /usr/local/bin/falcon-as
 ```
 
