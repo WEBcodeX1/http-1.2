@@ -79,7 +79,7 @@ This will be put inside server startup script later.
 ```bash
 # start server
 . ./scripts/ulimit.sh
-- ./scripts/set-transparent-hugepages.sh
+. ./scripts/set-transparent-hugepages.sh
 /usr/local/bin/falcon-as
 ```
 
