@@ -1,0 +1,56 @@
+{
+    "namespaces":
+    [
+        {
+            "id": "app1",
+            "hostname": "testapp1.local",
+            "path": "/app1",
+            "interpreters": 5
+        },
+        {
+            "id": "app2",
+            "hostname": "testapp2.local",
+            "path": "/app2",
+            "interpreters": 3
+        }
+    ],
+    "global":
+    {
+        "path":
+        {
+            "base": "/var/www"
+        },
+        "tcp":
+        {
+            "cork": false,
+            "nodelay": true
+        }
+    },
+    "server":
+    {
+        "runas":
+        {
+            "user": "x0-http",
+            "group": "x0-http"
+        },
+        "connection":
+        {
+            "timeout": "600",
+            "ipv4":
+            {
+                "address": "127.0.0.1",
+                "port": 80
+            }
+        },
+        "mimetypes":
+            [
+                "html", "js", "json", "css", "png", "jpg", "svg", "woff2"
+            ]
+    },
+    "cpu-binding":
+    {
+        "main-server": [ 0 ],
+        "staticfs": [ 1 ],
+        "app-server": [ 2, 3 ]
+    }
+}
