@@ -45,7 +45,9 @@ Configuration::Configuration() :
     }
     catch( const char* msg )
     {
-        ERR("Config file parse error:" << msg);
+    catch( const nlohmann::json::exception& e )
+    {
+        ERR("Config file parse error:" << e.what());
         exit(1);
     }
 }
