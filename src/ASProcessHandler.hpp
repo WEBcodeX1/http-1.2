@@ -21,6 +21,12 @@
 #include "Configuration.hpp"
 #include "ASRequestHandler.hpp"
 
+#define PY_SSIZE_T_CLEAN
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+
+#include <boost/python.hpp>
+#include <Python.h>
+
 #if defined(JAVA_BACKEND)
 #include <jni.h>
 #endif
