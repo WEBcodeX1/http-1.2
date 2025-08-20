@@ -1,17 +1,11 @@
 #ifndef Configuration_hpp
 #define Configuration_hpp
 
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-
-#include <boost/python.hpp>
-#include <boost/python/dict.hpp>
-
-#define PY_SSIZE_T_CLEAN
-
-#include <Python.h>
-
+#include <fstream>
 #include <string>
 #include <ctime>
+
+#include <nlohmann/json.hpp>
 
 #include "Debug.cpp"
 
