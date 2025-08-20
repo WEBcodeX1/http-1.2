@@ -12,6 +12,10 @@ Configuration::Configuration() :
 
     try {
         ifstream ConfigFile(CONFIG_FILE);
+        if (!ConfigFile.is_open()) {
+            ERR("Could not open config file: " << CONFIG_FILE);
+            exit(1);
+        }
         json jsonData = json::parse(ConfigFile);
 
         RunAsUnixUser = jsonData["server"]["runas"]["user"];
