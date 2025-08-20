@@ -11,7 +11,7 @@ Configuration::Configuration() :
     DBG(120, "Constructor");
 
     try {
-        ifstream ConfigFile(CONFIG_FILE);
+        std::ifstream ConfigFile(CONFIG_FILE);
         if (!ConfigFile.is_open()) {
             ERR("Could not open config file: " << CONFIG_FILE);
             exit(1);
