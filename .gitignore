@@ -25,6 +25,8 @@ compile_commands.json
 install_manifest.txt
 falcon-as
 test/eval/test-boost-python
+test/eval/test-pointer-ref
+test/eval/ResultOrder/test-result-order
 test/integration/boost-regex/test-boost-regex
 test/integration/event/test-event
 test/integration/string-functions/test-string-functions
