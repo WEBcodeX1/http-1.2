@@ -94,7 +94,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **⚡ Zero Bloat**: Eliminates HTTP/2's excessive complexity
 - **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
 - **🐍 Python-Powered**: Embedded Python interpreter / scripting integration
-- **:tea: Java-Powered**: Embedded Java JNI / scripting integration
+- **☕ Java-Powered**: Embedded Java JNI / scripting integration
 
 ### Protocol Innovations
 - **Fixed HTTP/1.1 Pipelining**: Resolves misordered request/reply pairs with UUID headers
