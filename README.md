@@ -225,7 +225,7 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 
 **⚠️ Coroutine Warning**: While trending, coroutines can be **counterproductive** for scalability if implemented incorrectly.
 
-**The Problem with incorrect implemented Coroutines:**
+**The Problem with incorrectly implemented Coroutines:**
 - In case a single connection awaits a syscall `read()` result
 - Its similar to one `poll()`  for a single connection file descriptor
 - 10,000 connections = 10,000 syscalls (context switches)
