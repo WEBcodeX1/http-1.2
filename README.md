@@ -1,5 +1,5 @@
 <h1 align="center">🚀 HTTP/1.2 - FalconAS</h1>
-<p align="center"><em>Lightning-Fast, Rock-Solid Python Application Server with HTTP/1.2 Protocol</em></p>
+<p align="center"><em>Lightning-Fast, Rock-Solid Python / Java Application Server with HTTP/1.2 Protocol</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
@@ -8,12 +8,15 @@
   <a href="https://github.com/WEBcodeX1/http-1.2/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat" alt="License">
   </a>
+  <!--
   <a href="http://docs.webcodex.de/wacp/rfp/">
     <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs">
   </a>
   <a href="https://github.com/WEBcodeX1/http-1.2/releases">
     <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
   </a>
+  -->
+
 </div>
 
 ---
