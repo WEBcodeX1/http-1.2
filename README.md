@@ -90,12 +90,11 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 
 ### Core Advantages
 - **🚀 Lightning-Fast**: Epoll-based architecture for maximum performance
-- **🔒 Secure by Design**: Logical TCP port separation prevents attack vectors
+- **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
 - **⚡ Zero Bloat**: Eliminates HTTP/2's excessive complexity
-- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications
+- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
 - **🐍 Python-Powered**: Embedded Python scripting with Boost integration
-- **☁️ Cloud-Ready**: Application server-friendly and proxy server-friendly
-- **♾️ Infinitely Scalable**: Built for modern hardware and infrastructure
+- **🐍 Java-Powered**: Embedded Java scripting with Boost integration
 
 ### Protocol Innovations
 - **Fixed HTTP/1.1 Pipelining**: Resolves misordered request/reply pairs with UUID headers
@@ -108,8 +107,8 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **Application Server**: Python scripting with shared memory architecture
 - **Memory Management**: Huge pages support and optimized memory layout
 - **Process Architecture**: Separate processes to avoid Python GIL limitations
-- **XML Configuration**: Clean, maintainable configuration system
-- **JSON Support**: [nlohmann/json](https://github.com/nlohmann/json) C++ library for configuration and data processing
+- **JSON Configuration**: Clean, maintainable configuration system
+- **JSON Powered By**: [nlohmann/json](https://github.com/nlohmann/json) C++ library for configuration and data processing
 
 ---
 
