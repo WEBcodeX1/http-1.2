@@ -119,7 +119,6 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 **HTTP/2 Complexity Crisis:**
 - Excessive complexity destroys HTTP/1.1's elegant simplicity
 - Everything packed into one "black box" without logical separation
-- Single TCP port creates security vulnerabilities
 - Libraries are confusing and difficult to understand
 - TLS/SSL handling unnecessarily embedded in protocol
 
@@ -132,8 +131,6 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 HTTP/1.2 **fixes** HTTP/1.1's single major flaw (broken pipelining) while **avoiding** HTTP/2's complexity disasters:
 
 > **🎯 Key Innovation**: Adding a simple `Request-UUID` header eliminates response ordering issues, making HTTP/2's complex Layer-7 multiplexing unnecessary.
-
-This renders HTTP/2 and HTTP/3 **obsolete** while drastically reducing complexity.
 
 ---
 
@@ -149,7 +146,7 @@ This renders HTTP/2 and HTTP/3 **obsolete** while drastically reducing complexit
 **Required Dependencies:**
 ```bash
 # core build tools
-apt-get install git cmake python3-pip
+apt-get install git cmake
 
 # c++ boost libraries
 apt-get install libboost-all-dev
