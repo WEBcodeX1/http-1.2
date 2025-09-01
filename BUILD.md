@@ -33,18 +33,7 @@ If not done by Boost Python Library, the Python Interpreter Source Code is requi
 apt-get install python3-dev
 ```
 
-## 1.3. Python XML Microparser
-
-We use our external Python XML Parser to bridge XML config to C++ using Boost Python library.
-
-```bash
-# install xmlmicroparser python module
-pip3 install xmlmicroparser
-```
-
-Details (e.g. building module) see [XML Parser Documentation](https://github.com/clauspruefer/python-xml-microparser/blob/master/README.md).
-
-## 1.4. Compile / Install
+## 1.3. Compile / Install
 
 On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
 be added to ```/etc/hosts```.
@@ -71,7 +60,7 @@ make
 make install
 ```
 
-## 1.5. Start Server
+## 1.4. Start Server
 
 Raise ulimit for open files and number of kernel hugepages before starting server.
 This will be put inside server startup script later.
@@ -85,14 +74,14 @@ This will be put inside server startup script later.
 
 Stop server with signal SIGTERM (```pkill falcon-as```).
 
-## 1.6. Check Server Working
+## 1.5. Check Server Working
 
-### 1.6.1. Check GET requests
+### 1.5.1. Check GET requests
 
 Open http://testapp1.local/index.html or http://testapp2.local/index.html in a local browser
 to check if setup is working correctly.
 
-### 1.6.2. Check POST requests
+### 1.5.2. Check POST requests
 
 ```bash
 # test post request

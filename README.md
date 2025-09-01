@@ -1,5 +1,5 @@
 <h1 align="center">🚀 HTTP/1.2 - FalconAS</h1>
-<p align="center"><em>Lightning-Fast, Rock-Solid Python Application Server with HTTP/1.2 Protocol</em></p>
+<p align="center"><em>Lightning-Fast, Rock-Solid Python / Java Application Server with HTTP/1.2 Protocol</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
@@ -8,25 +8,35 @@
   <a href="https://github.com/WEBcodeX1/http-1.2/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat" alt="License">
   </a>
-  <a href="http://docs.webcodex.de/wacp/rfp/">
-    <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs">
+  <a href="https://docs.webcodex.de/developer/falconas/doxygen/inherits.html">
+    <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Oxygen">
   </a>
+  <a href=" https://docs.webcodex.de/developer/falconas/sphinx/index.html">
+    <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Sphinx">
+  </a>
+  <!--
   <a href="https://github.com/WEBcodeX1/http-1.2/releases">
     <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
   </a>
+  -->
+
 </div>
 
 ---
 
 ## :pushpin: Overview
 
-**HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure, and significantly faster alternative to HTTP/2 and HTTP/3. While Google engineers push HTTP/3, and HTTP/2 remains problematic with major implementation flaws and performance issues, we've built **HTTP/1.2** - a much cleaner solution.
+**HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
+and significantly faster alternative to HTTP/2 and propbably HTTP/3.
+
+We've built **HTTP/1.2** - a much more lightweight solution.
 
 - **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- **Rock-Solid Security**: Logical separation via TCP ports, avoiding single-point vulnerabilities
-- **Infinitely Scalable**: Built for modern browser applications (SPAs) and cloud-native deployments
+- **Rock-Solid Security**: Runs with tight backend process-separation model (non-threaded)
+- **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
 - **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
 - **Python-Powered**: FalconAS application server with embedded Python scripting
+- **Java-Powered**: FalconAS application server with embedded Java scripting
 
 ## :bookmark_tabs: Table of Contents
 
@@ -35,14 +45,12 @@
 3. [Why HTTP/1.2?](#mega-why-http12)
 4. [Build & Installation](#hammer_and_wrench-build--installation)
 5. [Testing](#test_tube-testing)
-6. [HTTP/2 vs HTTP/3 Analysis](#chart_with_upwards_trend-http2-vs-http3-analysis)
-7. [Proof of Concept](#bulb-proof-of-concept)
-8. [Technical Architecture](#gear-technical-architecture)
-9. [Documentation](#page_with_curl-documentation)
-10. [Community & Support](#globe_with_meridians-community--support)
-11. [Contributing](#wave-contributing)
-12. [Future Milestones](#alarm_clock-future-milestones)
-13. [License](#memo-license)
+6. [Technical Architecture](#gear-technical-architecture)
+7. [Documentation](#page_with_curl-documentation)
+8. [Community & Support](#globe_with_meridians-community--support)
+9. [Contributing](#wave-contributing)
+10. [Future Milestones](#alarm_clock-future-milestones)
+11. [License](#memo-license)
 
 ---
 
@@ -83,12 +91,11 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 
 ### Core Advantages
 - **🚀 Lightning-Fast**: Epoll-based architecture for maximum performance
-- **🔒 Secure by Design**: Logical TCP port separation prevents attack vectors
+- **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
 - **⚡ Zero Bloat**: Eliminates HTTP/2's excessive complexity
-- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications
+- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
 - **🐍 Python-Powered**: Embedded Python scripting with Boost integration
-- **☁️ Cloud-Ready**: Application server-friendly and proxy server-friendly
-- **♾️ Infinitely Scalable**: Built for modern hardware and infrastructure
+- **🐍 Java-Powered**: Embedded Java scripting with Boost integration
 
 ### Protocol Innovations
 - **Fixed HTTP/1.1 Pipelining**: Resolves misordered request/reply pairs with UUID headers
@@ -101,8 +108,8 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **Application Server**: Python scripting with shared memory architecture
 - **Memory Management**: Huge pages support and optimized memory layout
 - **Process Architecture**: Separate processes to avoid Python GIL limitations
-- **XML Configuration**: Clean, maintainable configuration system
-- **JSON Support**: [nlohmann/json](https://github.com/nlohmann/json) C++ library for configuration and data processing
+- **JSON Configuration**: Clean, maintainable configuration system
+- **JSON Powered By**: [nlohmann/json](https://github.com/nlohmann/json) C++ library for configuration and data processing
 
 ---
 
@@ -113,7 +120,6 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 **HTTP/2 Complexity Crisis:**
 - Excessive complexity destroys HTTP/1.1's elegant simplicity
 - Everything packed into one "black box" without logical separation
-- Single TCP port creates security vulnerabilities
 - Libraries are confusing and difficult to understand
 - TLS/SSL handling unnecessarily embedded in protocol
 
@@ -126,8 +132,6 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 HTTP/1.2 **fixes** HTTP/1.1's single major flaw (broken pipelining) while **avoiding** HTTP/2's complexity disasters:
 
 > **🎯 Key Innovation**: Adding a simple `Request-UUID` header eliminates response ordering issues, making HTTP/2's complex Layer-7 multiplexing unnecessary.
-
-This renders HTTP/2 and HTTP/3 **obsolete** while drastically reducing complexity.
 
 ---
 
@@ -143,7 +147,7 @@ This renders HTTP/2 and HTTP/3 **obsolete** while drastically reducing complexit
 **Required Dependencies:**
 ```bash
 # core build tools
-apt-get install git cmake python3-pip
+apt-get install git cmake
 
 # c++ boost libraries
 apt-get install libboost-all-dev
@@ -187,81 +191,12 @@ For complete build instructions, see [BUILD.md](BUILD.md).
 
 Comprehensive testing infrastructure ensures reliability:
 
-**Test Types:**
 - **Unit Tests**: Core component validation (`/test/unit/`)
 - **Integration Tests**: End-to-end functionality (`/test/integration/`)
 - **Performance Tests**: Benchmarking and optimization (`/test/performance/`)
 - **Evaluation Tests**: Protocol compliance (`/test/eval/`)
 
-**Running Tests:**
-```bash
-# build with tests
-make test
-
-# run specific test suites
-cd test/
-cmake .
-make
-./unit_tests
-./integration_tests
-```
-
 See [test documentation](/test/README.md) for detailed testing procedures.
-
----
-
-## :chart_with_upwards_trend: HTTP/2 vs HTTP/3 Analysis
-
-### :warning: HTTP/2 Complexity Issues
-
-HTTP/2 introduces excessive complexity that destroys HTTP/1.1's simplicity:
-- **Monolithic Design**: Everything packed into one "black box" without logical separation
-- **Security Vulnerabilities**: Single TCP port creates attack vectors
-- **Library Confusion**: Open-source implementations are difficult to understand
-- **Misplaced TLS Integration**: SSL/TLS handling embedded in protocol instead of using proven solutions
-
-### :gear: HTTP/1.1 Pipelining - The Real Issue
-
-HTTP/2 was created to solve HTTP/1.1's **single major flaw**: broken pipelined connections.
-
-**Our Solution:**
-HTTP/1.2 fixes this with minimal changes:
-```http
-Request-UUID: 550e8400-e29b-41d4-a716-446655440000
-```
-
-Every request includes a unique identifier, making response ordering unnecessary. **This renders HTTP/2's complex multiplexing obsolete.**
-
-### :no_entry_sign: HTTP/3 UDP Problems
-
-HTTP/3's UDP-based approach creates more problems than it solves:
-- **Limited Use Cases**: Only suitable for precalculated CDN data
-- **Added Complexity**: Creates new complexity without addressing core architectural issues
-
----
-
-## :bulb: Proof of Concept
-
-**FalconAS** - Our working HTTP/1.2 server implementation includes:
-
-### Current Components
-- **🗂️ Static Content Server**: High-performance file serving with `sendfile()` 
-- **🐍 Application Server**: Python scripting with embedded interpreter
-- **🔄 Shared Memory Architecture**: Process-based design avoiding Python GIL
-- **⚡ Epoll Integration**: Lightning-fast connection handling
-
-### Planned Components  
-- **🔀 Proxy Server**: Load balancing and reverse proxy capabilities (in development)
-
-### Primary Milestone
-
-The **primary goal** is providing a lightning-fast, rock-solid, and secure Python application server component specifically optimized for:
-
-- **Modern Browser Applications** (Single Page Applications)
-- **Cloud-Native Deployments** (Docker)  
-- **High-Performance Workloads** (utilizing modern hardware capabilities)
-
-FalconAS will serve as a key component of the [x0 JavaScript Framework](https://github.com/WEBcodeX1/x0) ecosystem.
 
 ---
 
@@ -292,17 +227,14 @@ FalconAS will serve as a key component of the [x0 JavaScript Framework](https://
 **⚠️ Coroutine Warning**: While trending, coroutines can be **counterproductive** for scalability if implemented incorrectly.
 
 **The Problem with Coroutines:**
-- Main loop iterates over **ALL** active/idle connection file descriptors
-- 10,000 keep-alive connections = 10,000 syscalls (context switches)
-- Massive overhead for checking received data
+- In case a single connection awaits a syscall `read()` result
+- Its similar to one `poll()`  for a single connection file descriptor
+- 10,000 connections = 10,000 syscalls (context switches)
+- Massive overhead for checking received data (unscalable)
 
 **Our Epoll Advantage:**
 - **Single syscall** informs about multiple FDs with pending data
-- Optimized for 64-bit server CPUs and modern hardware
 - Used by nginx and other high-performance servers
-- **Lightning-fast performance** with proper implementation
-
-> **💡 Key Insight**: Technologies like nginx achieve superior performance by leveraging epoll's efficiency rather than iterating through connections.
 
 ---
 
