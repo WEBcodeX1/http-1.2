@@ -1,5 +1,5 @@
 <h1 align="center">🚀 HTTP/1.2 - FalconAS</h1>
-<p align="center"><em>Lightning-Fast, Rock-Solid Python / Java Application Server with HTTP/1.2 Protocol</em></p>
+<p align="center"><em>Lightning-Fast, Next-Level Python / Java Application Server with HTTP/1.2 Protocol</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
@@ -11,15 +11,14 @@
   <a href="https://docs.webcodex.de/developer/falconas/doxygen/inherits.html">
     <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Oxygen">
   </a>
-  <a href=" https://docs.webcodex.de/developer/falconas/sphinx/index.html">
-    <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Sphinx">
+  <a href="https://docs.webcodex.de/developer/falconas/sphinx/index.html">
+    <img src="https://img.shields.io/badge/docs-sphinx-blue" alt="Docs Sphinx">
   </a>
   <!--
   <a href="https://github.com/WEBcodeX1/http-1.2/releases">
     <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
   </a>
   -->
-
 </div>
 
 ---
@@ -129,7 +128,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 
 ### Our Solution: HTTP/1.2
 
-HTTP/1.2 **fixes** HTTP/1.1's single major flaw (broken pipelining) while **avoiding** HTTP/2's complexity disasters:
+HTTP/1.2 **fixes** HTTP/1.1's single major flaw (broken pipelining) while **avoiding** HTTP/2's complexity:
 
 > **🎯 Key Innovation**: Adding a simple `Request-UUID` header eliminates response ordering issues, making HTTP/2's complex Layer-7 multiplexing unnecessary.
 
@@ -226,7 +225,7 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 
 **⚠️ Coroutine Warning**: While trending, coroutines can be **counterproductive** for scalability if implemented incorrectly.
 
-**The Problem with Coroutines:**
+**The Problem with incorrectly implemented Coroutines:**
 - In case a single connection awaits a syscall `read()` result
 - Its similar to one `poll()`  for a single connection file descriptor
 - 10,000 connections = 10,000 syscalls (context switches)
@@ -291,13 +290,13 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## :alarm_clock: Future Milestones
 
 ### Short-term Goals
-- [ ] **Proxy Server Component**: Complete the load balancing/reverse proxy module
 - [ ] **x0 Framework Integration**: Seamless SPA framework compatibility
 - [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3 comparisons
 
 ### Long-term Vision
 - [ ] **Protocol Standardization**: Submit HTTP/1.2 as official RFC
 - [ ] **Enterprise Features**: Advanced monitoring, analytics, management
+- [ ] **Proxy Server Component**: Complete the load balancing/reverse proxy module
 
 See [GitHub Milestones](https://github.com/WEBcodeX1/http-1.2/milestones) for detailed roadmap.
 
