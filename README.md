@@ -29,7 +29,7 @@ and significantly faster alternative to HTTP/2 and propbably HTTP/3.
 We've built **HTTP/1.2** - a much more lightweight solution.
 
 - **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- **Rock-Solid Security**: Runs with backend process-separation model (non-threaded)
+- **Rock-Solid Security**: Runs with tight backend process-separation model (non-threaded)
 - **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
 - **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
 - **Python-Powered**: FalconAS application server with embedded Python scripting
