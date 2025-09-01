@@ -26,7 +26,7 @@
 ## :pushpin: Overview
 
 **HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
-and significantly faster alternative to HTTP/2 and propably HTTP/3.
+and significantly faster alternative to HTTP/2 and probably HTTP/3.
 
 We've built **HTTP/1.2** - a much more lightweight solution.
 
@@ -93,12 +93,12 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
 - **⚡ Zero Bloat**: Eliminates HTTP/2's excessive complexity
 - **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
-- **🐍 Python-Powered**: Embedded Python scripting with Boost integration
-- **🐍 Java-Powered**: Embedded Java scripting with Boost integration
+- **🐍 Python-Powered**: Embedded Python interpreter / scripting integration
+- **☕ Java-Powered**: Embedded Java JNI / scripting integration
 
 ### Protocol Innovations
 - **Fixed HTTP/1.1 Pipelining**: Resolves misordered request/reply pairs with UUID headers
-- **Permanent Keep-Alive**: Single socket per client for optimal TCP/IP utilization  
+- **Permanent Keep-Alive**: Single socket per client for optimal TCP/IP utilization
 - **Request UUID System**: Eliminates response ordering requirements
 - **Simplified Architecture**: Text-based protocol maintaining HTTP/1.1 simplicity
 
@@ -108,7 +108,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **Memory Management**: Huge pages support and optimized memory layout
 - **Process Architecture**: Separate processes to avoid Python GIL limitations
 - **JSON Configuration**: Clean, maintainable configuration system
-- **JSON Powered By**: [nlohmann/json](https://github.com/nlohmann/json) C++ library for configuration and data processing
+- **JSON Powered By**: [nlohmann/json](https://github.com/nlohmann/json) C++ JSON library
 
 ---
 
