@@ -42,14 +42,12 @@ We've built **HTTP/1.2** - a much more lightweight solution.
 3. [Why HTTP/1.2?](#mega-why-http12)
 4. [Build & Installation](#hammer_and_wrench-build--installation)
 5. [Testing](#test_tube-testing)
-6. [HTTP/2 vs HTTP/3 Analysis](#chart_with_upwards_trend-http2-vs-http3-analysis)
-7. [Proof of Concept](#bulb-proof-of-concept)
-8. [Technical Architecture](#gear-technical-architecture)
-9. [Documentation](#page_with_curl-documentation)
-10. [Community & Support](#globe_with_meridians-community--support)
-11. [Contributing](#wave-contributing)
-12. [Future Milestones](#alarm_clock-future-milestones)
-13. [License](#memo-license)
+6. [Technical Architecture](#gear-technical-architecture)
+7. [Documentation](#page_with_curl-documentation)
+8. [Community & Support](#globe_with_meridians-community--support)
+9. [Contributing](#wave-contributing)
+10. [Future Milestones](#alarm_clock-future-milestones)
+11. [License](#memo-license)
 
 ---
 
