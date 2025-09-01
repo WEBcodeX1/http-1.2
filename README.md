@@ -23,7 +23,10 @@
 
 ## :pushpin: Overview
 
-**HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure, and significantly faster alternative to HTTP/2 and HTTP/3. While Google engineers push HTTP/3, and HTTP/2 remains problematic with major implementation flaws and performance issues, we've built **HTTP/1.2** - a much cleaner solution.
+**HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
+and significantly faster alternative to HTTP/2 and propbably HTTP/3.
+
+We've built **HTTP/1.2** - a much more leightweight solution.
 
 - **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
 - **Rock-Solid Security**: Logical separation via TCP ports, avoiding single-point vulnerabilities
