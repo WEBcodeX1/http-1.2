@@ -30,12 +30,12 @@ and significantly faster alternative to HTTP/2 and propbably HTTP/3.
 
 We've built **HTTP/1.2** - a much more lightweight solution.
 
-- **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- **Rock-Solid Security**: Runs with tight backend process-separation model (non-threaded)
-- **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
-- **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
-- **Python-Powered**: FalconAS application server with embedded Python scripting
-- **Java-Powered**: FalconAS application server with embedded Java scripting
+- ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
+- ✅ **Rock-Solid Security**: Runs with tight backend process-separation model (non-threaded)
+- ✅ **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
+- ✅ **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
+- ✅ **Python-Powered**: FalconAS application server with embedded Python scripting
+- ✅ **Java-Powered**: FalconAS application server with embedded Java scripting
 
 ## :bookmark_tabs: Table of Contents
 
@@ -204,16 +204,16 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 ### Process Model
 
 ```text
-+---------------+---------------+---------------+---------------+
-| Server Process| AS Process 1  | AS Process x  | Result Process|
-|               | Python Interp.| Python Interp.|               |
-+---------------------------------------------------------------+
-| Shared Memory                                                 |
-|  - StaticFS Requests                                          |
-|  - AS Metadata                                                |  
-|  - AS Requests                                                |
-|  - AS Results                                                 |
-+---------------------------------------------------------------+
++----------------+---------------+---------------+----------------+
+| Server Process | AS Process 1  | AS Process x  | Result Process |
+|                | Python Interp.| Python Interp.|                |
++-----------------------------------------------------------------+
+| Shared Memory                                                   |
+|  - StaticFS Requests                                            |
+|  - AS Metadata                                                  |
+|  - AS Requests                                                  |
+|  - AS Results                                                   |
++-----------------------------------------------------------------+
 ```
 
 **Design Principles:**
