@@ -190,24 +190,10 @@ For complete build instructions, see [BUILD.md](BUILD.md).
 
 Comprehensive testing infrastructure ensures reliability:
 
-**Test Types:**
 - **Unit Tests**: Core component validation (`/test/unit/`)
 - **Integration Tests**: End-to-end functionality (`/test/integration/`)
 - **Performance Tests**: Benchmarking and optimization (`/test/performance/`)
 - **Evaluation Tests**: Protocol compliance (`/test/eval/`)
-
-**Running Tests:**
-```bash
-# build with tests
-make test
-
-# run specific test suites
-cd test/
-cmake .
-make
-./unit_tests
-./integration_tests
-```
 
 See [test documentation](/test/README.md) for detailed testing procedures.
 
@@ -248,12 +234,12 @@ HTTP/3's UDP-based approach creates more problems than it solves:
 **FalconAS** - Our working HTTP/1.2 server implementation includes:
 
 ### Current Components
-- **🗂️ Static Content Server**: High-performance file serving with `sendfile()` 
+- **🗂️ Static Content Server**: High-performance file serving with `sendfile()`
 - **🐍 Application Server**: Python scripting with embedded interpreter
 - **🔄 Shared Memory Architecture**: Process-based design avoiding Python GIL
 - **⚡ Epoll Integration**: Lightning-fast connection handling
 
-### Planned Components  
+### Planned Components
 - **🔀 Proxy Server**: Load balancing and reverse proxy capabilities (in development)
 
 ### Primary Milestone
@@ -261,7 +247,7 @@ HTTP/3's UDP-based approach creates more problems than it solves:
 The **primary goal** is providing a lightning-fast, rock-solid, and secure Python application server component specifically optimized for:
 
 - **Modern Browser Applications** (Single Page Applications)
-- **Cloud-Native Deployments** (Docker)  
+- **Cloud-Native Deployments** (Docker)
 - **High-Performance Workloads** (utilizing modern hardware capabilities)
 
 FalconAS will serve as a key component of the [x0 JavaScript Framework](https://github.com/WEBcodeX1/x0) ecosystem.
