@@ -26,7 +26,7 @@
 **HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
 and significantly faster alternative to HTTP/2 and propbably HTTP/3.
 
-We've built **HTTP/1.2** - a much more leightweight solution.
+We've built **HTTP/1.2** - a much more lightweight solution.
 
 - **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
 - **Rock-Solid Security**: Runs with backend process-separation model (non-threaded)
