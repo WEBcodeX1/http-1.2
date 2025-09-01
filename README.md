@@ -26,7 +26,7 @@
 ## :pushpin: Overview
 
 **HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
-and significantly faster alternative to HTTP/2 and propbably HTTP/3.
+and significantly faster alternative to HTTP/2 and propably HTTP/3.
 
 We've built **HTTP/1.2** - a much more lightweight solution.
 
