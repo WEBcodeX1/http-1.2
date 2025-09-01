@@ -224,17 +224,14 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 **⚠️ Coroutine Warning**: While trending, coroutines can be **counterproductive** for scalability if implemented incorrectly.
 
 **The Problem with Coroutines:**
-- Main loop iterates over **ALL** active/idle connection file descriptors
-- 10,000 keep-alive connections = 10,000 syscalls (context switches)
-- Massive overhead for checking received data
+- In case a single connection awaits a syscall `read()` result
+- Its similar to one `poll()`  for a single connection file descriptor
+- 10,000 connections = 10,000 syscalls (context switches)
+- Massive overhead for checking received data (unscalable)
 
 **Our Epoll Advantage:**
 - **Single syscall** informs about multiple FDs with pending data
-- Optimized for 64-bit server CPUs and modern hardware
 - Used by nginx and other high-performance servers
-- **Lightning-fast performance** with proper implementation
-
-> **💡 Key Insight**: Technologies like nginx achieve superior performance by leveraging epoll's efficiency rather than iterating through connections.
 
 ---
 
