@@ -3,7 +3,6 @@
 Basic Prerequisites (Ubuntu 22.04 or Debian 12):
 - git
 - cmake
-- python pip
 
 ```bash
 # install base requirements
