@@ -24,11 +24,13 @@ cmake_install*
 compile_commands.json
 install_manifest.txt
 falcon-as
+doc/doc_render/
 test/eval/test-boost-python
-test/eval/test-pointer-ref
-test/eval/ResultOrder/test-result-order
 test/integration/boost-regex/test-boost-regex
 test/integration/event/test-event
 test/integration/string-functions/test-string-functions
 test/integration/vector-multi-erase/test-Vector-multi-erase
 test/performance/test-performance
+test/eval/JavaJNI/test-run-jni
+test/eval/ResultOrder/test-result-order
+test/eval/test-pointer-ref
