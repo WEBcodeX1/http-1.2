@@ -25,5 +25,6 @@
 #define STATICFS_SUBDIR "/static"
 #define BACKEND_ROOT_PATH "/backend"
 
-#define CONFIG_FILE "/etc/falcon-http/config.json"
+//#define CONFIG_FILE "/etc/falcon-http/config.json"
+#define CONFIG_FILE "config/config.json"
 #endif
