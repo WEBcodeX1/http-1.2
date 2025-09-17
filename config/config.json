@@ -1,19 +1,4 @@
 {
-    "namespaces":
-    [
-        {
-            "id": "app1",
-            "hostname": "testapp1.local",
-            "path": "/app1",
-            "interpreters": 5
-        },
-        {
-            "id": "app2",
-            "hostname": "testapp2.local",
-            "path": "/app2",
-            "interpreters": 3
-        }
-    ],
     "global":
     {
         "path":
@@ -35,7 +20,7 @@
         },
         "connection":
         {
-            "timeout": 600,
+            "timeout": "600",
             "ipv4":
             {
                 "address": "127.0.0.1",
@@ -43,14 +28,56 @@
             }
         },
         "mimetypes":
-            [
-                "html", "js", "json", "css", "png", "jpg", "svg", "woff2"
-            ]
+        [
+            "html", "js", "json", "css", "png", "jpg", "svg", "woff2"
+        ],
+        "cache-control": {
+            "type": "private",
+            "max-age": 3600
+        }
     },
     "cpu-binding":
     {
         "main-server": [ 0 ],
         "staticfs": [ 1 ],
         "app-server": [ 2, 3 ]
-    }
+    },
+    "namespaces":
+    [
+        {
+            "id": "app1",
+            "hostname": "testapp1.local",
+            "path": "/app1",
+            "interpreters": 5,
+            "access":
+            {
+                "as-post":
+                {
+                    "/": "default"
+                }
+            }
+        },
+        {
+            "id": "app2",
+            "hostname": "testapp2.local",
+            "path": "/app2",
+            "interpreters": 3,
+            "access":
+            {
+                "as-post":
+                {
+                    "/": false,
+                    "/endpoint1": "method1"
+                },
+                "as-get":
+                {
+                    "/endpoint2":
+                    {
+                        "params": [ "param1", "param2" ],
+                        "method": "method2"
+                    }
+                }
+            }
+        }
+    ]
 }
