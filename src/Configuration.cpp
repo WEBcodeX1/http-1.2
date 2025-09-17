@@ -14,7 +14,7 @@ Configuration::Configuration() :
         ifstream ConfigFile(CONFIG_FILE);
         json jsonData = json::parse(ConfigFile);
 
-        RunAsUnixUser = jsonData["server"]["runas"]["user"];
+	RunAsUnixUser = jsonData["server"]["runas"]["user"];
         RunAsUnixGroup = jsonData["server"]["runas"]["group"];
 
         BasePath = jsonData["global"]["path"]["base"];
@@ -37,9 +37,8 @@ Configuration::Configuration() :
             );
         }
     }
-    catch( const char* msg )
-    {
-        ERR("Config file parse error:" << msg);
+    catch(const json::exception& e) {
+        ERR("JSON Config processing error:" << e.what());
         exit(1);
     }
 }
