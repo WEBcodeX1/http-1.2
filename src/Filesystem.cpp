@@ -106,19 +106,26 @@ FileProperties_t Filesystem::getFilePropertiesByFile(const string &File)
 
 string Filesystem::getFileEtag(const string &File) {
 
-    streampos size;
-    char * memblock;
+    streampos FileSize;
+    char* FileBuffer;
+    size_t FileHashInt = 0;
 
-    ifstream FStream(File, ios::in | ios::binary | ios::ate);
+    try {
+        ifstream FStream(File, ios::in | ios::binary | ios::ate);
 
-    size = FStream.tellg();
-    memblock = new char[size];
-    FStream.seekg (0, ios::beg);
-    FStream.read (memblock, size);
-    FStream.close();
+        FileSize = FStream.tellg();
+        FileBuffer = new char[FileSize];
+        FStream.seekg (0, ios::beg);
+        FStream.read (FileBuffer, FileSize);
+        FStream.close();
 
-    size_t FileHashInt = hash<string>{}(string(memblock, size));
-    delete[] memblock;
+        FileHashInt = hash<string>{}(string(FileBuffer, FileSize));
+        delete[] FileBuffer;
+    }
+    catch(const char* msg) {
+        ERR("Etag generation error:" << msg);
+        exit(1);
+    }
 
     stringstream FileHash;
     FileHash << std::hex << FileHashInt;
