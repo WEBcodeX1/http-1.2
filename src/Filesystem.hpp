@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "Debug.cpp"
 #include "Helper.hpp"
@@ -55,8 +57,9 @@ public:
 
     void initFiles();
     void processFileProperties();
-    FileProperties_t getFilePropertiesByFile(string File);
-    bool checkFileExists(string File);
+    FileProperties_t getFilePropertiesByFile(const string &File);
+    bool checkFileExists(const string &File);
+    string getFileEtag(const string &File);
 
     string Hostname;
     string BasePath;

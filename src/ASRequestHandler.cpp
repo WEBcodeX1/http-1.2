@@ -24,7 +24,7 @@ void ASRequestHandler::_calculateOffsets() {
 
     for (const auto &Namespace:_Namespaces) {
 
-        OffsetEnd += Namespace.second.InterpreterCount;
+        OffsetEnd += AppServerID_t(Namespace.second.JSONConfig["interpreters"]);
 
         _VHostOffsets.insert(
             PairVHostOffsets_t(Namespace.first, { OffsetStart, OffsetEnd } )
@@ -33,8 +33,7 @@ void ASRequestHandler::_calculateOffsets() {
             PairVHostOffsetsPrecalc_t(Namespace.first, {} )
         );
 
-        OffsetStart += Namespace.second.InterpreterCount;
-
+        OffsetStart += AppServerID_t(Namespace.second.JSONConfig["interpreters"]);
     }
 
     for (const auto &Offset:_VHostOffsets) {

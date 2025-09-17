@@ -11,11 +11,7 @@ Configuration::Configuration() :
     DBG(120, "Constructor");
 
     try {
-        std::ifstream ConfigFile(CONFIG_FILE);
-        if (!ConfigFile.is_open()) {
-            ERR("Could not open config file: " << CONFIG_FILE);
-            exit(1);
-        }
+        ifstream ConfigFile(CONFIG_FILE);
         json jsonData = json::parse(ConfigFile);
 
         RunAsUnixUser = jsonData["server"]["runas"]["user"];
@@ -29,27 +25,30 @@ Configuration::Configuration() :
 
         for (const auto& NamespaceItem:jsonData["namespaces"]) {
 
-            string NamespaceID;
+            //string NamespaceID;
+
             NamespaceProps_t NamespaceProps;
 
             DBG(-1, "NamespaceItem:" << NamespaceItem);
 
+            NamespaceProps.JSONConfig = std::move(NamespaceItem);
             NamespaceProps.FilesystemRef = nullptr;
 
+            /*
             NamespaceID = NamespaceItem["hostname"];
             NamespaceProps.PathRel = NamespaceItem["path"];
             NamespaceProps.InterpreterCount = NamespaceItem["interpreters"];
-
             DBG(-1, "Namespace:" << NamespaceID << " Path:" << NamespaceProps.PathRel << " Interpreters:" << NamespaceProps.InterpreterCount);
+            */
 
             Namespaces.insert(
-                NamespacePair_t(NamespaceID, NamespaceProps)
+                NamespacePair_t(NamespaceItem["hostname"], NamespaceProps)
             );
         }
     }
-    catch( const nlohmann::json::exception& e )
+    catch( const char* msg )
     {
-        ERR("Config file parse error:" << e.what());
+        ERR("Config file parse error:" << msg);
         exit(1);
     }
 }

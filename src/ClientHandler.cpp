@@ -46,7 +46,7 @@ void ClientHandler::addClient(const uint16_t ClientFD)
     //- set client connection non blocking
     Socket::makeNonblocking(ClientFD);
 
-    ClientRef_t ClientObj(new HTTPParser(ClientFD));
+    ClientRef_t ClientObj(new HTTPParser(ClientFD, _Namespaces));
 
     Clients.insert(
         ClientMapPair_t(ClientFD, ClientObj)
@@ -87,7 +87,6 @@ void ClientHandler::processClients()
 
     //- process appserver queue
     ProcessedClients += _ASRequestHandlerRef->processQueue();
-    //_ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)

@@ -34,7 +34,7 @@ uint ASProcessHandler::getASInterpreterCount()
 {
     uint ASInterpreterCount = 0;
     for (const auto& NamespaceProps:_Namespaces) {
-        ASInterpreterCount += NamespaceProps.second.InterpreterCount;
+        ASInterpreterCount += uint(NamespaceProps.second.JSONConfig["interpreters"]);
     }
     return ASInterpreterCount;
 }
@@ -100,7 +100,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
                 DBG(120, "Process UID:" << getuid() << " GID:" << getgid());
 
-                const string BackendRootPath = "/var/www" + Namespace.second.PathRel + BACKEND_ROOT_PATH;
+                const string BackendRootPath = "/var/www" + string(Namespace.second.JSONConfig["path"]) + string(BACKEND_ROOT_PATH);
                 setenv("PYTHONPATH", BackendRootPath.c_str(), 1);
                 DBG(120, "BackendRootPath Path:" << BackendRootPath.c_str());
 

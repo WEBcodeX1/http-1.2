@@ -68,13 +68,9 @@ void Filesystem::processFileProperties()
 
             FindPos = FileName.rfind(".");
             string FileExtension = FileName.substr(FindPos+1, File.length()-FindPos);
-
             string MimeType = MimeRelations.at(FileExtension);
-
             string ReplacePath = BasePath + Path + "/static";
-
             string RelPath = FilePath.substr(ReplacePath.length(), FilePath.length()-ReplacePath.length());
-
             string FileListKey = RelPath + "/" + FileName;
 
             DBG(210, "FilePath:" << FilePath << " ReplacePath:" << ReplacePath << " FileListKey:" << FileListKey);
@@ -86,6 +82,7 @@ void Filesystem::processFileProperties()
             FileProps.FileName = FileName;
             FileProps.FileExtension = FileExtension;
             FileProps.MimeType = MimeType;
+            FileProps.ETag = this->getFileEtag(File);
 
             _FilesExtended.insert(
                 FileListExtendedPair_t(FileListKey, FileProps)
@@ -94,7 +91,7 @@ void Filesystem::processFileProperties()
     }
 }
 
-bool Filesystem::checkFileExists(string File)
+bool Filesystem::checkFileExists(const string &File)
 {
     if (_FilesExtended.find(File) == _FilesExtended.end()) {
         return false;
@@ -102,7 +99,28 @@ bool Filesystem::checkFileExists(string File)
     return true;
 }
 
-FileProperties_t Filesystem::getFilePropertiesByFile(string File)
+FileProperties_t Filesystem::getFilePropertiesByFile(const string &File)
 {
     return _FilesExtended.at(File);
+}
+
+string Filesystem::getFileEtag(const string &File) {
+
+    streampos size;
+    char * memblock;
+
+    ifstream FStream(File, ios::in | ios::binary | ios::ate);
+
+    size = FStream.tellg();
+    memblock = new char[size];
+    FStream.seekg (0, ios::beg);
+    FStream.read (memblock, size);
+    FStream.close();
+
+    size_t FileHashInt = hash<string>{}(string(memblock, size));
+    delete[] memblock;
+
+    stringstream FileHash;
+    FileHash << std::hex << FileHashInt;
+    return FileHash.str();
 }
