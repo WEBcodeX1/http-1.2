@@ -104,6 +104,15 @@ add_custom_target(
 add_subdirectory(lib)
 add_subdirectory(test)
 
+# strip main binary
+if (NOT DEFINED DEBUG_BUILD)
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_STRIP} ${PROJECT_NAME}
+    )
+endif()
+
 # install
 install(CODE "execute_process(COMMAND ./scripts/add_user_group.sh)")
 install(CODE "execute_process(COMMAND ./scripts/mk_www.sh)")
