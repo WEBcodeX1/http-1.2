@@ -14,7 +14,7 @@ Configuration::Configuration() :
         ifstream ConfigFile(CONFIG_FILE);
         json jsonData = json::parse(ConfigFile);
 
-	RunAsUnixUser = jsonData["server"]["runas"]["user"];
+        RunAsUnixUser = jsonData["server"]["runas"]["user"];
         RunAsUnixGroup = jsonData["server"]["runas"]["group"];
 
         BasePath = jsonData["global"]["path"]["base"];
