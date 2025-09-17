@@ -3,8 +3,9 @@
 using namespace std;
 
 
-HTTPParser::HTTPParser(ClientFD_t ClientFD) :
+HTTPParser::HTTPParser(ClientFD_t ClientFD, NamespacesRef_t NamespacesRef) :
     Client(ClientFD),
+    _Namespaces(NamespacesRef),
     _RequestCount(0),
     _RequestCountGet(0),
     _RequestCountPost(0),
@@ -27,9 +28,9 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
     //- workaround
     if (BufferRef[0] == 0) { return; }
 
-    const string Buffer(&BufferRef[0], BufferSize);
-    DBG(250, "size:" << Buffer.length() << "appendBuffer:'" << Buffer << "'");
-    _HTTPRequestBuffer = _HTTPRequestBuffer + move(Buffer);
+    //const string Buffer(&BufferRef[0], BufferSize);
+    DBG(250, "size:" << string(BufferRef).length() << "appendBuffer:'" << string(BufferRef) << "'");
+    _HTTPRequestBuffer = _HTTPRequestBuffer + string(BufferRef);
     //String::hexout(_HTTPRequestBuffer);
     DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
 
@@ -41,7 +42,7 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
     }
 }
 
-void HTTPParser::_splitRequests()
+inline void HTTPParser::_splitRequests()
 {
     //DBG(180, "splitRequests Buffer:'" << _HTTPRequestBuffer << "'");
 
@@ -85,7 +86,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
     DBG(140, "Processing Index:" << Index << " Request:'" << Request << "'");
 
     BasePropsResult_t BasePropsFound;
-    this->_parseRequestProperties(Request, BasePropsFound);
+    _parseRequestProperties(Request, BasePropsFound);
 
     DBG(140, "HTTP Version:" << BasePropsFound.at(0) << " File:" << BasePropsFound.at(1) << " Method:" << BasePropsFound.at(2));
     DBG(140, "Complete Request:" << Request.c_str());
@@ -120,7 +121,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
     //- if not POSTAS, return
     if (HTTPMethod == 2 && AppServerReqFound == string::npos) {
-        ++this->_RequestCountPost;
+        ++_RequestCountPost;
         return;
     }
 
@@ -130,6 +131,40 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
     DBG(140, "HTTP RequestNr:" << RequestNr);
 
+    RequestHeaderResult_t Headers;
+
+    //- AS GET request
+    if (HTTPMethod == 1 && AppServerReqFound != string::npos) {
+
+        //- parse request headers
+        _parseRequestHeaders(Request, Headers);
+
+        const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
+        string JSONPayload("{ \"payload\": {");
+
+        for (const auto& [Endpoint, EndpointProps]: NamespaceProps.JSONConfig["access"]["as-get"].items()) {
+            DBG(200, "Endpoint:" << Endpoint);
+            const size_t EndpointFound = BasePropsFound.at(1).find("/backend" + Endpoint);
+            if (EndpointFound != string::npos) {
+                for (size_t i=0; i<EndpointProps["params"].size(); ++i) {
+                    const string Param = EndpointProps["params"][i];
+                    string ProcessURL = BasePropsFound.at(1);
+                    const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
+                    JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
+                    if (i != EndpointProps["params"].size()) {
+                        JSONPayload += ",";
+                    }
+                }
+                JSONPayload += "}";
+                _processASPayload(
+                    ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, JSONPayload
+                );
+                return;
+            }
+        }
+    }
+
+    //- AS POST request
     if (HTTPMethod == 2 && AppServerReqFound != string::npos) {
 
         DBG(140, "Request Type ASRequest:" << Request);
@@ -148,8 +183,8 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
             Request.replace(0, FirstLineEndMarker+2, "");
         }
 
-        RequestHeaderResult_t Headers;
-        this->_parseRequestHeaders(Request, Headers);
+        //- parse request headers
+        _parseRequestHeaders(Request, Headers);
 
         uint ContentBytes = 0;
 
@@ -187,26 +222,18 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
         DBG(140, "HTTP POST-AS Payload:" << Payload);
 
         if (PayloadFound) {
-            //- increment request count
-            ++this->_RequestCountPostAS;
-
-            //- add ASRequestHandler request
-            ASRequestHandlerRef->addRequest({
-                Headers.at("Host"),
-                _ClientFD,
-                HTTPMethod,
-                HTTPVersion,
-                RequestNr,
-                Payload
-            });
+            _processASPayload(
+                ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, Payload
+            );
         }
     }
 
-    if (HTTPMethod == 1) {
+    //- Standard GET request
+    if (HTTPMethod == 1 && AppServerReqFound == string::npos) {
 
         DBG(140, "Request Type GET:" << Request);
 
-        ++this->_RequestCountGet;
+        ++_RequestCountGet;
 
         //- set values in get requests shared memory
         const char* MsgCString = Request.c_str();
@@ -281,4 +308,70 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
         }
     }
     DBG(120, "End parse headers.");
+}
+
+inline string HTTPParser::_getASURLParamValue(
+    const string& Param,
+    const uint16_t Index,
+    string& ReqURL
+){
+    //- process first ? parameter
+    if (Index == 0) {
+        const size_t StartMarkerPos = ReqURL.find("?");
+        const size_t MidMarkerPos = ReqURL.find("=");
+        const size_t EndMarkerPos = ReqURL.find("&");
+        const size_t CompletePos = ReqURL.find("?" + Param + "=");
+        const size_t CheckMidPos = CompletePos+Param.size()+1;
+
+        if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
+            const size_t EndPos = (EndMarkerPos == string::npos) ? ReqURL.size() : EndMarkerPos-1;
+            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos);
+            ReqURL.replace(CompletePos, EndPos, "");
+            return ReturnString;
+        }
+        else {
+            return "not-found";
+        }
+    }
+    //- process next & parameter(s)
+    if (Index > 0) {
+        const size_t StartMarkerPos = ReqURL.find("&");
+        const size_t MidMarkerPos = ReqURL.find("=");
+        const size_t CompletePos = ReqURL.find("&" + Param + "=");
+        const size_t CheckMidPos = CompletePos+Param.size()+1;
+
+        if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
+            const size_t NextMarkerPos = ReqURL.find("&", MidMarkerPos);
+            const size_t EndPos = (NextMarkerPos == string::npos) ? ReqURL.size() : NextMarkerPos-1;
+            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos);
+            ReqURL.replace(CompletePos, EndPos, "");
+            return ReturnString;
+        }
+        else {
+            return "not-found";
+        }
+    }
+    return "parse-error";
+}
+
+inline void HTTPParser::_processASPayload(
+    const ASRequestHandlerRef_t ASRequestHandlerRef,
+    const RequestHeaderResult_t &Headers,
+    const uint16_t HTTPMethod,
+    const uint16_t HTTPVersion,
+    const uint16_t RequestNr,
+    const string &Payload
+){
+    //- increment request count
+    ++_RequestCountPostAS;
+
+    //- add ASRequestHandler request
+    ASRequestHandlerRef->addRequest({
+        Headers.at("Host"),
+        _ClientFD,
+        HTTPMethod,
+        HTTPVersion,
+        RequestNr,
+        Payload
+    });
 }

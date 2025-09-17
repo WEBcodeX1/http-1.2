@@ -36,7 +36,7 @@ class HTTPParser: private Client, private SHMStaticFS, private SHMPythonAS
 
 public:
 
-    HTTPParser(ClientFD_t);
+    HTTPParser(ClientFD_t, NamespacesRef_t);
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
@@ -44,11 +44,13 @@ public:
 
 private:
 
-    void _splitRequests();
+    inline void _splitRequests();
     void _processRequestProperties(const size_t, const ASRequestHandlerRef_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
+
+    NamespacesRef_t _Namespaces;
 
     size_t _RequestCount;
     size_t _RequestCountGet;
@@ -64,6 +66,20 @@ protected:
     void _parseRequestProperties(string&, BasePropsResultRef_t);
     void _parseRequestHeaders(string&, RequestHeaderResultRef_t);
 
+    inline string _getASURLParamValue(
+        const string&,
+        const uint16_t,
+        string&
+    );
+
+    inline void _processASPayload(
+        const ASRequestHandlerRef_t,
+        const RequestHeaderResult_t&,
+        const uint16_t,
+        const uint16_t,
+        const uint16_t,
+        const string&
+    );
 };
 
 #endif
