@@ -325,7 +325,7 @@ inline string HTTPParser::_getASURLParamValue(
 
         if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
             const size_t EndPos = (EndMarkerPos == string::npos) ? ReqURL.size() : EndMarkerPos-1;
-            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos);
+            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
             ReqURL.replace(CompletePos, EndPos, "");
             return ReturnString;
         }
@@ -343,7 +343,7 @@ inline string HTTPParser::_getASURLParamValue(
         if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
             const size_t NextMarkerPos = ReqURL.find("&", MidMarkerPos);
             const size_t EndPos = (NextMarkerPos == string::npos) ? ReqURL.size() : NextMarkerPos-1;
-            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos);
+            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
             ReqURL.replace(CompletePos, EndPos, "");
             return ReturnString;
         }
