@@ -11,7 +11,7 @@ Configuration::Configuration() :
     DBG(120, "Constructor");
 
     try {
-        ifstream ConfigFile(CONFIG_FILE);
+        std::ifstream ConfigFile(CONFIG_FILE);
         json jsonData = json::parse(ConfigFile);
 
         RunAsUnixUser = jsonData["server"]["runas"]["user"];
