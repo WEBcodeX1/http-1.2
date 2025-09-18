@@ -13,6 +13,9 @@ include_directories( ${PYTHON_INCLUDE_DIRS} )
 # find boost::python
 find_package(Boost 1.74 REQUIRED COMPONENTS system filesystem python)
 
+# find nlohmann json
+find_package(nlohmann_json 3.0 REQUIRED)
+
 # check for -D JAVA_BACKEND=1
 if ( DEFINED JAVA_BACKEND )
 
@@ -74,6 +77,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
+    nlohmann_json::nlohmann_json
     libhttp
 )
 
