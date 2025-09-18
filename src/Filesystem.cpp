@@ -122,8 +122,8 @@ string Filesystem::getFileEtag(const string &File) {
         FileHashInt = hash<string>{}(string(FileBuffer, FileSize));
         delete[] FileBuffer;
     }
-    catch(const char* msg) {
-        ERR("Etag generation error:" << msg);
+    catch(const std::exception& e) {
+        ERR("Etag generation error: " << e.what());
         exit(1);
     }
 
