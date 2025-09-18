@@ -151,7 +151,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
                     string ProcessURL = BasePropsFound.at(1);
                     const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
                     JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
-                    if (i != EndpointProps["params"].size()) {
+                    if (i != EndpointProps["params"].size() - 1) {
                         JSONPayload += ",";
                     }
                 }
