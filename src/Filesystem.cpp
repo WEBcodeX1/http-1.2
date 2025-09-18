@@ -111,7 +111,7 @@ string Filesystem::getFileEtag(const string &File) {
     size_t FileHashInt = 0;
 
     try {
-        ifstream FStream(File, ios::in | ios::binary | ios::ate);
+        std::ifstream FStream(File, ios::in | ios::binary | ios::ate);
 
         FileSize = FStream.tellg();
         FileBuffer = new char[FileSize];
