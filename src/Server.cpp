@@ -58,7 +58,7 @@ void Server::init()
 
     //- fork application server proesses
     setASProcessHandlerNamespaces(Namespaces);
-    setASProcessHandlerOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- check interpreter count
