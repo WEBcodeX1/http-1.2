@@ -60,7 +60,7 @@ inline void HTTPParser::_splitRequests()
     DBG(120, "_HTTPRequestBuffer after split:'" << _HTTPRequestBuffer << "'");
 }
 
-size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t ASRequestHandlerRef)
+size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t ASRequestHandlerRef&)
 {
     DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
 
@@ -75,7 +75,7 @@ size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRe
     return _RequestCountGet;
 }
 
-void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t ASRequestHandlerRef)
+void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t ASRequestHandlerRef&)
 {
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
