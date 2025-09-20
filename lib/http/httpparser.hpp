@@ -73,7 +73,7 @@ protected:
     );
 
     inline void _processASPayload(
-        const ASRequestHandlerRef_t,
+        const ASRequestHandlerRef_t&,
         const RequestHeaderResult_t&,
         const uint16_t,
         const uint16_t,

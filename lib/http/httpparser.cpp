@@ -355,7 +355,7 @@ inline string HTTPParser::_getASURLParamValue(
 }
 
 inline void HTTPParser::_processASPayload(
-    const ASRequestHandlerRef_t ASRequestHandlerRef,
+    const ASRequestHandlerRef_t &ASRequestHandlerRef,
     const RequestHeaderResult_t &Headers,
     const uint16_t HTTPMethod,
     const uint16_t HTTPVersion,
