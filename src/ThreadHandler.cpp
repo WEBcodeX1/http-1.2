@@ -31,8 +31,8 @@ void ThreadHandler::_addRequests(
         else {
             ClientRequestDataVec_t ReqPropsVec;
             ReqPropsVec.push_back(std::move(RequestProps));
-            _RequestsSorted.insert(
-                ClientRequestDataListPair_t(RequestProps.ClientFD, std::move(ReqPropsVec))
+            _RequestsSorted.emplace(
+                RequestProps.ClientFD, std::move(ReqPropsVec)
             );
         }
     }
@@ -75,12 +75,12 @@ void ThreadHandler::_processThreads()
             new ClientThread(ClientFD, _Globals.Namespaces, std::move(RequestProps))
         );
 
-        _ProcessRequestsIndex.insert(
-            ProcessRequestsIndexListPair_t(ClientFD, i)
+        _ProcessRequestsIndex.emplace(
+            ClientFD, i
         );
 
-        _ClientThreads.insert(
-            ClientListPair_t(ClientFD, std::move(ClientThreadObj))
+        _ClientThreads.emplace(
+            ClientFD, std::move(ClientThreadObj)
         );
         ClientThreadObj->startThread();
         ++i;

@@ -26,11 +26,11 @@ void ASRequestHandler::_calculateOffsets() {
 
         OffsetEnd += AppServerID_t(Namespace.second.JSONConfig["interpreters"]);
 
-        _VHostOffsets.insert(
-            PairVHostOffsets_t(Namespace.first, { OffsetStart, OffsetEnd } )
+        _VHostOffsets.emplace(
+            Namespace.first, OffsetStartEnd_t{ OffsetStart, OffsetEnd }
         );
-        _VHostOffsetsPrecalc.insert(
-            PairVHostOffsetsPrecalc_t(Namespace.first, {} )
+        _VHostOffsetsPrecalc.emplace(
+            Namespace.first, vector<AppServerID_t>{}
         );
 
         OffsetStart += AppServerID_t(Namespace.second.JSONConfig["interpreters"]);
