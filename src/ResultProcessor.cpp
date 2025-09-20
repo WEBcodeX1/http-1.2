@@ -1,5 +1,7 @@
 #include "ResultProcessor.hpp"
 
+#include <memory>
+
 using namespace std;
 
 static bool RunServer = true;
@@ -33,7 +35,7 @@ void ResultProcessor::loadStaticFSData(
 ){
     for (auto& [Key, Value]: Namespaces) {
 
-        Filesystem* FilesysRef = new Filesystem();
+        auto FilesysRef = std::make_shared<Filesystem>();
 
         DBG(120, "Host:" << Key << " Path:" << string(Value.JSONConfig["path"]) << " InterpreterCount:" << string(Value.JSONConfig["interpreters"]));
 
@@ -45,8 +47,7 @@ void ResultProcessor::loadStaticFSData(
         FilesysRef->initFiles();
         FilesysRef->processFileProperties();
 
-        std::shared_ptr<Filesystem> FilesysRefPtr(FilesysRef);
-        _Namespaces[Key].FilesystemRef = std::move(FilesysRefPtr);
+        _Namespaces[Key].FilesystemRef = FilesysRef;
     }
 }
 

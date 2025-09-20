@@ -1,12 +1,13 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
 #include "../../../src/Client.hpp"
 #include "../../../src/ClientHandler.hpp"
 
-
 using namespace std;
 using json = nlohmann::json;
+
 
 BOOST_AUTO_TEST_CASE( test_single_get_request )
 {
@@ -26,18 +27,13 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    /*
-    NamespaceProps.InterpreterCount = 2;
-    NamespaceProps.PathRel = "/test";
-    */
-
     Namespaces.emplace(
         "test1", NamespaceProps
     );
 
-    ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
+    ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
         Namespaces,
-        { SHMASMeta, SHMASRequests, SHMASResults }
+        BaseAdresses_t{ SHMASMeta, SHMASRequests, SHMASResults }
     );
 
     ClientFD_t ClientFD = 1;
@@ -68,18 +64,13 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    /*
-    NamespaceProps.InterpreterCount = 2;
-    NamespaceProps.PathRel = "/test";
-    */
-
     Namespaces.emplace(
         "test1", NamespaceProps
     );
 
-    ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
+    ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
         Namespaces,
-        { SHMASMeta, SHMASRequests, SHMASResults }
+        BaseAdresses_t{ SHMASMeta, SHMASRequests, SHMASResults }
     );
 
     ClientFD_t ClientFD = 1;
@@ -110,18 +101,13 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    /*
-    NamespaceProps.InterpreterCount = 2;
-    NamespaceProps.PathRel = "/test";
-    */
-
     Namespaces.emplace(
         "test1", NamespaceProps
     );
 
-    ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
+    ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
         Namespaces,
-        { SHMASMeta, SHMASRequests, SHMASResults }
+        BaseAdresses_t{ SHMASMeta, SHMASRequests, SHMASResults }
     );
 
     ClientFD_t ClientFD = 1;
@@ -152,18 +138,13 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    /*
-    NamespaceProps.InterpreterCount = 2;
-    NamespaceProps.PathRel = "/test";
-    */
-
     Namespaces.emplace(
         "test1", NamespaceProps
     );
 
-    ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
+    ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
         Namespaces,
-        { SHMASMeta, SHMASRequests, SHMASResults }
+        BaseAdresses_t{ SHMASMeta, SHMASRequests, SHMASResults }
     );
 
     ClientFD_t ClientFD = 1;

@@ -1,6 +1,7 @@
 #include "../Global.hpp"
 #include "../ASProcessHandler.hpp"
 
+#include <memory>
 #include <jni.h>
 
 
@@ -14,7 +15,7 @@ namespace Backend {
         static void init(ASProcessHandler* ProcessHandlerPtr)
         {
             //- set java class path (jvm options)
-            JavaVMOption* options = new JavaVMOption[1];
+            auto options = std::make_unique<JavaVMOption[]>(1);
             string JavaClassPath = "-Djava.class.path=./json-java.jar:.";
             options[0].optionString = (char*)JavaClassPath.c_str();
 
@@ -22,13 +23,13 @@ namespace Backend {
             JavaVMInitArgs vm_args;
             vm_args.version = JNI_VERSION_1_6;
             vm_args.nOptions = 1;
-            vm_args.options = options;
+            vm_args.options = options.get();
             vm_args.ignoreUnrecognized = false;
 
             //- init jvm / jni interface
             jint rc = JNI_CreateJavaVM(&ProcessHandlerPtr->jvm, (void**)&ProcessHandlerPtr->jnienv, &vm_args);
             DBG(160, "JNI CreateJavaVM rc:" << rc);
-            delete[] options;
+            // options automatically deallocated when going out of scope
         }
 
         //- process request
