@@ -68,13 +68,9 @@ void Filesystem::processFileProperties()
 
             FindPos = FileName.rfind(".");
             string FileExtension = FileName.substr(FindPos+1, File.length()-FindPos);
-
             string MimeType = MimeRelations.at(FileExtension);
-
             string ReplacePath = BasePath + Path + "/static";
-
             string RelPath = FilePath.substr(ReplacePath.length(), FilePath.length()-ReplacePath.length());
-
             string FileListKey = RelPath + "/" + FileName;
 
             DBG(210, "FilePath:" << FilePath << " ReplacePath:" << ReplacePath << " FileListKey:" << FileListKey);
@@ -86,6 +82,7 @@ void Filesystem::processFileProperties()
             FileProps.FileName = FileName;
             FileProps.FileExtension = FileExtension;
             FileProps.MimeType = MimeType;
+            FileProps.ETag = this->getFileEtag(File);
 
             _FilesExtended.insert(
                 FileListExtendedPair_t(FileListKey, FileProps)
@@ -94,7 +91,7 @@ void Filesystem::processFileProperties()
     }
 }
 
-bool Filesystem::checkFileExists(string File)
+bool Filesystem::checkFileExists(const string &File)
 {
     if (_FilesExtended.find(File) == _FilesExtended.end()) {
         return false;
@@ -102,7 +99,35 @@ bool Filesystem::checkFileExists(string File)
     return true;
 }
 
-FileProperties_t Filesystem::getFilePropertiesByFile(string File)
+FileProperties_t Filesystem::getFilePropertiesByFile(const string &File)
 {
     return _FilesExtended.at(File);
+}
+
+string Filesystem::getFileEtag(const string &File) {
+
+    streampos FileSize;
+    char* FileBuffer;
+    size_t FileHashInt = 0;
+
+    try {
+        std::ifstream FStream(File, ios::in | ios::binary | ios::ate);
+
+        FileSize = FStream.tellg();
+        FileBuffer = new char[FileSize];
+        FStream.seekg (0, ios::beg);
+        FStream.read (FileBuffer, FileSize);
+        FStream.close();
+
+        FileHashInt = hash<string>{}(string(FileBuffer, FileSize));
+        delete[] FileBuffer;
+    }
+    catch(const std::exception& e) {
+        ERR("Etag generation error: " << e.what());
+        exit(1);
+    }
+
+    stringstream FileHash;
+    FileHash << std::hex << FileHashInt;
+    return FileHash.str();
 }

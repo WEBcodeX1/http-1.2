@@ -35,10 +35,10 @@ void ResultProcessor::loadStaticFSData(
 
         Filesystem* FilesysRef = new Filesystem();
 
-        DBG(120, "Host:" << Key << " Path:" << Value.PathRel << " InterpreterCount:" << Value.InterpreterCount);
+        DBG(120, "Host:" << Key << " Path:" << string(Value.JSONConfig["path"]) << " InterpreterCount:" << string(Value.JSONConfig["interpreters"]));
 
         FilesysRef->Hostname = Key;
-        FilesysRef->Path = Value.PathRel;
+        FilesysRef->Path = string(Value.JSONConfig["path"]);
         FilesysRef->BasePath = BasePath;
         FilesysRef->Mimetypes = Mimetypes;
 

@@ -14,8 +14,7 @@
 
 
 typedef struct {
-    string PathRel;
-    uint InterpreterCount;
+    nlohmann::json JSONConfig;
     std::shared_ptr<Filesystem> FilesystemRef;
 } NamespaceProps_t;
 

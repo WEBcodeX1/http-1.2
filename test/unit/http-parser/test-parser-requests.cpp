@@ -6,6 +6,7 @@
 
 
 using namespace std;
+using json = nlohmann::json;
 
 BOOST_AUTO_TEST_CASE( test_single_get_request )
 {
@@ -18,11 +19,17 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
     void* SHMASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
+    const json JSONConfig = { {"interpreters", 2}, {"path", "/test"} };
+
     Namespaces_t Namespaces;
     NamespaceProps_t NamespaceProps;
     NamespaceProps.FilesystemRef = nullptr;
+    NamespaceProps.JSONConfig = JSONConfig;
+
+    /*
     NamespaceProps.InterpreterCount = 2;
     NamespaceProps.PathRel = "/test";
+    */
 
     Namespaces.insert(
         NamespacePair_t("test1", NamespaceProps)
@@ -34,7 +41,7 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
     );
 
     ClientFD_t ClientFD = 1;
-    ClientRef_t ClientObj(new HTTPParser(ClientFD));
+    ClientRef_t ClientObj(new HTTPParser(ClientFD, Namespaces));
 
     std::string Request("GET /test/test.png HTTP/1.1\r\nCustomHeader: one\r\n\r\n");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
@@ -54,11 +61,17 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
     void* SHMASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
+    const json JSONConfig = { {"interpreters", 2}, {"path", "/test"} };
+
     Namespaces_t Namespaces;
     NamespaceProps_t NamespaceProps;
     NamespaceProps.FilesystemRef = nullptr;
+    NamespaceProps.JSONConfig = JSONConfig;
+
+    /*
     NamespaceProps.InterpreterCount = 2;
     NamespaceProps.PathRel = "/test";
+    */
 
     Namespaces.insert(
         NamespacePair_t("test1", NamespaceProps)
@@ -70,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
     );
 
     ClientFD_t ClientFD = 1;
-    ClientRef_t ClientObj(new HTTPParser(ClientFD));
+    ClientRef_t ClientObj(new HTTPParser(ClientFD, Namespaces));
 
     std::string Request("GET /test/test1.png HTTP/1.1\r\nCustomHeader: one\r\n\r\nGET /test/test2.png HTTP/1.1\r\nCustomHeader: two\r\n\r\n");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
@@ -90,11 +103,17 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     void* SHMASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
+    const json JSONConfig = { {"interpreters", 2}, {"path", "/test"} };
+
     Namespaces_t Namespaces;
     NamespaceProps_t NamespaceProps;
     NamespaceProps.FilesystemRef = nullptr;
+    NamespaceProps.JSONConfig = JSONConfig;
+
+    /*
     NamespaceProps.InterpreterCount = 2;
     NamespaceProps.PathRel = "/test";
+    */
 
     Namespaces.insert(
         NamespacePair_t("test1", NamespaceProps)
@@ -106,7 +125,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     );
 
     ClientFD_t ClientFD = 1;
-    ClientRef_t ClientObj(new HTTPParser(ClientFD));
+    ClientRef_t ClientObj(new HTTPParser(ClientFD, Namespaces));
 
     std::string Request("POST /python/test1.py HTTP/1.1\r\nHost: test.loalnet\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
@@ -126,11 +145,17 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
     void* SHMASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     void* SHMASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
+    const json JSONConfig = { {"interpreters", 2}, {"path", "/test"} };
+
     Namespaces_t Namespaces;
     NamespaceProps_t NamespaceProps;
     NamespaceProps.FilesystemRef = nullptr;
+    NamespaceProps.JSONConfig = JSONConfig;
+
+    /*
     NamespaceProps.InterpreterCount = 2;
     NamespaceProps.PathRel = "/test";
+    */
 
     Namespaces.insert(
         NamespacePair_t("test1", NamespaceProps)
@@ -142,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
     );
 
     ClientFD_t ClientFD = 1;
-    ClientRef_t ClientObj(new HTTPParser(ClientFD));
+    ClientRef_t ClientObj(new HTTPParser(ClientFD, Namespaces));
 
     std::string Request("GET /t/tA.png HTTP/1.1\r\nCustomHeader: a\r\n\r\nGET /t/tB.png HTTP/1.1\r\nCustomHeader: b\r\n\r\nGET /t/tC.png HT");
     ClientObj->appendBuffer(Request.c_str(), Request.length());
