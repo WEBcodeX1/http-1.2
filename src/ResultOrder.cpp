@@ -23,15 +23,15 @@ void ResultOrder::append(
 )
 {
     if (_Requests.contains(ReqProps.ClientFD)) {
-        _Requests.at(ReqProps.ClientFD).insert(
-            PairReqNrProps_t(ReqNr, std::move(ReqProps))
+        _Requests.at(ReqProps.ClientFD).emplace(
+            ReqNr, std::move(ReqProps)
         );
     }
     else {
         MapReqNrProps_t ReqNrProps;
-        ReqNrProps.insert(PairReqNrProps_t(ReqNr, ReqProps));
-        _Requests.insert(
-            PairRequests_t(ReqProps.ClientFD, std::move(ReqNrProps))
+        ReqNrProps.emplace(ReqNr, ReqProps);
+        _Requests.emplace(
+            ReqProps.ClientFD, std::move(ReqNrProps)
         );
     }
 }
@@ -40,7 +40,7 @@ void ResultOrder::calculate()
 {
     for (const auto& [ClientFD, Requests]: _Requests) {
         if (!_LastRequest.contains(ClientFD)) {
-            _LastRequest.insert(PairLastRequest_t(ClientFD, { 1, chrono::system_clock::to_time_t (chrono::system_clock::now()) }));
+            _LastRequest.emplace(ClientFD, LastRequestProps_t{ 1, chrono::system_clock::to_time_t (chrono::system_clock::now()) });
         }
     }
 }

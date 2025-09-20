@@ -32,8 +32,8 @@ Configuration::Configuration() :
             NamespaceProps.JSONConfig = std::move(NamespaceItem);
             NamespaceProps.FilesystemRef = nullptr;
 
-            Namespaces.insert(
-                NamespacePair_t(NamespaceItem["hostname"], NamespaceProps)
+            Namespaces.emplace(
+                NamespaceItem["hostname"], NamespaceProps
             );
         }
     }

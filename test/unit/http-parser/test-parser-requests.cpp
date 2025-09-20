@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
     NamespaceProps.PathRel = "/test";
     */
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
     NamespaceProps.PathRel = "/test";
     */
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     NamespaceProps.PathRel = "/test";
     */
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
@@ -157,8 +157,8 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
     NamespaceProps.PathRel = "/test";
     */
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = new ASRequestHandler(
