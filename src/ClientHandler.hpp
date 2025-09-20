@@ -46,7 +46,7 @@ public:
     void setSharedMemPointer(ClientHandlerSHMPointer_t);
     void setClientHandlerConfig(Namespaces_t);
 
-    ASRequestHandlerRef_t getClientHandlerASRequestHandlerRef();
+    ASRequestHandler& getClientHandlerASRequestHandlerRef();
 
     uint16_t ProcessedClients;
     MemoryManager<char> BufferMemory;

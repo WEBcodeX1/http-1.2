@@ -64,7 +64,6 @@ private:
 
 };
 
-//typedef std::shared_ptr<ASRequestHandler> ASRequestHandlerRef_t;
-typedef ASRequestHandler* ASRequestHandlerRef_t;
+typedef std::unique_ptr<ASRequestHandler> ASRequestHandlerRef_t;
 
 #endif

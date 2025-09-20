@@ -50,10 +50,10 @@ void Server::init()
     loadStaticFSData(Namespaces, BasePath, Mimetypes);
 
     //- get ASRequestHandler reference
-    ASRequestHandlerRef_t ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
+    ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
 
     //- fork result processor process
-    ResultProcessor::setVHostOffsets(ASRequestHandlerRef->getOffsetsPrecalc());
+    ResultProcessor::setVHostOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- fork application server proesses

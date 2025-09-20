@@ -1,5 +1,7 @@
 #include "Filesystem.hpp"
 
+#include <memory>
+
 using namespace std;
 
 
@@ -107,20 +109,19 @@ FileProperties_t Filesystem::getFilePropertiesByFile(const string &File)
 string Filesystem::getFileEtag(const string &File) {
 
     streampos FileSize;
-    char* FileBuffer;
     size_t FileHashInt = 0;
 
     try {
         std::ifstream FStream(File, ios::in | ios::binary | ios::ate);
 
         FileSize = FStream.tellg();
-        FileBuffer = new char[FileSize];
+        auto FileBuffer = std::make_unique<char[]>(FileSize);
         FStream.seekg (0, ios::beg);
-        FStream.read (FileBuffer, FileSize);
+        FStream.read (FileBuffer.get(), FileSize);
         FStream.close();
 
-        FileHashInt = hash<string>{}(string(FileBuffer, FileSize));
-        delete[] FileBuffer;
+        FileHashInt = hash<string>{}(string(FileBuffer.get(), FileSize));
+        // FileBuffer automatically deallocated when going out of scope
     }
     catch(const std::exception& e) {
         ERR("Etag generation error: " << e.what());

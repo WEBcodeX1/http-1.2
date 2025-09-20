@@ -1,5 +1,7 @@
 #include "ClientHandler.hpp"
 
+#include <memory>
+
 using namespace std;
 
 ClientHandler::ClientHandler() :
@@ -29,14 +31,14 @@ void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPoint
 
 void ClientHandler::setClientHandlerConfig(Namespaces_t Namespaces) {
     _Namespaces = Namespaces;
-    _ASRequestHandlerRef = new ASRequestHandler(
+    _ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
         Namespaces,
-        { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults }
+        BaseAdresses_t{ _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults }
     );
 }
 
-ASRequestHandlerRef_t ClientHandler::getClientHandlerASRequestHandlerRef() {
-    return _ASRequestHandlerRef;
+ASRequestHandler& ClientHandler::getClientHandlerASRequestHandlerRef() {
+    return *_ASRequestHandlerRef;
 }
 
 void ClientHandler::addClient(const uint16_t ClientFD)
