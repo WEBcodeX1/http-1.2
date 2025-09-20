@@ -48,7 +48,7 @@ void ClientHandler::addClient(const uint16_t ClientFD)
     //- set client connection non blocking
     Socket::makeNonblocking(ClientFD);
 
-    ClientRef_t ClientObj(new HTTPParser(ClientFD, _Namespaces));
+    ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, _Namespaces);
 
     Clients.insert(
         ClientMapPair_t(ClientFD, ClientObj)
