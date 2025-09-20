@@ -50,8 +50,8 @@ void ClientHandler::addClient(const uint16_t ClientFD)
 
     ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, _Namespaces);
 
-    Clients.insert(
-        ClientMapPair_t(ClientFD, ClientObj)
+    Clients.emplace(
+        ClientFD, ClientObj
     );
 
     //- add fd to epoll

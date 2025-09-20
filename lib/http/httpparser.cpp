@@ -302,8 +302,8 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
             DBG(120, "HeaderID:'" << HeaderID << "'");
             DBG(120, "HeaderValue:'" << HeaderValue << "'");
 
-            ResultRef.insert(
-                HeaderPair_t(HeaderID, HeaderValue)
+            ResultRef.emplace(
+                HeaderID, HeaderValue
             );
         }
     }

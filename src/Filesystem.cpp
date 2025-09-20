@@ -86,8 +86,8 @@ void Filesystem::processFileProperties()
             FileProps.MimeType = MimeType;
             FileProps.ETag = this->getFileEtag(File);
 
-            _FilesExtended.insert(
-                FileListExtendedPair_t(FileListKey, FileProps)
+            _FilesExtended.emplace(
+                FileListKey, FileProps
             );
         }
     }

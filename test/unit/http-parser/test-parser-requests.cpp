@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE( test_single_get_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE( test_single_post_request )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE( test_multiple_get_request_truncated )
     NamespaceProps.FilesystemRef = nullptr;
     NamespaceProps.JSONConfig = JSONConfig;
 
-    Namespaces.insert(
-        NamespacePair_t("test1", NamespaceProps)
+    Namespaces.emplace(
+        "test1", NamespaceProps
     );
 
     ASRequestHandlerRef_t ASRequestHandlerRef = std::make_unique<ASRequestHandler>(

@@ -14,15 +14,15 @@ ResultOrder::~ResultOrder()
 void ResultOrder::append(const ClientFD_t ClientFD, const RequestNr_t ReqNr, const RequestProps_t ReqProps)
 {
     if (_Requests.contains(ClientFD)) {
-        _Requests.at(ClientFD).insert(
-            PairReqNrProps_t(ReqNr, ReqProps)
+        _Requests.at(ClientFD).emplace(
+            ReqNr, ReqProps
         );
     }
     else {
         MapReqNrProps_t ReqNrProps;
-        ReqNrProps.insert(PairReqNrProps_t(ReqNr, ReqProps));
-        _Requests.insert(
-            PairRequests_t(ClientFD, ReqNrProps)
+        ReqNrProps.emplace(ReqNr, ReqProps);
+        _Requests.emplace(
+            ClientFD, ReqNrProps
         );
     }
 }
@@ -31,7 +31,7 @@ void ResultOrder::processClients()
 {
     for (auto& [ClientFD, Requests]: _Requests) {
         if (!_LastRequest.contains(ClientFD)) {
-            _LastRequest.insert(PairLastRequest_t(ClientFD, { 1, chrono::system_clock::to_time_t (chrono::system_clock::now()) }));
+            _LastRequest.emplace(ClientFD, LastRequestProps_t{ 1, chrono::system_clock::to_time_t (chrono::system_clock::now()) });
         }
     }
 }
