@@ -32,7 +32,7 @@ typedef vector<string> FilelistPlain_t;
 typedef pair<string, FileProperties_t> FileListExtendedPair_t;
 typedef unordered_map<string, const FileProperties_t> FileListExtended_t;
 
-static const MimetypeRelations_t MimeRelations{
+static const MimetypeRelations_t MimeRelations {
     { "html", "text/html" },
     { "js", "text/javascript" },
     { "json", "application/json" },

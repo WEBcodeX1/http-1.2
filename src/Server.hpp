@@ -18,7 +18,7 @@
 #include "ResultProcessor.hpp"
 
 
-class Server : private Configuration, private ResultProcessor, private ASProcessHandler, private ClientHandler {
+class Server : private ResultProcessor, private ASProcessHandler, private ClientHandler {
 
 public:
 

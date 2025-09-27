@@ -44,7 +44,8 @@ public:
     void processClients();
     void readClientData(const uint16_t);
     void setSharedMemPointer(ClientHandlerSHMPointer_t);
-    void setClientHandlerConfig(Namespaces_t);
+    //void setClientHandlerConfig(Namespaces_t);
+    void setClientHandlerConfig();
 
     ASRequestHandler& getClientHandlerASRequestHandlerRef();
 
@@ -69,7 +70,7 @@ private:
 
     ASRequestHandlerRef_t _ASRequestHandlerRef;
 
-    Namespaces_t _Namespaces;
+    //Namespaces_t _Namespaces;
 
 };
 
