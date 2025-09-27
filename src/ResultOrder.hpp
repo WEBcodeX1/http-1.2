@@ -46,7 +46,8 @@ public:
 
     void reset();
 
-    void THsetGlobalData(pidfd_t, Namespaces_t);
+    //void THsetGlobalData(pidfd_t, Namespaces_t);
+    //void THsetGlobalData(pidfd_t);
     void THprocessThreads();
 
     void append(const RequestNr_t, RequestProps_t);

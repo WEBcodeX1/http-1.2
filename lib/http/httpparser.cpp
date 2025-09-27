@@ -28,7 +28,6 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
     //- workaround
     if (BufferRef[0] == 0) { return; }
 
-    //const string Buffer(&BufferRef[0], BufferSize);
     DBG(250, "size:" << string(BufferRef).length() << "appendBuffer:'" << string(BufferRef) << "'");
     _HTTPRequestBuffer = _HTTPRequestBuffer + string(BufferRef);
     //String::hexout(_HTTPRequestBuffer);

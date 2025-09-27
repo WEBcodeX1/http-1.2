@@ -31,6 +31,7 @@
 #include <jni.h>
 #endif
 
+
 typedef struct {
     void* PostASMetaPtr;
     void* PostASRequestsPtr;
@@ -48,7 +49,7 @@ public:
 
     void forkProcessASHandler(ASProcessHandlerSHMPointer_t);
     void setTerminationHandler();
-    void setASProcessHandlerNamespaces(Namespaces_t);
+    //void setASProcessHandlerNamespaces(Namespaces_t);
     void setASProcessHandlerOffsets(VHostOffsetsPrecalc_t);
     uint getASInterpreterCount();
 
@@ -65,7 +66,7 @@ public:
 
     private:
 
-    Namespaces_t _Namespaces;
+    //Namespaces_t _Namespaces;
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
 };
 
