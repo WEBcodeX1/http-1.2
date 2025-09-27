@@ -23,18 +23,14 @@
             "timeout": "600",
             "ipv4":
             {
-                "address": "127.0.0.1",
+                "address": "192.168.72.10",
                 "port": 80
             }
         },
         "mimetypes":
         [
-            "html", "js", "json", "css", "png", "jpg", "svg", "woff2"
-        ],
-        "cache-control": {
-            "type": "private",
-            "max-age": 3600
-        }
+            "html", "js", "json", "css", "png", "jpg", "svg", "woff2", "ico"
+        ]
     },
     "cpu-binding":
     {
@@ -49,6 +45,10 @@
             "hostname": "testapp1.local",
             "path": "/app1",
             "interpreters": 5,
+            "cache-control": {
+                "type": "private",
+                "max-age": 3600
+            },
             "access":
             {
                 "as-post":
@@ -62,6 +62,10 @@
             "hostname": "testapp2.local",
             "path": "/app2",
             "interpreters": 3,
+            "cache-control": {
+                "type": "private",
+                "max-age": 3600
+            },
             "access":
             {
                 "as-post":
