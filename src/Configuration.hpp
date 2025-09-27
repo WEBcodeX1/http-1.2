@@ -33,6 +33,8 @@ public:
     Configuration();
     ~Configuration();
 
+    void mapStaticFSData();
+
     string RunAsUnixUser;
     string RunAsUnixGroup;
 
