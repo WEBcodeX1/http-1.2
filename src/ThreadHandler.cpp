@@ -208,7 +208,7 @@ void ClientThread::processRequests()
                         const string CacheMaxAge = to_string(NamespaceProps.JSONConfig["cache-control"]["max-age"]);
 
                         Response.append("Cache-Control: " + CacheType + ", max-age=" + CacheMaxAge + "\n");
-                        Response.append("Etag: " + FileProps.ETag + "\n");
+                        Response.append("ETag: " + FileProps.ETag + "\n");
                     }
 
                     Response.append("Date: ");
