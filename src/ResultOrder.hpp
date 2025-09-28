@@ -19,8 +19,7 @@ typedef pair<const RequestNr_t, const RequestProps_t> PairReqNrProps_t;
 typedef unordered_map<ClientFD_t, MapReqNrProps_t> MapRequests_t;
 typedef pair<const ClientFD_t, const MapReqNrProps_t> PairRequests_t;
 
-//- LastRequest
-
+//- Last request
 typedef struct {
     RequestNr_t RequestNr;
     time_t RequestTime;
@@ -29,8 +28,7 @@ typedef struct {
 typedef unordered_map<ClientFD_t, LastRequestProps_t> MapLastRequest_t;
 typedef pair<ClientFD_t, LastRequestProps_t> PairLastRequest_t;
 
-//- LastProcessed
-
+//- Last processed
 typedef vector<RequestNr_t> RequestNumbers_t;
 typedef unordered_map<ClientFD_t, RequestNumbers_t> MapLastProcessed_t;
 typedef pair<ClientFD_t, RequestNumbers_t> PairLastProcessed_t;
@@ -45,9 +43,6 @@ public:
     ~ResultOrder();
 
     void reset();
-
-    //void THsetGlobalData(pidfd_t, Namespaces_t);
-    //void THsetGlobalData(pidfd_t);
     void THprocessThreads();
 
     void append(const RequestNr_t, RequestProps_t);

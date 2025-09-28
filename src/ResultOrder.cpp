@@ -91,15 +91,6 @@ void ResultOrder::processRequests(const HTTPType_t HTTPType)
     ThreadHandler::_addRequests(std::move(ResultData));
 }
 
-/*
-//void ResultOrder::THsetGlobalData(pidfd_t ParentPidFD, Namespaces_t Namespaces)
-void ResultOrder::THsetGlobalData(pidfd_t ParentPidFD)
-{
-    //ThreadHandler::_setGlobalData(ParentPidFD, Namespaces);
-    //ThreadHandler::_setGlobalData(ParentPidFD);
-}
-*/
-
 void ResultOrder::THprocessThreads()
 {
     ThreadHandler::_processThreads();

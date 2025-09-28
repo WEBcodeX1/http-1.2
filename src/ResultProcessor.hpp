@@ -32,7 +32,6 @@ public:
     ResultProcessor();
     ~ResultProcessor();
 
-    //void loadStaticFSData(Namespaces_t, string, Mimetypes_t);
     void forkProcessResultProcessor(ResultProcessorSHMPointer_t);
     void setTerminationHandler();
     void setVHostOffsets(VHostOffsetsPrecalc_t);
@@ -47,7 +46,6 @@ private:
 
     pid_t _ForkResult;
     pidfd_t _ParentPidFD;
-    //Namespaces_t _Namespaces;
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
 
 };

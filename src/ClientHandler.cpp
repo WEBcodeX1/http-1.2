@@ -30,11 +30,8 @@ void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPoint
     _SHMPythonASResults = SharedMemPointer.PostASResultsPtr;
 }
 
-//void ClientHandler::setClientHandlerConfig(Namespaces_t Namespaces) {
 void ClientHandler::setClientHandlerConfig() {
-    //_Namespaces = Namespaces;
     _ASRequestHandlerRef = std::make_unique<ASRequestHandler>(
-        //Namespaces,
         ConfigRef.Namespaces,
         BaseAdresses_t{ _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults }
     );
@@ -51,7 +48,6 @@ void ClientHandler::addClient(const uint16_t ClientFD)
     //- set client connection non blocking
     Socket::makeNonblocking(ClientFD);
 
-    //ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, _Namespaces);
     ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, ConfigRef.Namespaces);
 
     Clients.emplace(

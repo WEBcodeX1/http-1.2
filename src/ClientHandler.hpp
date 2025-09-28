@@ -44,7 +44,6 @@ public:
     void processClients();
     void readClientData(const uint16_t);
     void setSharedMemPointer(ClientHandlerSHMPointer_t);
-    //void setClientHandlerConfig(Namespaces_t);
     void setClientHandlerConfig();
 
     ASRequestHandler& getClientHandlerASRequestHandlerRef();
@@ -69,8 +68,6 @@ private:
     void* _SHMPythonASResults;
 
     ASRequestHandlerRef_t _ASRequestHandlerRef;
-
-    //Namespaces_t _Namespaces;
 
 };
 

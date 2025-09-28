@@ -121,7 +121,6 @@ string Filesystem::getFileEtag(const string &File) {
         FStream.close();
 
         FileHashInt = hash<string>{}(string(FileBuffer.get(), FileSize));
-        // FileBuffer automatically deallocated when going out of scope
     }
     catch(const std::exception& e) {
         ERR("Etag generation error: " << e.what());

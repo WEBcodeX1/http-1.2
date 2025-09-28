@@ -29,31 +29,6 @@ void ResultProcessor::terminate(int _ignored)
     RunServer = false;
 }
 
-/*
-void ResultProcessor::loadStaticFSData(
-        Namespaces_t Namespaces,
-        string BasePath,
-        Mimetypes_t Mimetypes
-){
-    for (auto& [Key, Value]: Namespaces) {
-
-        auto FilesysRef = std::make_shared<Filesystem>();
-
-        DBG(120, "Host:" << Key << " Path:" << Value.JSONConfig["path"] << " InterpreterCount:" << Value.JSONConfig["interpreters"]);
-
-        FilesysRef->Hostname = Key;
-        FilesysRef->Path = string(Value.JSONConfig["path"]);
-        FilesysRef->BasePath = BasePath;
-        FilesysRef->Mimetypes = Mimetypes;
-
-        FilesysRef->initFiles();
-        FilesysRef->processFileProperties();
-
-        _Namespaces[Key].FilesystemRef = FilesysRef;
-    }
-}
-*/
-
 void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
     _VHostOffsetsPrecalc = VHostOffsets;
 }
@@ -82,8 +57,6 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
 
         //- get parent pid filedescriptor
         _ParentPidFD = Syscall::pidfd_open(getppid(), 0);
-        //THsetGlobalData(_ParentPidFD);
-        //THsetGlobalData(_ParentPidFD, _Namespaces);
 
         //- overwrite parent termination handler
         setTerminationHandler();

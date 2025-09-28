@@ -28,7 +28,6 @@ void Server::init()
     ConfigRef.mapStaticFSData();
 
     //- set client handler namespaces
-    //setClientHandlerConfig(Namespaces);
     setClientHandlerConfig();
 
     //- TODO: just set if exists in config, else default
@@ -51,10 +50,6 @@ void Server::init()
 
     //- setup server socket monitoring
     setupPoll();
-
-    //- init static filesystem
-    //loadStaticFSData(Namespaces, BasePath, Mimetypes);
-    //ResultProcessor::loadStaticFSData(ConfigRef.Namespaces, ConfigRef.BasePath, ConfigRef.Mimetypes);
 
     //- get ASRequestHandler reference
     ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();

@@ -22,13 +22,6 @@ ASProcessHandler::~ASProcessHandler()
     DBG(120, "Destructor");
 }
 
-/*
-void ASProcessHandler::setASProcessHandlerNamespaces(Namespaces_t Namespaces)
-{
-    _Namespaces = Namespaces;
-}
-*/
-
 void ASProcessHandler::setASProcessHandlerOffsets(VHostOffsetsPrecalc_t Offsets)
 {
     _VHostOffsetsPrecalc = Offsets;
@@ -38,7 +31,6 @@ uint ASProcessHandler::getASInterpreterCount()
 {
     uint ASInterpreterCount = 0;
     for (const auto& NamespaceProps:ConfigRef.Namespaces) {
-    //for (const auto& NamespaceProps:_Namespaces) {
         ASInterpreterCount += uint(NamespaceProps.second.JSONConfig["interpreters"]);
     }
     return ASInterpreterCount;
@@ -67,7 +59,6 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
     setBaseAddresses( { SHMAdresses.PostASMetaPtr, SHMAdresses.PostASRequestsPtr, SHMAdresses.PostASResultsPtr } );
 
     for (const auto& Namespace: ConfigRef.Namespaces) {
-    //for (const auto& Namespace: _Namespaces) {
 
         for (const auto &Index:_VHostOffsetsPrecalc.at(Namespace.first)) {
 

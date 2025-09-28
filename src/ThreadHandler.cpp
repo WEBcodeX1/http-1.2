@@ -14,16 +14,6 @@ ThreadHandler::~ThreadHandler()
     DBG(120, "Destructor");
 }
 
-/*
-//void ThreadHandler::_setGlobalData(pidfd_t ParentPidFD, Namespaces_t Namespaces)
-void ThreadHandler::_setGlobalData(pidfd_t ParentPidFD)
-{
-    _ParentPidFD = ParentPidFD;
-    //_Globals.ParentPidFD = ParentPidFD;
-    //_Globals.Namespaces = Namespaces;
-}
-*/
-
 void ThreadHandler::_addRequests(
     ClientRequestDataVec_t Requests
 )
@@ -78,7 +68,6 @@ void ThreadHandler::_processThreads()
         }
 
         ClientThreadObjRef_t ClientThreadObj(
-            //new ClientThread(ClientFD, _Globals.Namespaces, std::move(RequestProps))
             new ClientThread(ClientFD, ConfigRef.Namespaces, std::move(RequestProps))
         );
 
