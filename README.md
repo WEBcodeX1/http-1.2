@@ -66,7 +66,7 @@ cd http-1.2
 apt-get install git cmake python3-pip libboost-all-dev python3-dev nlohmann-json3-dev
 
 # build and install
-cmake CMakeLists.txt .
+cmake .
 make
 make install
 
