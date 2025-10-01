@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+# Falcon HTTP Application Server - OpenRC Init Script
+
+name="falcon-as"
+description="Falcon HTTP Application Server"
+
+command="/usr/local/bin/falcon-as"
+command_user="falcon-http:falcon-http"
+pidfile="/run/${RC_SVCNAME}.pid"
+command_background=true
+
+depend() {
+    need net
+    after firewall
+}
+
+start_pre() {
+    # Set ulimit for open files
+    ulimit -n 1000000
+    
+    # Set transparent hugepages
+    sysctl -w vm.nr_hugepages=1024
+    
+    # Ensure required directories exist
+    checkpath --directory --owner ${command_user} --mode 0750 /etc/falcon-http
+    checkpath --directory --owner ${command_user} --mode 0775 /var/www
+}
