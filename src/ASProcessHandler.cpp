@@ -11,7 +11,7 @@ using namespace std;
 static bool RunServer = true;
 extern Configuration ConfigRef;
 
-//- Forward declaration to access Server::addChildPID
+//- forward declaration to access Server::addChildPID
 class Server;
 extern void registerChildPIDToServer(pid_t pid);
 
@@ -132,7 +132,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                 Backend::Processor::init(this);
 
                 //- main loop
-                while(true) {
+                while(RunServer) {
 
                     DBG(300, "AppServer Main Loop Index:" << Index);
                     atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
