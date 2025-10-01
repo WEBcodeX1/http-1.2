@@ -9,6 +9,7 @@
 
 #include <poll.h>
 #include <thread>
+#include <vector>
 
 #include "Global.hpp"
 #include "Constant.hpp"
@@ -36,6 +37,9 @@ public:
 
     void setupSharedMemory();
 
+    static void addChildPID(pid_t);
+    static void terminateChildren();
+
 private:
 
     string SocketListenAddress;
@@ -52,6 +56,8 @@ private:
     void* _SHMPythonASMeta;
     void* _SHMPythonASRequests;
     void* _SHMPythonASResults;
+
+    static std::vector<pid_t> ChildPIDs;
 
 };
 

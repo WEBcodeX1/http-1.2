@@ -33,7 +33,7 @@ void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
     _VHostOffsetsPrecalc = VHostOffsets;
 }
 
-void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHMAdresses)
+pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHMAdresses)
 {
     //- reset atomic lock
     atomic_uint16_t* StaticFSLock = new(SHMAdresses.StaticFSPtr) atomic_uint16_t(0);
@@ -51,6 +51,7 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
     if (_ForkResult > 0) {
         DBG(120, "Parent ResultProcessor Process PID:" << getpid());
         DBG(120, "Parent ResultProcessor Atomic Address:" << StaticFSLock);
+        return _ForkResult;  // Return child PID to parent
     }
 
     if (_ForkResult == 0) {
