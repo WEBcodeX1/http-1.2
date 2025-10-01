@@ -7,7 +7,7 @@ Configuration ConfigRef = Configuration();
 
 std::vector<pid_t> Server::ChildPIDs;
 
-//- Global function for ASProcessHandler to register child PIDs
+//- global function for ASProcessHandler to register child PIDs
 void registerChildPIDToServer(pid_t pid)
 {
     Server::addChildPID(pid);
@@ -69,14 +69,13 @@ void Server::init()
         addChildPID(resultProcessorPID);
     }
 
-    //- fork application server proesses
-    //setASProcessHandlerNamespaces(Namespaces);
+    //- fork application server processes
     setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- check interpreter count
     uint ASInterpreterCount = getASInterpreterCount();
-    DBG(50, "Sum AS Interpreter:" << ASInterpreterCount);
+    DBG(50, "Sum AS Interpreters:" << ASInterpreterCount);
 
     //- apply cpu bound processing
     //setCPUConfig();
@@ -103,9 +102,11 @@ void Server::addChildPID(pid_t pid)
 void Server::terminateChildren()
 {
     DBG(-1, "Sending SIGTERM to " << ChildPIDs.size() << " child processes");
-    for (pid_t pid : ChildPIDs) {
+    reverse(ChildPIDs.begin(), ChildPIDs.end());
+    for (const auto& pid : ChildPIDs) {
         DBG(-1, "Sending SIGTERM to child PID:" << pid);
         kill(pid, SIGTERM);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
 

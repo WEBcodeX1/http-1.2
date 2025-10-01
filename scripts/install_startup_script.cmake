@@ -6,7 +6,7 @@ message(STATUS "Installing startup script...")
 message(STATUS "========================================")
 
 # Detect systemd
-if(EXISTS "/run/systemd/system" OR EXISTS "/usr/lib/systemd/system")
+if(EXISTS "/run/systemd/system")
     set(INIT_SYSTEM "systemd")
     set(INIT_SCRIPT_SRC "${CMAKE_CURRENT_LIST_DIR}/startup/systemd/falcon-as.service")
     set(INIT_SCRIPT_DEST "/etc/systemd/system/falcon-as.service")

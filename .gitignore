@@ -30,6 +30,7 @@ test/integration/boost-regex/test-boost-regex
 test/integration/event/test-event
 test/integration/string-functions/test-string-functions
 test/integration/vector-multi-erase/test-Vector-multi-erase
+test/integration/signal-termination/test-signal-termination
 test/performance/test-performance
 test/eval/JavaJNI/test-run-jni
 test/eval/ResultOrder/test-result-order

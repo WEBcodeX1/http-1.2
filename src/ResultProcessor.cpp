@@ -51,7 +51,7 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
     if (_ForkResult > 0) {
         DBG(120, "Parent ResultProcessor Process PID:" << getpid());
         DBG(120, "Parent ResultProcessor Atomic Address:" << StaticFSLock);
-        return _ForkResult;  // Return child PID to parent
+        return _ForkResult;  // return child PID to parent
     }
 
     if (_ForkResult == 0) {
@@ -119,8 +119,6 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
                 this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
             }
         }
-
-        delete StaticFSLock;
 
         DBG(-1, "Exit Parent ResultProcessor Process.");
         exit(0);
