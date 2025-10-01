@@ -35,7 +35,8 @@ apt-get install python3-dev
 ## 1.3. Compile / Install
 
 On installation "testapp1.local" and "testapp2.local" with address 127.0.0.1 will
-be added to ```/etc/hosts```.
+be added to ```/etc/hosts```. A startup script for your Linux init system (systemd, OpenRC, 
+or SysVinit) will also be automatically installed to ```/etc/systemd/system/``` or ```/etc/init.d/```.
 
 ```bash
 # compile / install
@@ -61,11 +62,43 @@ make install
 
 ## 1.4. Start Server
 
-Raise ulimit for open files and number of kernel hugepages before starting server.
-This will be put inside server startup script later.
+After installation, the appropriate startup script is automatically installed for your init system.
+The startup script already includes ulimit settings for open files and kernel hugepages configuration.
 
+**Using systemd (Ubuntu 22.04+, Debian 12+):**
 ```bash
-# start server
+# enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable falcon-as
+sudo systemctl start falcon-as
+
+# check status
+sudo systemctl status falcon-as
+```
+
+**Using OpenRC (Devuan, Gentoo, Alpine):**
+```bash
+# enable and start service
+sudo rc-update add falcon-as default
+sudo rc-service falcon-as start
+
+# check status
+sudo rc-service falcon-as status
+```
+
+**Using SysVinit (Debian ≤11, older systems):**
+```bash
+# enable and start service
+sudo update-rc.d falcon-as defaults
+sudo service falcon-as start
+
+# check status
+sudo service falcon-as status
+```
+
+**Manual start (without service):**
+```bash
+# start server manually
 . ./scripts/ulimit.sh
 . ./scripts/set-transparent-hugepages.sh
 /usr/local/bin/falcon-as
