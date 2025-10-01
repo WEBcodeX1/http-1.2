@@ -124,3 +124,6 @@ install(CODE "execute_process(COMMAND ./scripts/cp_etc.sh)")
 install(CODE "execute_process(COMMAND ./scripts/set-transparent-hugepages.sh)")
 install(CODE "execute_process(COMMAND ./scripts/patch_etc_hosts.sh)")
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+# install startup script based on detected init system
+install(SCRIPT ${CMAKE_SOURCE_DIR}/scripts/install_startup_script.cmake)
