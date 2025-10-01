@@ -103,7 +103,7 @@ void Server::terminateChildren()
 {
     DBG(-1, "Sending SIGTERM to " << ChildPIDs.size() << " child processes");
     reverse(ChildPIDs.begin(), ChildPIDs.end());
-    for (auto& pid : ChildPIDs) {
+    for (const auto& pid : ChildPIDs) {
         DBG(-1, "Sending SIGTERM to child PID:" << pid);
         kill(pid, SIGTERM);
         this_thread::sleep_for(chrono::milliseconds(50));
