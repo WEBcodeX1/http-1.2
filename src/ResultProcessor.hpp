@@ -32,7 +32,7 @@ public:
     ResultProcessor();
     ~ResultProcessor();
 
-    void forkProcessResultProcessor(ResultProcessorSHMPointer_t);
+    pid_t forkProcessResultProcessor(ResultProcessorSHMPointer_t);
     void setTerminationHandler();
     void setVHostOffsets(VHostOffsetsPrecalc_t);
 

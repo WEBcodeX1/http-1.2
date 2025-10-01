@@ -5,6 +5,14 @@ using namespace std;
 static bool RunServer = true;
 Configuration ConfigRef = Configuration();
 
+std::vector<pid_t> Server::ChildPIDs;
+
+//- Global function for ASProcessHandler to register child PIDs
+void registerChildPIDToServer(pid_t pid)
+{
+    Server::addChildPID(pid);
+}
+
 
 Server::Server() :
     SocketListenAddress("127.0.0.1"),
@@ -56,7 +64,10 @@ void Server::init()
 
     //- fork result processor process
     ResultProcessor::setVHostOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
-    ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    pid_t resultProcessorPID = ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    if (resultProcessorPID > 0) {
+        addChildPID(resultProcessorPID);
+    }
 
     //- fork application server proesses
     //setASProcessHandlerNamespaces(Namespaces);
@@ -83,9 +94,25 @@ void Server::setTerminationHandler()
     signal(SIGTERM, Server::terminate);
 }
 
+void Server::addChildPID(pid_t pid)
+{
+    ChildPIDs.push_back(pid);
+    DBG(120, "Registered child PID:" << pid);
+}
+
+void Server::terminateChildren()
+{
+    DBG(-1, "Sending SIGTERM to " << ChildPIDs.size() << " child processes");
+    for (pid_t pid : ChildPIDs) {
+        DBG(-1, "Sending SIGTERM to child PID:" << pid);
+        kill(pid, SIGTERM);
+    }
+}
+
 void Server::terminate(int _ignored)
 {
     DBG(-1, "SIGTERM Main Server received, shutting down");
+    terminateChildren();
     RunServer = false;
 }
 

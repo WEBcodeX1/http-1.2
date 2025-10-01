@@ -11,6 +11,10 @@ using namespace std;
 static bool RunServer = true;
 extern Configuration ConfigRef;
 
+//- Forward declaration to access Server::addChildPID
+class Server;
+extern void registerChildPIDToServer(pid_t pid);
+
 
 ASProcessHandler::ASProcessHandler()
 {
@@ -48,6 +52,11 @@ void ASProcessHandler::terminate(int _ignored)
     RunServer = false;
 }
 
+void ASProcessHandler::registerChildPID(pid_t pid)
+{
+    registerChildPIDToServer(pid);
+}
+
 void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdresses)
 {
     namespace bp = boost::python;
@@ -70,6 +79,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
             }
             if (ForkResult > 0) {
                 DBG(120, "ASProcessHandler Process ParentPID:" << getpid());
+                registerChildPID(ForkResult);  // Register child PID in parent
             }
 
             if (ForkResult == 0) {

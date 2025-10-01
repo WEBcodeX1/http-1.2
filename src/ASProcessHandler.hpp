@@ -53,6 +53,7 @@ public:
     uint getASInterpreterCount();
 
     static void terminate(int);
+    static void registerChildPID(pid_t);
 
     string ReqPayloadString;
 
