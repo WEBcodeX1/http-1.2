@@ -1,82 +1,27 @@
-#!/bin/sh
-### BEGIN INIT INFO
-# Provides:          falcon-as
-# Required-Start:    $local_fs $network $remote_fs $syslog
-# Required-Stop:     $local_fs $network $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Falcon AS Web/Application Server
-# Description:        Falcon AS, a high speed, secure static content and Python
-#                     or Java scripting language application server written in C++.
-### END INIT INFO
+#!/sbin/openrc-run
+# Falcon HTTP Application Server - OpenRC Init Script
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
+name="falcon-as"
+description="Falcon HTTP Application Server"
 
-NAME=falcon-as
-DAEMON=/usr/local/bin/falcon-as
-DESC="Falcon AS daemon"
-PIDFILE=/var/run/$NAME.pid
-SCRIPTNAME=/etc/init.d/$NAME
+command="/usr/local/bin/falcon-as"
+command_user="falcon-http:falcon-http"
+pidfile="/run/${RC_SVCNAME}.pid"
+command_background=true
 
-if test -f /etc/default/$NAME; then
-	. /etc/default/$NAME
-fi
-
-# Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
-
-. /lib/init/vars.sh
-
-. /lib/lsb/init-functions
-
-daemon_start()
-{
-	if [ -f "$PIDFILE" ]; then
-		log_failure_msg "$DESC is running already."
-		exit 1
-	fi
-	ulimit -n 1000000
-	sysctl -w vm.nr_hugepages=1024
-	start-stop-daemon --start --exec $DAEMON --background --make-pidfile --pidfile $PIDFILE --
+depend() {
+    need net
+    after firewall
 }
 
-daemon_stop()
-{
-	if [ -f "$PIDFILE" ]; then
-		start-stop-daemon --stop --remove-pidfile --pidfile $PIDFILE
-	fi
+start_pre() {
+    # Set ulimit for open files
+    ulimit -n 1000000
+    
+    # Set transparent hugepages
+    sysctl -w vm.nr_hugepages=1024
+    
+    # Ensure required directories exist
+    checkpath --directory --owner ${command_user} --mode 0750 /etc/falcon-http
+    checkpath --directory --owner ${command_user} --mode 0775 /var/www
 }
-
-daemon_status() {
-	if [ ! -e $PIDFILE ]; then
-		status_of_proc "${DAEMON}" "${DESC}"
-	else
-		status_of_proc -p "${PIDFILE}" "${DAEMON}" "${DESC}"
-	fi
-}
-
-case "$1" in
-	start)
-		log_begin_msg "Starting ${DESC}"
-		daemon_start
-		log_end_msg $?
-	;;
-	stop)
-		log_begin_msg "Stopping ${DESC}"
-		daemon_stop
-		log_end_msg $?
-	;;
-	status)
-		daemon_status
-	;;
-	restart|reload|force-reload)
-		log_begin_msg "Restarting ${DESC}"
-		daemon_stop
-		daemon_start
-		log_end_msg $?
-	;;
-	*)
-		echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}"
-		exit 1
-	;;
-esac

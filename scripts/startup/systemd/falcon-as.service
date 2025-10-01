@@ -1,0 +1,31 @@
+[Unit]
+Description=Falcon HTTP Application Server
+After=network.target
+
+[Service]
+Type=simple
+User=falcon-http
+Group=falcon-http
+
+# Set transparent hugepages before starting
+ExecStartPre=/usr/bin/sysctl -w vm.nr_hugepages=1024
+
+# Start the application server
+ExecStart=/usr/local/bin/falcon-as
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+
+# Resource limits (ulimit equivalent)
+LimitNOFILE=1000000
+
+# Working directory
+WorkingDirectory=/var/www
+
+# Security settings
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
