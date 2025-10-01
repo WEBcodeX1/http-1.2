@@ -9,6 +9,8 @@ cp ./www/index-app1.html /var/www/app1/static/index.html
 cp ./www/index-app2.html /var/www/app2/static/index.html
 cp ./www/falcon-robotics.jpg /var/www/app1/static/
 cp ./www/falcon-robotics.jpg /var/www/app2/static/
+cp ./www/favicon.ico /var/www/app1/static/
+cp ./www/favicon.ico /var/www/app2/static/
 
 cp ./www/WebApp.py /var/www/app1/backend/
 cp ./www/WebApp.py /var/www/app2/backend/
@@ -25,4 +27,3 @@ chown -R falcon-http:falcon-http /var/www/app1
 chown -R falcon-http:falcon-http /var/www/app2
 chmod 755 /var/www/app1
 chmod 755 /var/www/app2
-
