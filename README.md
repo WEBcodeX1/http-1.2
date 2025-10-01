@@ -70,13 +70,16 @@ apt-get install git cmake python3-pip libboost-all-dev python3-dev nlohmann-json
 # build and install
 cmake .
 make
-make install
+sudo make install
 
-# configure system
+# start using systemd (automatically configured during install)
+sudo systemctl daemon-reload
+sudo systemctl enable falcon-as
+sudo systemctl start falcon-as
+
+# OR start manually
 . ./scripts/ulimit.sh
 . ./scripts/set-transparent-hugepages.sh
-
-# start server
 /usr/local/bin/falcon-as
 ```
 
