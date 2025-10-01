@@ -106,7 +106,7 @@ void Server::terminateChildren()
     for (const auto& pid : ChildPIDs) {
         DBG(-1, "Sending SIGTERM to child PID:" << pid);
         kill(pid, SIGTERM);
-        this_thread::sleep_for(chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
 
