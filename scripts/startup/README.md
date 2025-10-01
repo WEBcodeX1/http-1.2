@@ -23,7 +23,7 @@ sudo systemctl start falcon-as
 sudo systemctl status falcon-as
 ```
 
-## OpenRC / SysVinit (Devuan, Gentoo, Alpine)
+## OpenRC (Devuan, Gentoo, Alpine)
 
 To install and enable the OpenRC init script:
 
@@ -44,9 +44,40 @@ sudo rc-service falcon-as start
 sudo rc-service falcon-as status
 ```
 
+## SysVinit (Debian <= 11, Ubuntu <= 14.04, older systems)
+
+To install and enable the SysVinit init script:
+
+```bash
+# Copy init script to init.d directory
+sudo cp init.d/falcon-as /etc/init.d/
+
+# Make it executable (if not already)
+sudo chmod +x /etc/init.d/falcon-as
+
+# Enable service to start on boot
+sudo update-rc.d falcon-as defaults
+
+# Start the service
+sudo service falcon-as start
+# or
+sudo /etc/init.d/falcon-as start
+
+# Check service status
+sudo service falcon-as status
+# or
+sudo /etc/init.d/falcon-as status
+
+# Stop the service
+sudo service falcon-as stop
+
+# Restart the service
+sudo service falcon-as restart
+```
+
 ## Important Notes
 
-Both startup scripts include:
+All startup scripts include:
 - **ulimit settings**: Sets maximum open files to 1,000,000
 - **Transparent hugepages**: Sets vm.nr_hugepages to 1024
 - **User/Group**: Runs as `falcon-http` user and group
