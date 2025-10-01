@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=falcon-http
-Group=falcon-http
+User=root
+Group=root
 
 # Set transparent hugepages before starting
 ExecStartPre=/usr/bin/sysctl -w vm.nr_hugepages=1024
