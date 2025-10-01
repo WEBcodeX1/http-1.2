@@ -39,7 +39,26 @@ Configuration::Configuration() :
     }
     catch(const json::exception& e) {
         ERR("JSON Config processing error:" << e.what());
-        exit(1);
+        std::exit(1);
+    }
+}
+
+void Configuration::mapStaticFSData(){
+    for (auto& [Host, Namespace]: Namespaces) {
+
+        auto FilesysRef = std::make_shared<Filesystem>();
+
+        DBG(120, "Host:" << Host << " Path:" << Namespace.JSONConfig["path"] << " InterpreterCount:" << Namespace.JSONConfig["interpreters"]);
+
+        FilesysRef->Hostname = Host;
+        FilesysRef->Path = string(Namespace.JSONConfig["path"]);
+        FilesysRef->BasePath = BasePath;
+        FilesysRef->Mimetypes = Mimetypes;
+
+        FilesysRef->initFiles();
+        FilesysRef->processFileProperties();
+
+        Namespaces[Host].FilesystemRef = FilesysRef;
     }
 }
 

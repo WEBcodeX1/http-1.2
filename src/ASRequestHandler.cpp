@@ -22,7 +22,7 @@ void ASRequestHandler::_calculateOffsets() {
     AppServerID_t OffsetStart = 0;
     AppServerID_t OffsetEnd = -1;
 
-    for (const auto &Namespace:_Namespaces) {
+    for (const auto& Namespace:_Namespaces) {
 
         OffsetEnd += AppServerID_t(Namespace.second.JSONConfig["interpreters"]);
 
@@ -54,7 +54,6 @@ void ASRequestHandler::_calculateOffsets() {
             DBG(80, "Namespace:" << Offset.first << " Index:" << Index);
        }
     }
-
 }
 
 void ASRequestHandler::_resetSharedMem() {

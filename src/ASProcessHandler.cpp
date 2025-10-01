@@ -9,6 +9,8 @@
 using namespace std;
 
 static bool RunServer = true;
+extern Configuration ConfigRef;
+
 
 ASProcessHandler::ASProcessHandler()
 {
@@ -20,11 +22,6 @@ ASProcessHandler::~ASProcessHandler()
     DBG(120, "Destructor");
 }
 
-void ASProcessHandler::setASProcessHandlerNamespaces(Namespaces_t Namespaces)
-{
-    _Namespaces = Namespaces;
-}
-
 void ASProcessHandler::setASProcessHandlerOffsets(VHostOffsetsPrecalc_t Offsets)
 {
     _VHostOffsetsPrecalc = Offsets;
@@ -33,7 +30,7 @@ void ASProcessHandler::setASProcessHandlerOffsets(VHostOffsetsPrecalc_t Offsets)
 uint ASProcessHandler::getASInterpreterCount()
 {
     uint ASInterpreterCount = 0;
-    for (const auto& NamespaceProps:_Namespaces) {
+    for (const auto& NamespaceProps:ConfigRef.Namespaces) {
         ASInterpreterCount += uint(NamespaceProps.second.JSONConfig["interpreters"]);
     }
     return ASInterpreterCount;
@@ -61,7 +58,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
     //- set shared mem address pointer
     setBaseAddresses( { SHMAdresses.PostASMetaPtr, SHMAdresses.PostASRequestsPtr, SHMAdresses.PostASResultsPtr } );
 
-    for (const auto& Namespace: _Namespaces) {
+    for (const auto& Namespace: ConfigRef.Namespaces) {
 
         for (const auto &Index:_VHostOffsetsPrecalc.at(Namespace.first)) {
 

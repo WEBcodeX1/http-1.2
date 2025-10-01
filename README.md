@@ -28,10 +28,12 @@
 **HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
 and significantly faster alternative to HTTP/2 and probably HTTP/3.
 
-We've built **HTTP/1.2** - a much more lightweight solution.
+We are building **HTTP/1.2** - a much more lightweight solution.
 
+- ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
 - ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- ✅ **Rock-Solid Security**: Runs with tight backend process-separation model (non-threaded)
+- ✅ **Threaded Static File Delivery**: Threading and in-kernel sendfile() increase scheduling latency
+- ✅ **Rock-Solid App-Server Security**: Runs with tight backend process-separation model (non-threaded)
 - ✅ **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
 - ✅ **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
 - ✅ **Python-Powered**: FalconAS application server with embedded Python scripting
@@ -66,7 +68,7 @@ cd http-1.2
 apt-get install git cmake python3-pip libboost-all-dev python3-dev nlohmann-json3-dev
 
 # build and install
-cmake CMakeLists.txt .
+cmake .
 make
 make install
 

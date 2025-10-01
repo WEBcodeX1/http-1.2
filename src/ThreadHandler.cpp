@@ -1,6 +1,8 @@
 #include "ThreadHandler.hpp"
 
 using namespace std;
+extern Configuration ConfigRef;
+
 
 ThreadHandler::ThreadHandler()
 {
@@ -10,12 +12,6 @@ ThreadHandler::ThreadHandler()
 ThreadHandler::~ThreadHandler()
 {
     DBG(120, "Destructor");
-}
-
-void ThreadHandler::_setGlobalData(pidfd_t ParentPidFD, Namespaces_t Namespaces)
-{
-    _Globals.ParentPidFD = ParentPidFD;
-    _Globals.Namespaces = Namespaces;
 }
 
 void ThreadHandler::_addRequests(
@@ -72,7 +68,7 @@ void ThreadHandler::_processThreads()
         }
 
         ClientThreadObjRef_t ClientThreadObj(
-            new ClientThread(ClientFD, _Globals.Namespaces, std::move(RequestProps))
+            new ClientThread(ClientFD, ConfigRef.Namespaces, std::move(RequestProps))
         );
 
         _ProcessRequestsIndex.emplace(
@@ -170,46 +166,73 @@ void ClientThread::processRequests()
             if (NamespaceProps.FilesystemRef->checkFileExists(BaseProps.at(1))) {
                 FileProps = NamespaceProps.FilesystemRef->getFilePropertiesByFile(BaseProps.at(1));
 
-                //DBG(80, "ParentPidFD:" << _Globals.ParentPidFD);
                 DBG(80, "ClientFileDescriptor:" << _ClientRequests[i].ClientFD);
                 DBG(80, "FileDescriptor:" << FileProps.Filedescriptor);
                 DBG(80, "FileSize:" << FileProps.FileSize);
                 DBG(80, "MimeType:" << FileProps.MimeType);
 
-                string Response = "HTTP/1.1 200 OK\n";
-                Response.append("Date: ");
-                Response.append(current_date.str());
-                Response.append(" GMT\n");
-                Response.append("Server: falcon/0.1\n");
-                Response.append("Content-Length: " + to_string(FileProps.FileSize) + "\n");
-                Response.append("Content-Type: " + FileProps.MimeType + "\n\n");
+                DBG(80, "JSONConfig:" << NamespaceProps.JSONConfig);
 
-                const char* send_buf = Response.c_str();
+                //- if etags match, send 304 not-modified
+                if (Headers.find("If-None-Match") != Headers.end() && Headers.at("If-None-Match") == FileProps.ETag) {
+                    string Response304 = "HTTP/1.1 304 Not Modified\n";
+                    Response304.append("Date: ");
+                    Response304.append(current_date.str());
+                    Response304.append(" GMT\n");
+                    Response304.append("Server: falcon/0.1\n\n");
 
-                DBG(120, "ClientFD:" << _ClientRequests[i].ClientFD << " ClientFDShared:" << _ClientRequests[i].ClientFDShared << " StaticFileFD:" << FileProps.Filedescriptor);
+                    const char* send_buf = Response304.c_str();
 
-                int r = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
+                    DBG(120, "ClientFD:" << _ClientRequests[i].ClientFD << " ClientFDShared:" << _ClientRequests[i].ClientFDShared << " StaticFileFD:" << FileProps.Filedescriptor);
 
-                if (r < 0) { DBG(50, "write() err:" << strerror(errno)); }
-
-                lseek(FileProps.Filedescriptor, 0, SEEK_SET);
-
-                int SentBytes = 0;
-                unsigned int SumBytes = 0;
-
-                while (1) {
-                    SentBytes = sendfile(_ClientRequests[i].ClientFDShared, FileProps.Filedescriptor, 0, FileProps.FileSize);
-                    if (SentBytes < 0) {
-                        uint8_t errsv = errno;
-                        DBG(300, "sendfile() err:" << strerror(errsv));
-                        if (errsv != EAGAIN) { break; }
-                    }
-                    else {
-                        SumBytes += SentBytes;
-                    }
-                    if (SumBytes == FileProps.FileSize) { break; }
+                    const int rc = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
+                    if (rc < 0) { ERR("write() err:" << strerror(errno)); }
                 }
-                DBG(300, "sendfile() wrote bytes:" << SumBytes);
+                else {
+                    string Response = "HTTP/1.1 200 OK\n";
+
+                    //- send cache-control header if cache-control activated in config
+                    if (NamespaceProps.JSONConfig.find("cache-control") != NamespaceProps.JSONConfig.end()) {
+                        const string CacheType = NamespaceProps.JSONConfig["cache-control"]["type"];
+                        const string CacheMaxAge = to_string(NamespaceProps.JSONConfig["cache-control"]["max-age"]);
+
+                        Response.append("Cache-Control: " + CacheType + ", max-age=" + CacheMaxAge + "\n");
+                        Response.append("ETag: " + FileProps.ETag + "\n");
+                    }
+
+                    Response.append("Date: ");
+                    Response.append(current_date.str());
+                    Response.append(" GMT\n");
+                    Response.append("Server: falcon/0.1\n");
+                    Response.append("Content-Length: " + to_string(FileProps.FileSize) + "\n");
+                    Response.append("Content-Type: " + FileProps.MimeType + "\n\n");
+
+                    const char* send_buf = Response.c_str();
+
+                    DBG(120, "ClientFD:" << _ClientRequests[i].ClientFD << " ClientFDShared:" << _ClientRequests[i].ClientFDShared << " StaticFileFD:" << FileProps.Filedescriptor);
+
+                    const int rc = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
+                    if (rc < 0) { ERR("write() err:" << strerror(errno)); }
+
+                    lseek(FileProps.Filedescriptor, 0, SEEK_SET);
+
+                    int SentBytes = 0;
+                    unsigned int SumBytes = 0;
+
+                    while (1) {
+                        SentBytes = sendfile(_ClientRequests[i].ClientFDShared, FileProps.Filedescriptor, 0, FileProps.FileSize);
+                        if (SentBytes < 0) {
+                            uint8_t errsv = errno;
+                            DBG(300, "sendfile() err:" << strerror(errsv));
+                            if (errsv != EAGAIN) { break; }
+                        }
+                        else {
+                            SumBytes += SentBytes;
+                        }
+                        if (SumBytes == FileProps.FileSize) { break; }
+                    }
+                    DBG(300, "sendfile() wrote bytes:" << SumBytes);
+                }
             }
             else {
                 string Response = "HTTP/1.1 404 Not Found\n";
@@ -225,7 +248,8 @@ void ClientThread::processRequests()
 
                 DBG(120, "ClientFD:" << _ClientRequests[i].ClientFD << " ClientFDShared:" << _ClientRequests[i].ClientFDShared << " StaticFileFD:" << FileProps.Filedescriptor);
 
-                int res1 = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
+                const int rc = write(_ClientRequests[i].ClientFDShared, send_buf, strlen(send_buf));
+                if (rc < 0) { ERR("write() err:" << strerror(errno)); }
             }
 
             /*

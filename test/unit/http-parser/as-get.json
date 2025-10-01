@@ -1,0 +1,14 @@
+{
+    "id": "test1",
+    "hostname": "test.local",
+    "path": "/test1",
+    "interpreters": 2,
+    "access": {
+        "as-get": {
+            "/test1": {
+                "params": [ "param1", "param2" ]
+            },
+            "method": "method1"
+        }
+    }
+}

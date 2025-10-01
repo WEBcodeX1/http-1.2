@@ -33,12 +33,6 @@ typedef unordered_map<ClientFD_t, PocessRequestsIndex_t> ProcessRequestsIndexLis
 typedef pair<ClientFD_t, PocessRequestsIndex_t> ProcessRequestsIndexListPair_t;
 
 
-typedef struct {
-    pidfd_t ParentPidFD;
-    Namespaces_t Namespaces;
-} ThreadHandlerGlobals_t;
-
-
 class ClientThread: private HTTPParser
 {
 
@@ -83,12 +77,11 @@ public:
 
 protected:
 
-    void _setGlobalData(pidfd_t, Namespaces_t);
     void _addRequests(ClientRequestDataVec_t);
     void _processThreads();
     void _checkProcessed();
 
-    ThreadHandlerGlobals_t _Globals;
+    pidfd_t _ParentPidFD;
     ClientRequestDataList_t _RequestsSorted;
     ClientRequestDataListVector_t _ProcessRequests;
     ProcessRequestsIndexList_t _ProcessRequestsIndex;

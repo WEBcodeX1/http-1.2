@@ -5,6 +5,7 @@
 using namespace std;
 
 static bool RunServer = true;
+extern Configuration ConfigRef;
 
 ResultProcessor::ResultProcessor()
 {
@@ -26,29 +27,6 @@ void ResultProcessor::terminate(int _ignored)
 {
     DBG(-1, "SIGTERM ResultProcessor received, shutting down");
     RunServer = false;
-}
-
-void ResultProcessor::loadStaticFSData(
-        Namespaces_t Namespaces,
-        string BasePath,
-        Mimetypes_t Mimetypes
-){
-    for (auto& [Key, Value]: Namespaces) {
-
-        auto FilesysRef = std::make_shared<Filesystem>();
-
-        DBG(120, "Host:" << Key << " Path:" << string(Value.JSONConfig["path"]) << " InterpreterCount:" << string(Value.JSONConfig["interpreters"]));
-
-        FilesysRef->Hostname = Key;
-        FilesysRef->Path = string(Value.JSONConfig["path"]);
-        FilesysRef->BasePath = BasePath;
-        FilesysRef->Mimetypes = Mimetypes;
-
-        FilesysRef->initFiles();
-        FilesysRef->processFileProperties();
-
-        _Namespaces[Key].FilesystemRef = FilesysRef;
-    }
 }
 
 void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
@@ -79,7 +57,6 @@ void ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SHM
 
         //- get parent pid filedescriptor
         _ParentPidFD = Syscall::pidfd_open(getppid(), 0);
-        THsetGlobalData(_ParentPidFD, _Namespaces);
 
         //- overwrite parent termination handler
         setTerminationHandler();
@@ -194,7 +171,8 @@ uint16_t ResultProcessor::_processPythonASResults()
 {
     uint16_t processed = 0;
 
-    for (const auto& Namespace: _Namespaces) {
+    //for (const auto& Namespace: _Namespaces) {
+    for (const auto& Namespace: ConfigRef.Namespaces) {
         for (const auto &Index: _VHostOffsetsPrecalc.at(Namespace.first)) {
             atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
             atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));

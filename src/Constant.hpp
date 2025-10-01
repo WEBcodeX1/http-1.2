@@ -4,7 +4,7 @@
 #define RUNAS_USER_DEFAULT 2000
 #define RUNAS_GROUP_DEFAULT 2000
 
-#define LOG_LEVEL 251
+#define LOG_LEVEL 250
 
 #define SERVER_VERSION "v0.1"
 

@@ -3,6 +3,8 @@
 using namespace std;
 
 static bool RunServer = true;
+Configuration ConfigRef = Configuration();
+
 
 Server::Server() :
     SocketListenAddress("127.0.0.1"),
@@ -22,12 +24,15 @@ void Server::init()
     setupSharedMemory();
     setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
+    //- init static filesystem
+    ConfigRef.mapStaticFSData();
+
     //- set client handler namespaces
-    setClientHandlerConfig(Namespaces);
+    setClientHandlerConfig();
 
     //- TODO: just set if exists in config, else default
-    SocketListenAddress = ServerAddress;
-    SocketListenPort = ServerPort;
+    SocketListenAddress = ConfigRef.ServerAddress;
+    SocketListenPort = ConfigRef.ServerPort;
 
     //- disable OS signals SIGINT, SIGPIPE
     Signal::disableSignals();
@@ -46,18 +51,15 @@ void Server::init()
     //- setup server socket monitoring
     setupPoll();
 
-    //- init static filesystem
-    loadStaticFSData(Namespaces, BasePath, Mimetypes);
-
     //- get ASRequestHandler reference
     ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
 
     //- fork result processor process
     ResultProcessor::setVHostOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
-    forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- fork application server proesses
-    setASProcessHandlerNamespaces(Namespaces);
+    //setASProcessHandlerNamespaces(Namespaces);
     setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
@@ -69,7 +71,7 @@ void Server::init()
     //setCPUConfig();
 
     //- drop privileges
-    Permission::dropPrivileges(RunAsUnixGroupID, RunAsUnixUserID);
+    Permission::dropPrivileges(ConfigRef.RunAsUnixGroupID, ConfigRef.RunAsUnixUserID);
 
     //- start server loop
     ServerLoop();

@@ -9,6 +9,7 @@
 
 #include <string>
 
+
 typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
 
@@ -24,8 +25,7 @@ static const vector<string> HeaderList
     "Host",
     "Request-UUID",
     "Transfer-Encoding",
-    "ETag",
-    "Cache-Control",
+    "If-None-Match",
     "Content-Type",
     "Content-Length"
 };
@@ -36,7 +36,7 @@ class HTTPParser: private Client, private SHMStaticFS, private SHMPythonAS
 
 public:
 
-    HTTPParser(ClientFD_t, NamespacesRef_t);
+    HTTPParser(const ClientFD_t, const NamespacesRef_t);
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);

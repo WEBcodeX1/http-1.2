@@ -28,7 +28,6 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
     //- workaround
     if (BufferRef[0] == 0) { return; }
 
-    //const string Buffer(&BufferRef[0], BufferSize);
     DBG(250, "size:" << string(BufferRef).length() << "appendBuffer:'" << string(BufferRef) << "'");
     _HTTPRequestBuffer = _HTTPRequestBuffer + string(BufferRef);
     //String::hexout(_HTTPRequestBuffer);
@@ -146,16 +145,19 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
             DBG(200, "Endpoint:" << Endpoint);
             const size_t EndpointFound = BasePropsFound.at(1).find("/backend" + Endpoint);
             if (EndpointFound != string::npos) {
+                DBG(200, "Looping on params");
+                string ProcessURL = BasePropsFound.at(1);
                 for (size_t i=0; i<EndpointProps["params"].size(); ++i) {
                     const string Param = EndpointProps["params"][i];
-                    string ProcessURL = BasePropsFound.at(1);
                     const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
                     JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
+                    DBG(200, "ProcessURL: " << ProcessURL << " Param: " << Param << " Value:" << ParamValue);
                     if (i != EndpointProps["params"].size() - 1) {
                         JSONPayload += ",";
                     }
                 }
-                JSONPayload += "}";
+                JSONPayload += "}}";
+                DBG(200, "AS GET JSONPayload:" << JSONPayload);
                 _processASPayload(
                     ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, JSONPayload
                 );
@@ -315,6 +317,7 @@ inline string HTTPParser::_getASURLParamValue(
     const uint16_t Index,
     string& ReqURL
 ){
+    DBG(200, "ReqURL:" << ReqURL);
     //- process first ? parameter
     if (Index == 0) {
         const size_t StartMarkerPos = ReqURL.find("?");
@@ -324,9 +327,10 @@ inline string HTTPParser::_getASURLParamValue(
         const size_t CheckMidPos = CompletePos+Param.size()+1;
 
         if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
-            const size_t EndPos = (EndMarkerPos == string::npos) ? ReqURL.size() : EndMarkerPos-1;
+            const size_t EndPos = (EndMarkerPos == string::npos) ? ReqURL.size() : EndMarkerPos;
             const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
-            ReqURL.replace(CompletePos, EndPos, "");
+            DBG(200, "ReqURL StartMarkerPos:" << StartMarkerPos << " EndPos:" << EndPos);
+            ReqURL.replace(StartMarkerPos, EndPos-StartMarkerPos, "");
             return ReturnString;
         }
         else {
@@ -344,7 +348,8 @@ inline string HTTPParser::_getASURLParamValue(
             const size_t NextMarkerPos = ReqURL.find("&", MidMarkerPos);
             const size_t EndPos = (NextMarkerPos == string::npos) ? ReqURL.size() : NextMarkerPos;
             const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
-            ReqURL.replace(CompletePos, EndPos, "");
+            DBG(200, "ReqURL StartMarkerPos:" << StartMarkerPos << " EndPos:" << EndPos);
+            ReqURL.replace(StartMarkerPos, EndPos-StartMarkerPos, "");
             return ReturnString;
         }
         else {
