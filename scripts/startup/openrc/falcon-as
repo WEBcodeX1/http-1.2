@@ -37,7 +37,7 @@ daemon_start()
 	fi
 	ulimit -n 1000000
 	sysctl -w vm.nr_hugepages=1024
-	start-stop-daemon --start --exec $DAEMON --make-pidfile --pidfile $PIDFILE --
+	start-stop-daemon --start --exec $DAEMON --background --make-pidfile --pidfile $PIDFILE --
 }
 
 daemon_stop()
