@@ -36,3 +36,4 @@ test/eval/JavaJNI/test-run-jni
 test/eval/ResultOrder/test-result-order
 test/eval/test-pointer-ref
 test/unit/http-parser/test-parser-requests
+test/unit/memory-alignment/test-memory-alignment
