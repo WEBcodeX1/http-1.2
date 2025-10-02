@@ -51,6 +51,10 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
     if (_ForkResult > 0) {
         DBG(120, "Parent ResultProcessor Process PID:" << getpid());
         DBG(120, "Parent ResultProcessor Atomic Address:" << StaticFSLock);
+        
+        //- allow child process to ptrace parent (required for pidfd_getfd)
+        prctl(PR_SET_PTRACER, _ForkResult);
+        
         return _ForkResult;  // return child PID to parent
     }
 
