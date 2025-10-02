@@ -43,9 +43,10 @@ private:
     void _processStaticFSRequests(uint16_t);
     inline void _parseHTTPBaseProps(string&);
     uint16_t _processPythonASResults();
+    int _getFDFromParent(uint16_t fd);
 
     pid_t _ForkResult;
-    pidfd_t _ParentPidFD;
+    int _FDPassingSocketFD;
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
 
 };

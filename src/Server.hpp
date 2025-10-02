@@ -36,6 +36,8 @@ public:
     static void terminate(int);
 
     void setupSharedMemory();
+    void setupFDPassingServer();
+    void handleFDPassingRequests();
 
     static void addChildPID(pid_t);
     static void terminateChildren();
@@ -56,6 +58,9 @@ private:
     void* _SHMPythonASMeta;
     void* _SHMPythonASRequests;
     void* _SHMPythonASResults;
+
+    int _FDPassingServerFD;
+    std::thread _FDPassingThread;
 
     static std::vector<pid_t> ChildPIDs;
 

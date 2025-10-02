@@ -29,6 +29,26 @@ void ResultProcessor::terminate(int _ignored)
     RunServer = false;
 }
 
+int ResultProcessor::_getFDFromParent(uint16_t fd)
+{
+    // Send the requested FD number to the parent
+    if (write(_FDPassingSocketFD, &fd, sizeof(fd)) != sizeof(fd)) {
+        ERR("Failed to send FD request to parent");
+        return -1;
+    }
+    
+    // Receive the FD from the parent
+    int received_fd = Syscall::recvFD(_FDPassingSocketFD);
+    
+    if (received_fd < 0) {
+        ERR("Failed to receive FD from parent");
+        return -1;
+    }
+    
+    DBG(120, "Received FD:" << received_fd << " from parent for requested FD:" << fd);
+    return received_fd;
+}
+
 void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
     _VHostOffsetsPrecalc = VHostOffsets;
 }
@@ -56,8 +76,16 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
 
     if (_ForkResult == 0) {
 
-        //- get parent pid filedescriptor
-        _ParentPidFD = Syscall::pidfd_open(getppid(), 0);
+        //- connect to parent's FD passing server
+        const char* socket_path = "/tmp/falcon-fd-passing.sock";
+        _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
+        
+        if (_FDPassingSocketFD < 0) {
+            ERR("ResultProcessor: Failed to connect to FD passing server");
+            exit(1);
+        }
+        
+        DBG(120, "ResultProcessor: Connected to FD passing server");
 
         //- overwrite parent termination handler
         setTerminationHandler();
@@ -65,7 +93,7 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
         //- spectre userspace protection
         prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_ENABLE, 0, 0);
 
-        DBG(120, "Child ResultProcessor Process PID:" << getpid() << " ParentPidFD:" << _ParentPidFD);
+        DBG(120, "Child ResultProcessor Process PID:" << getpid() << " FDPassingSocketFD:" << _FDPassingSocketFD);
         DBG(120, "Child ResultProcessor SharedMemAddress:" << SHMAdresses.StaticFSPtr);
         DBG(120, "Child ResultProcessor Atomic Address:" << StaticFSLock << " Value:" << *(StaticFSLock));
 
@@ -151,7 +179,7 @@ void ResultProcessor::_processStaticFSRequests(uint16_t RequestCount)
         getNextAddress(ClientPayloadLength);
         DBG(120, "ClientFD:" << ClientFD << " ReqNr:" << ReqNr << " HTTPVersion:" << HTTPVersion << " PayloadLength:" << ClientPayloadLength << " Payload:'" << ClientPayloadString << "'");
 
-        ClientFD_t ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, ClientFD, 0);
+        ClientFD_t ClientFDShared = _getFDFromParent(ClientFD);
 
         RequestProps_t Request;
 
@@ -182,7 +210,7 @@ uint16_t ResultProcessor::_processPythonASResults()
                 RequestProps_t Request;
 
                 Request.ClientFD = *(static_cast<ClientFD_t*>(getMetaAddress(Index, 2)));
-                Request.ClientFDShared = Syscall::pidfd_getfd(_ParentPidFD, Request.ClientFD, 0);
+                Request.ClientFDShared = _getFDFromParent(Request.ClientFD);
                 Request.HTTPVersion = *(static_cast<HTTPVersionType_t*>(getMetaAddress(Index, 3)));
                 Request.PayloadLength = *(static_cast<HTTPPayloadLength_t*>(getMetaAddress(Index, 7)));
 

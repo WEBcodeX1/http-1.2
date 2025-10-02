@@ -3,12 +3,15 @@
 
 #include <csignal>
 #include <string>
+#include <cstring>
 #include <unordered_map>
 #include <vector>
 #include <exception>
 #include <cstdlib>
 
 #include <sys/syscall.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <unistd.h>
 #include <execinfo.h>
 
@@ -19,7 +22,6 @@ using namespace std;
 
 
 typedef unsigned int Filedescriptor_t;
-typedef unsigned int pidfd_t;
 
 typedef uint16_t HTTPVersionType_t;
 typedef uint16_t HTTPMethodType_t;
@@ -67,16 +69,118 @@ class Syscall {
 
 public:
 
-    //- wrapper function for pidfd_open
-    static int pidfd_open(pid_t pid, unsigned int flags)
+    //- Unix domain socket for FD passing - server side (parent process)
+    static int createFDPassingServer(const char* socket_path)
     {
-        return syscall(SYS_pidfd_open, pid, flags);
+        int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (server_fd < 0) {
+            return -1;
+        }
+
+        // Remove any existing socket file
+        unlink(socket_path);
+
+        struct sockaddr_un server_addr;
+        memset(&server_addr, 0, sizeof(server_addr));
+        server_addr.sun_family = AF_UNIX;
+        strncpy(server_addr.sun_path, socket_path, sizeof(server_addr.sun_path) - 1);
+
+        if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+            close(server_fd);
+            return -1;
+        }
+
+        if (listen(server_fd, 50) < 0) {
+            close(server_fd);
+            return -1;
+        }
+
+        return server_fd;
     }
 
-    //- wrapper function for pidfd_getfd
-    static int pidfd_getfd(int pidfd, int targetfd, unsigned int flags)
+    //- Unix domain socket for FD passing - client side (child process)
+    static int connectFDPassingClient(const char* socket_path)
     {
-        return syscall(SYS_pidfd_getfd, pidfd, targetfd, flags);
+        int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (client_fd < 0) {
+            return -1;
+        }
+
+        struct sockaddr_un server_addr;
+        memset(&server_addr, 0, sizeof(server_addr));
+        server_addr.sun_family = AF_UNIX;
+        strncpy(server_addr.sun_path, socket_path, sizeof(server_addr.sun_path) - 1);
+
+        if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+            close(client_fd);
+            return -1;
+        }
+
+        return client_fd;
+    }
+
+    //- Send a file descriptor over Unix domain socket
+    static int sendFD(int socket_fd, int fd_to_send)
+    {
+        struct msghdr msg;
+        struct iovec iov[1];
+        char ctrl_buf[CMSG_SPACE(sizeof(int))];
+        char data[1] = {0};
+
+        memset(&msg, 0, sizeof(msg));
+        memset(ctrl_buf, 0, sizeof(ctrl_buf));
+
+        // Setup iovec for dummy data
+        iov[0].iov_base = data;
+        iov[0].iov_len = sizeof(data);
+
+        msg.msg_iov = iov;
+        msg.msg_iovlen = 1;
+        msg.msg_control = ctrl_buf;
+        msg.msg_controllen = sizeof(ctrl_buf);
+
+        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+        cmsg->cmsg_level = SOL_SOCKET;
+        cmsg->cmsg_type = SCM_RIGHTS;
+        cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+        *((int*)CMSG_DATA(cmsg)) = fd_to_send;
+
+        if (sendmsg(socket_fd, &msg, 0) < 0) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    //- Receive a file descriptor over Unix domain socket
+    static int recvFD(int socket_fd)
+    {
+        struct msghdr msg;
+        struct iovec iov[1];
+        char ctrl_buf[CMSG_SPACE(sizeof(int))];
+        char data[1];
+
+        memset(&msg, 0, sizeof(msg));
+        memset(ctrl_buf, 0, sizeof(ctrl_buf));
+
+        iov[0].iov_base = data;
+        iov[0].iov_len = sizeof(data);
+
+        msg.msg_iov = iov;
+        msg.msg_iovlen = 1;
+        msg.msg_control = ctrl_buf;
+        msg.msg_controllen = sizeof(ctrl_buf);
+
+        if (recvmsg(socket_fd, &msg, 0) < 0) {
+            return -1;
+        }
+
+        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+        if (cmsg == NULL || cmsg->cmsg_type != SCM_RIGHTS) {
+            return -1;
+        }
+
+        return *((int*)CMSG_DATA(cmsg));
     }
 
 };

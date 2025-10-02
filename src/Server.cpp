@@ -32,6 +32,9 @@ void Server::init()
     setupSharedMemory();
     setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
+    //- setup FD passing server
+    setupFDPassingServer();
+
     //- init static filesystem
     ConfigRef.mapStaticFSData();
 
@@ -247,4 +250,96 @@ void Server::setupSharedMemory()
     madvise(_SHMPythonASResults, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
 
     DBG(120, "SharedMemAddress:" << _SHMStaticFS);
+}
+
+void Server::setupFDPassingServer()
+{
+    DBG(120, "Setup FD Passing Server.");
+    
+    const char* socket_path = "/tmp/falcon-fd-passing.sock";
+    _FDPassingServerFD = Syscall::createFDPassingServer(socket_path);
+    
+    if (_FDPassingServerFD < 0) {
+        ERR("Failed to create FD passing server socket");
+        exit(EXIT_FAILURE);
+    }
+    
+    DBG(120, "FD Passing Server socket created at:" << socket_path);
+    
+    // Start thread to handle FD passing requests
+    _FDPassingThread = std::thread(&Server::handleFDPassingRequests, this);
+}
+
+void Server::handleFDPassingRequests()
+{
+    DBG(120, "FD Passing handler thread started");
+    
+    // Set socket to non-blocking
+    int flags = fcntl(_FDPassingServerFD, F_GETFL, 0);
+    fcntl(_FDPassingServerFD, F_SETFL, flags | O_NONBLOCK);
+    
+    std::vector<int> client_fds;
+    
+    while(RunServer) {
+        // Accept new connections
+        struct sockaddr_un client_addr;
+        socklen_t client_len = sizeof(client_addr);
+        
+        int new_client_fd = accept(_FDPassingServerFD, (struct sockaddr*)&client_addr, &client_len);
+        
+        if (new_client_fd >= 0) {
+            DBG(120, "FD passing new client connected, fd:" << new_client_fd);
+            client_fds.push_back(new_client_fd);
+        }
+        
+        // Process existing connections
+        auto it = client_fds.begin();
+        while (it != client_fds.end()) {
+            int client_fd = *it;
+            uint16_t requested_fd;
+            
+            ssize_t n = read(client_fd, &requested_fd, sizeof(requested_fd));
+            
+            if (n == sizeof(requested_fd)) {
+                DBG(120, "FD passing request for FD:" << requested_fd);
+                
+                // Send the requested FD to the client
+                if (Syscall::sendFD(client_fd, requested_fd) < 0) {
+                    ERR("Failed to send FD:" << requested_fd);
+                    close(client_fd);
+                    it = client_fds.erase(it);
+                } else {
+                    DBG(120, "Successfully sent FD:" << requested_fd);
+                    ++it;
+                }
+            } else if (n == 0) {
+                // Connection closed
+                DBG(120, "FD passing client disconnected, fd:" << client_fd);
+                close(client_fd);
+                it = client_fds.erase(it);
+            } else if (n < 0) {
+                if (errno != EAGAIN && errno != EWOULDBLOCK) {
+                    ERR("Failed to read requested FD number:" << strerror(errno));
+                    close(client_fd);
+                    it = client_fds.erase(it);
+                } else {
+                    ++it;
+                }
+            } else {
+                // Partial read - shouldn't happen with small fixed-size data
+                ERR("Partial read of FD request");
+                close(client_fd);
+                it = client_fds.erase(it);
+            }
+        }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    
+    // Clean up
+    for (int fd : client_fds) {
+        close(fd);
+    }
+    
+    DBG(120, "FD Passing handler thread exiting");
 }
