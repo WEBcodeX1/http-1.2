@@ -55,7 +55,7 @@ class Signal {
 
 public:
 
-    //- disable unwanted signal handlers (SIGINT, SIGPIPE)
+    // disable unwanted signal handlers (SIGINT, SIGPIPE)
     static void disableSignals()
     {
         signal(SIGINT,  SIG_IGN);
@@ -69,15 +69,15 @@ class Syscall {
 
 public:
 
-    //- Unix domain socket for FD passing - server side (parent process)
+    // unix domain socket for FD passing - server side (parent process)
     static int createFDPassingServer(const char* socket_path)
     {
-        int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        int server_fd = socket(AF_UNIX, SOCK_SEQPACKET, 0);
         if (server_fd < 0) {
             return -1;
         }
 
-        // Remove any existing socket file
+        // remove any existing socket file
         unlink(socket_path);
 
         struct sockaddr_un server_addr;
@@ -98,10 +98,10 @@ public:
         return server_fd;
     }
 
-    //- Unix domain socket for FD passing - client side (child process)
+    // unix domain socket for FD passing - client side (child process)
     static int connectFDPassingClient(const char* socket_path)
     {
-        int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        int client_fd = socket(AF_UNIX, SOCK_SEQPACKET, 0);
         if (client_fd < 0) {
             return -1;
         }
@@ -119,7 +119,7 @@ public:
         return client_fd;
     }
 
-    //- Send a file descriptor over Unix domain socket
+    // send a file descriptor over Unix domain socket
     static int sendFD(int socket_fd, int fd_to_send)
     {
         struct msghdr msg;
@@ -152,7 +152,7 @@ public:
         return 0;
     }
 
-    //- Receive a file descriptor over Unix domain socket
+    // receive a file descriptor over Unix domain socket
     static int recvFD(int socket_fd)
     {
         struct msghdr msg;
@@ -192,7 +192,7 @@ public:
 
     static void dropPrivileges(uint GroupID, uint UserID)
     {
-        //- in case of being root, drop privileges
+        // in case of being root, drop privileges
         if (getuid() == 0) {
 
             if (setgid(GroupID) != 0) {
