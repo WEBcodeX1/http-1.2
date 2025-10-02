@@ -97,7 +97,7 @@ private:
         T* MemPointer = MemoryBaseAddress;
 
         if (SegmentOffset < SegmentCount) {
-            MemPointer += (SegmentOffset*SegmentSize)*sizeof(T);
+            MemPointer += (SegmentOffset*SegmentSize);
         }
 
         DBG(180, "Memory Base Address:" << static_cast<void*>(MemoryBaseAddress) << " SegmentOffset:" << SegmentOffset << " MemPointer Address:" << static_cast<void*>(MemPointer));
