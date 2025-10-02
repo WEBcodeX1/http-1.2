@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <fcntl.h>
+#include <cerrno>
 
 #include <poll.h>
 #include <thread>
