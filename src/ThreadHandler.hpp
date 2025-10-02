@@ -81,7 +81,6 @@ protected:
     void _processThreads();
     void _checkProcessed();
 
-    pidfd_t _ParentPidFD;
     ClientRequestDataList_t _RequestsSorted;
     ClientRequestDataListVector_t _ProcessRequests;
     ProcessRequestsIndexList_t _ProcessRequestsIndex;
