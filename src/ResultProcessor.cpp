@@ -31,15 +31,15 @@ void ResultProcessor::terminate(int _ignored)
 
 int ResultProcessor::_getFDFromParent(uint16_t fd)
 {
-    // Send the requested FD number to the parent
+    // send the requested FD number to the parent
     if (write(_FDPassingSocketFD, &fd, sizeof(fd)) != sizeof(fd)) {
         ERR("Failed to send FD request to parent");
         return -1;
     }
-    
+
     // Receive the FD from the parent
     int received_fd = Syscall::recvFD(_FDPassingSocketFD);
-    
+
     if (received_fd < 0) {
         ERR("Failed to receive FD from parent");
         return -1;
@@ -79,12 +79,12 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
         //- connect to parent's FD passing server
         const char* socket_path = "/tmp/falcon-fd-passing.sock";
         _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
-        
+
         if (_FDPassingSocketFD < 0) {
             ERR("ResultProcessor: Failed to connect to FD passing server");
             exit(1);
         }
-        
+
         DBG(120, "ResultProcessor: Connected to FD passing server");
 
         //- overwrite parent termination handler
@@ -92,6 +92,9 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
 
         //- spectre userspace protection
         prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_ENABLE, 0, 0);
+
+        //- drop privileges
+        Permission::dropPrivileges(RUNAS_USER_DEFAULT, RUNAS_GROUP_DEFAULT);
 
         DBG(120, "Child ResultProcessor Process PID:" << getpid() << " FDPassingSocketFD:" << _FDPassingSocketFD);
         DBG(120, "Child ResultProcessor SharedMemAddress:" << SHMAdresses.StaticFSPtr);
@@ -148,7 +151,11 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
             }
         }
 
-        DBG(-1, "Exit Parent ResultProcessor Process.");
+        DBG(-1, "Parent ResultProcessor closing Unix Domain Socket.");
+
+        close(_FDPassingSocketFD);
+
+        DBG(-1, "Exit parent ResultProcessor process.");
         exit(0);
     }
 }
@@ -198,7 +205,6 @@ uint16_t ResultProcessor::_processPythonASResults()
 {
     uint16_t processed = 0;
 
-    //for (const auto& Namespace: _Namespaces) {
     for (const auto& Namespace: ConfigRef.Namespaces) {
         for (const auto &Index: _VHostOffsetsPrecalc.at(Namespace.first)) {
             atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));

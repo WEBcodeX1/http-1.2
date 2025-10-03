@@ -62,7 +62,6 @@ private:
     void* _SHMPythonASResults;
 
     int _FDPassingServerFD;
-    std::thread _FDPassingThread;
 
     static std::vector<pid_t> ChildPIDs;
 

@@ -3,6 +3,8 @@
 using namespace std;
 
 static bool RunServer = true;
+static std::thread _FDPassingThread;
+
 Configuration ConfigRef = Configuration();
 
 std::vector<pid_t> Server::ChildPIDs;
@@ -41,7 +43,7 @@ void Server::init()
     //- set client handler namespaces
     setClientHandlerConfig();
 
-    //- TODO: just set if exists in config, else default
+    //- TODO: only set if exists in config, else default
     SocketListenAddress = ConfigRef.ServerAddress;
     SocketListenPort = ConfigRef.ServerPort;
 
@@ -67,7 +69,7 @@ void Server::init()
 
     //- fork result processor process
     ResultProcessor::setVHostOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
-    pid_t resultProcessorPID = ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    const pid_t resultProcessorPID = ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
     if (resultProcessorPID > 0) {
         addChildPID(resultProcessorPID);
     }
@@ -77,7 +79,7 @@ void Server::init()
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- check interpreter count
-    uint ASInterpreterCount = getASInterpreterCount();
+    const uint ASInterpreterCount = getASInterpreterCount();
     DBG(50, "Sum AS Interpreters:" << ASInterpreterCount);
 
     //- apply cpu bound processing
@@ -116,8 +118,23 @@ void Server::terminateChildren()
 void Server::terminate(int _ignored)
 {
     DBG(-1, "SIGTERM Main Server received, shutting down");
-    terminateChildren();
     RunServer = false;
+    terminateChildren();
+
+    if (_FDPassingThread.joinable()) {
+        _FDPassingThread.join();
+    }
+
+    std::this_thread::sleep_for(chrono::milliseconds(100));
+
+    if (_FDPassingThread.joinable()) {
+        _FDPassingThread.join();
+    }
+
+    std::this_thread::sleep_for(chrono::milliseconds(100));
+    if (_FDPassingThread.joinable()) {
+        _FDPassingThread.join();
+    }
 }
 
 void Server::setupSocket()
@@ -266,7 +283,7 @@ void Server::setupFDPassingServer()
 
     DBG(120, "FD Passing Server socket created at:" << socket_path);
 
-    // Start thread to handle FD passing requests
+    // start thread to handle FD passing requests
     _FDPassingThread = std::thread(&Server::handleFDPassingRequests, this);
 }
 
@@ -278,35 +295,36 @@ void Server::handleFDPassingRequests()
     int flags = fcntl(_FDPassingServerFD, F_GETFL, 0);
     fcntl(_FDPassingServerFD, F_SETFL, flags | O_NONBLOCK);
 
-    std::vector<int> client_fds;
+    std::vector<int> ClientFDs;
 
     while(RunServer) {
 
         struct sockaddr_un client_addr;
         socklen_t client_len = sizeof(client_addr);
+        int NewClientFD = accept(_FDPassingServerFD, (struct sockaddr*)&client_addr, &client_len);
 
-        int new_client_fd = accept(_FDPassingServerFD, (struct sockaddr*)&client_addr, &client_len);
+        if (NewClientFD >= 0) {
+            DBG(120, "FD passing new client connected, fd:" << NewClientFD);
 
-        if (new_client_fd >= 0) {
-            DBG(120, "FD passing new client connected, fd:" << new_client_fd);
-            client_fds.push_back(new_client_fd);
+            // set client_fd non-blocking
+            int flags = fcntl(NewClientFD, F_GETFL, 0);
+            fcntl(NewClientFD, F_SETFL, flags | O_NONBLOCK);
+
+            ClientFDs.push_back(NewClientFD);
         }
 
-        auto it = client_fds.begin();
-        while (it != client_fds.end()) {
+        auto it = ClientFDs.begin();
+        while (it != ClientFDs.end()) {
             int client_fd = *it;
             uint16_t requested_fd;
-
             ssize_t n = read(client_fd, &requested_fd, sizeof(requested_fd));
-
             if (n == sizeof(requested_fd)) {
                 DBG(120, "FD passing request for FD:" << requested_fd);
-
                 // send the requested FD to the client
                 if (Syscall::sendFD(client_fd, requested_fd) < 0) {
                     ERR("Failed to send FD:" << requested_fd);
                     close(client_fd);
-                    it = client_fds.erase(it);
+                    it = ClientFDs.erase(it);
                 } else {
                     DBG(120, "Successfully sent FD:" << requested_fd);
                     ++it;
@@ -315,25 +333,38 @@ void Server::handleFDPassingRequests()
                 // connection closed
                 DBG(120, "FD passing client disconnected, fd:" << client_fd);
                 close(client_fd);
-                it = client_fds.erase(it);
+                it = ClientFDs.erase(it);
             } else if (n < 0) {
                 if (errno != EAGAIN && errno != EWOULDBLOCK) {
                     ERR("Failed to read requested FD number:" << strerror(errno));
                     close(client_fd);
-                    it = client_fds.erase(it);
+                    it = ClientFDs.erase(it);
                 } else {
                     ++it;
                 }
             }
         }
-
         std::this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
     }
 
+    DBG(120, "FD Passing handler thread exiting");
+
+    std::this_thread::sleep_for(chrono::milliseconds(50));
+
+    DBG(120, "FD Passing handler thread closing client connections");
+
     // clean up
-    for (int fd : client_fds) {
+    //close(client_fd);
+    for (const int& fd : ClientFDs) {
         close(fd);
     }
 
-    DBG(120, "FD Passing handler thread exiting");
+    std::this_thread::sleep_for(chrono::milliseconds(50));
+
+    DBG(120, "FD Passing handler thread closing serve unix domain socket");
+
+    close(_FDPassingServerFD);
+    unlink("/tmp/falcon-fd-passing.sock");
+
+    DBG(120, "FD Passing handler thread finally exiting");
 }
