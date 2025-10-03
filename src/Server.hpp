@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <fcntl.h>
+#include <cerrno>
 
 #include <poll.h>
 #include <thread>
@@ -36,6 +38,8 @@ public:
     static void terminate(int);
 
     void setupSharedMemory();
+    void setupFDPassingServer();
+    void handleFDPassingRequests();
 
     static void addChildPID(pid_t);
     static void terminateChildren();
@@ -56,6 +60,8 @@ private:
     void* _SHMPythonASMeta;
     void* _SHMPythonASRequests;
     void* _SHMPythonASResults;
+
+    int _FDPassingServerFD;
 
     static std::vector<pid_t> ChildPIDs;
 

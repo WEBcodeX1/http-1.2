@@ -119,14 +119,11 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
                     ERR("Cannot change dir to BackendRootPath Path:" << BackendRootPath.c_str());
                 }
 
-                //- get parent pid filedescriptor
-                pidfd_t ParentPidFD = Syscall::pidfd_open(getppid(), 0);
-
                 const char* Env1 = std::getenv("PATH");
                 const char* Env2 = std::getenv("PYTHONPATH");
 
                 DBG(120, "Process PATH:" << Env1 << " PYTHONPATH:" << Env2);
-                DBG(200, "Child ASProcessHandler Process PID:" << getpid() << " ParentPidFD:" << ParentPidFD);
+                DBG(200, "Child ASProcessHandler Process PID:" << getpid());
 
                 //- initialize backend
                 Backend::Processor::init(this);
