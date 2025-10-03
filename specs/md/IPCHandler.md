@@ -10,7 +10,7 @@ The following two handler exist:
 
 ## 1.1. IPCHandler
 
-IPCHandler Memory (SHM Segment #1) Layout see [BaseLayout.md](./BaseLayout.md) Section 3.1.
+IPCHandler Memory (SHM Segment #1) Layout see [README.md](./README.md) Section 3.1.
 
 The following describes the functionality in detail.
 
@@ -48,7 +48,7 @@ Set _OffsetSizes from `static const SharedMemOffset_t ElementSizes` (std::vector
 
 ## 1.2. IPCHandlerAS
 
-IPCHandler Memory (SHM Segment #2, #3 and #4) Layout see [BaseLayout.md](./BaseLayout.md) Section 3.2., 3.3 and 3.4.
+IPCHandler Memory (SHM Segment #2, #3 and #4) Layout see [README.md](./README.md) Section 3.2., 3.3 and 3.4.
 
 ### 1.2.1. setBaseAddresses()
 
