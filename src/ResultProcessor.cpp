@@ -31,13 +31,13 @@ void ResultProcessor::terminate(int _ignored)
 
 int ResultProcessor::_getFDFromParent(uint16_t fd)
 {
-    // send the requested FD number to the parent
+    // Send the requested FD number to the parent
     if (write(_FDPassingSocketFD, &fd, sizeof(fd)) != sizeof(fd)) {
         ERR("Failed to send FD request to parent");
         return -1;
     }
     
-    // receive the FD from the parent
+    // Receive the FD from the parent
     int received_fd = Syscall::recvFD(_FDPassingSocketFD);
     
     if (received_fd < 0) {
@@ -76,24 +76,12 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
 
     if (_ForkResult == 0) {
 
-        //- connect to parent's FD passing server with retry
+        //- connect to parent's FD passing server
         const char* socket_path = "/tmp/falcon-fd-passing.sock";
-        int retry_count = 0;
-        const int max_retries = 10;
-        
-        while (retry_count < max_retries) {
-            _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
-            if (_FDPassingSocketFD >= 0) {
-                break;
-            }
-            
-            // wait a bit before retrying
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            retry_count++;
-        }
+        _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
         
         if (_FDPassingSocketFD < 0) {
-            ERR("ResultProcessor: Failed to connect to FD passing server after " << max_retries << " retries");
+            ERR("ResultProcessor: Failed to connect to FD passing server");
             exit(1);
         }
         

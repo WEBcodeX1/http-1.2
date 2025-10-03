@@ -130,7 +130,7 @@ public:
         memset(&msg, 0, sizeof(msg));
         memset(ctrl_buf, 0, sizeof(ctrl_buf));
 
-        // setup iovec for dummy data
+        // Setup iovec for dummy data
         iov[0].iov_base = data;
         iov[0].iov_len = sizeof(data);
 

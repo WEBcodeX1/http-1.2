@@ -16,8 +16,7 @@ void registerChildPIDToServer(pid_t pid)
 
 Server::Server() :
     SocketListenAddress("127.0.0.1"),
-    SocketListenPort(80),
-    _FDPassingServerFD(-1)
+    SocketListenPort(80)
 {
     DBG(120, "Constructor");
 }
@@ -25,17 +24,6 @@ Server::Server() :
 Server::~Server()
 {
     DBG(120, "Destructor");
-    
-    // join FD passing thread if running
-    if (_FDPassingThread.joinable()) {
-        _FDPassingThread.join();
-    }
-    
-    // clean up FD passing socket
-    if (_FDPassingServerFD >= 0) {
-        close(_FDPassingServerFD);
-        unlink("/tmp/falcon-fd-passing.sock");
-    }
 }
 
 void Server::init()
@@ -130,11 +118,6 @@ void Server::terminate(int _ignored)
     DBG(-1, "SIGTERM Main Server received, shutting down");
     terminateChildren();
     RunServer = false;
-    
-    // wait for FD passing thread to finish
-    if (_FDPassingThread.joinable()) {
-        _FDPassingThread.join();
-    }
 }
 
 void Server::setupSocket()
@@ -283,7 +266,7 @@ void Server::setupFDPassingServer()
 
     DBG(120, "FD Passing Server socket created at:" << socket_path);
 
-    // start thread to handle FD passing requests
+    // Start thread to handle FD passing requests
     _FDPassingThread = std::thread(&Server::handleFDPassingRequests, this);
 }
 
@@ -305,10 +288,6 @@ void Server::handleFDPassingRequests()
         int new_client_fd = accept(_FDPassingServerFD, (struct sockaddr*)&client_addr, &client_len);
 
         if (new_client_fd >= 0) {
-            // make client socket non-blocking
-            int flags = fcntl(new_client_fd, F_GETFL, 0);
-            fcntl(new_client_fd, F_SETFL, flags | O_NONBLOCK);
-            
             DBG(120, "FD passing new client connected, fd:" << new_client_fd);
             client_fds.push_back(new_client_fd);
         }
@@ -345,11 +324,6 @@ void Server::handleFDPassingRequests()
                 } else {
                     ++it;
                 }
-            } else {
-                // partial read - shouldn't happen with SOCK_SEQPACKET but handle anyway
-                ERR("Partial read of FD request, bytes:" << n);
-                close(client_fd);
-                it = client_fds.erase(it);
             }
         }
 
