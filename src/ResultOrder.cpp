@@ -23,7 +23,8 @@ void ResultOrder::append(
 )
 {
     if (_Requests.contains(ReqProps.ClientFD)) {
-        _Requests.at(ReqProps.ClientFD).emplace(
+        auto& clientRequests = _Requests[ReqProps.ClientFD];
+        clientRequests.emplace(
             ReqNr, std::move(ReqProps)
         );
     }
@@ -57,10 +58,13 @@ void ResultOrder::processRequests(const HTTPType_t HTTPType)
 
         //- HTTP/1.2 (unordered)
         if (HTTPType == HTTP1_2) {
-            for (const auto& [ReqNr, ReqProps]: _Requests.at(ClientFD)) {
-                if (ReqProps.HTTPVersion == HTTP1_2) {
-                    DBG(120, "HTTP1_2 RequestProps ClientFD:" << ReqProps.ClientFD << " HTTPType:" << ReqProps.HTTPVersion);
-                    ResultData.push_back(ReqProps);
+            auto requestsIter = _Requests.find(ClientFD);
+            if (requestsIter != _Requests.end()) {
+                for (const auto& [ReqNr, ReqProps]: requestsIter->second) {
+                    if (ReqProps.HTTPVersion == HTTP1_2) {
+                        DBG(120, "HTTP1_2 RequestProps ClientFD:" << ReqProps.ClientFD << " HTTPType:" << ReqProps.HTTPVersion);
+                        ResultData.push_back(ReqProps);
+                    }
                 }
             }
         }
@@ -68,23 +72,32 @@ void ResultOrder::processRequests(const HTTPType_t HTTPType)
         //- HTTP/1.1 (ordered)
         if (HTTPType == HTTP1_1) {
 
-            RequestNr_t LastRequestNrCheck = _LastRequest.at(ClientFD).RequestNr;
+            auto lastRequestIter = _LastRequest.find(ClientFD);
+            if (lastRequestIter == _LastRequest.end()) {
+                ERR("_LastRequest does not contain ClientFD:" << ClientFD);
+                continue;
+            }
+
+            RequestNr_t LastRequestNrCheck = lastRequestIter->second.RequestNr;
             RequestNr_t ReqIndex = 0;
 
             DBG(200, "Processing HTTP1.1 LastReqNrCheck:" << LastRequestNrCheck);
 
-            for (const auto& [ReqNr, ReqProps]: _Requests.at(ClientFD)) {
+            auto requestsIter = _Requests.find(ClientFD);
+            if (requestsIter != _Requests.end()) {
+                for (const auto& [ReqNr, ReqProps]: requestsIter->second) {
 
-                DBG(200, "ReqIndex:" << ReqIndex << " ReqNr:" << ReqNr);
+                    DBG(200, "ReqIndex:" << ReqIndex << " ReqNr:" << ReqNr);
 
-                //- if first ReqNr is not next (LastRequest+1) do not process
-                if (ReqProps.HTTPVersion == HTTP1_1 && ReqIndex == 0 && ReqNr != LastRequestNrCheck) { break; }
-                if (ReqProps.HTTPVersion == HTTP1_1 && ReqNr == LastRequestNrCheck) {
-                    DBG(200, "HTTP1_1 RequestProps ClientFD:" << ReqProps.ClientFD << " HTTPType:" << ReqProps.HTTPVersion);
-                    ResultData.push_back(ReqProps);
+                    //- if first ReqNr is not next (LastRequest+1) do not process
+                    if (ReqProps.HTTPVersion == HTTP1_1 && ReqIndex == 0 && ReqNr != LastRequestNrCheck) { break; }
+                    if (ReqProps.HTTPVersion == HTTP1_1 && ReqNr == LastRequestNrCheck) {
+                        DBG(200, "HTTP1_1 RequestProps ClientFD:" << ReqProps.ClientFD << " HTTPType:" << ReqProps.HTTPVersion);
+                        ResultData.push_back(ReqProps);
+                    }
+                    LastRequestNrCheck += 1;
+                    ReqIndex += 1;
                 }
-                LastRequestNrCheck += 1;
-                ReqIndex += 1;
             }
         }
     }

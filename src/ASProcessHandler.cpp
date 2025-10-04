@@ -69,7 +69,13 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
     for (const auto& Namespace: ConfigRef.Namespaces) {
 
-        for (const auto &Index:_VHostOffsetsPrecalc.at(Namespace.first)) {
+        auto offsetIter = _VHostOffsetsPrecalc.find(Namespace.first);
+        if (offsetIter == _VHostOffsetsPrecalc.end()) {
+            ERR("_VHostOffsetsPrecalc does not contain Namespace:" << Namespace.first);
+            continue;
+        }
+
+        for (const auto &Index:offsetIter->second) {
 
             pid_t ForkResult = fork();
 

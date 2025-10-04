@@ -121,7 +121,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         else {
             //- if filedescriptor exists in map, append buffer data
             if (Clients.contains(ReadFD)) {
-                ClientRef_t ClientRef = Clients.at(ReadFD);
+                ClientRef_t ClientRef = Clients[ReadFD];
                 ClientRef->appendBuffer(Buffer, RcvBytes);
 
                 if (ClientRef->processRequests(SHMGetRequests, _ASRequestHandlerRef) > 0) {

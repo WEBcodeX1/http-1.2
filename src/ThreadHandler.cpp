@@ -45,11 +45,18 @@ void ThreadHandler::_checkProcessed()
         if (it->second->join()) {
             DBG(120, "Joined Thread for ClientFD:" << it->first << ", removing from Map");
 
-            _ProcessRequests.erase(
-                _ProcessRequests.begin()+_ProcessRequestsIndex.at(it->first)
-            );
+            //- safely check if index exists before erasing
+            auto indexIter = _ProcessRequestsIndex.find(it->first);
+            if (indexIter != _ProcessRequestsIndex.end()) {
+                _ProcessRequests.erase(
+                    _ProcessRequests.begin()+indexIter->second
+                );
+                _ProcessRequestsIndex.erase(indexIter);
+            }
+            else {
+                ERR("_ProcessRequestsIndex does not contain ClientFD:" << it->first);
+            }
 
-            _ProcessRequestsIndex.erase(it->first);
             _ClientThreads.erase(it++);
         }
         else {++it;};
@@ -138,11 +145,23 @@ void ClientThread::processRequests()
             RequestHeaderResult_t Headers;
             _parseRequestHeaders(_ClientRequests[i].HTTPPayload, Headers);
 
+            //- validate BaseProps has minimum required elements
+            if (BaseProps.size() < 3) {
+                ERR("Invalid HTTP request - insufficient base properties");
+                continue;
+            }
+
             DBG(120, "RequestType:'" << BaseProps.at(2) << "'");
             DBG(120, "RequestPath:'" << BaseProps.at(1) << "'");
             DBG(120, "HTTPVersion:'" << BaseProps.at(0) << "'");
 
-            const string NamespaceID = Headers.at("Host");
+            //- check if Host header exists
+            auto hostIter = Headers.find("Host");
+            if (hostIter == Headers.end()) {
+                ERR("Missing Host header in request");
+                continue;
+            }
+            const string NamespaceID = hostIter->second;
             DBG(120, "NamespaceID:'" << NamespaceID << "'");
 
             FileProperties_t FileProps;
@@ -158,7 +177,33 @@ void ClientThread::processRequests()
             }
             */
 
-            NamespaceProps_t NamespaceProps = _Namespaces.at(NamespaceID);
+            //- check if namespace exists
+            auto namespaceIter = _Namespaces.find(NamespaceID);
+            if (namespaceIter == _Namespaces.end()) {
+                ERR("Namespace not found for NamespaceID:'" << NamespaceID << "'");
+                
+                //- send 404 response for non-existent vhost
+                stringstream current_date_404;
+                std::time_t tt_404 = std::chrono::system_clock::to_time_t (std::chrono::system_clock::now());
+                struct std::tm * ptm_404 = std::localtime(&tt_404);
+                current_date_404 << std::put_time(ptm_404, "%a, %d %b %Y %T") << '\n';
+                
+                string Response404 = "HTTP/1.1 404 Not Found\n";
+                Response404.append("Date: ");
+                Response404.append(current_date_404.str());
+                Response404.append(" GMT\n");
+                Response404.append("Server: falcon/0.1\n");
+                Response404.append("Content-Length: 26\n");
+                Response404.append("Content-Type: text/html\n\n");
+                Response404.append("<html>404 Not Found</html>");
+                
+                const char* send_buf_404 = Response404.c_str();
+                const int rc_404 = write(_ClientRequests[i].ClientFDShared, send_buf_404, strlen(send_buf_404));
+                if (rc_404 < 0) { ERR("write() err:" << strerror(errno)); }
+                continue;
+            }
+            
+            NamespaceProps_t NamespaceProps = namespaceIter->second;
 
             DBG(120, "NamespacePath:'" << NamespaceProps.FilesystemRef->Path << "'");
             DBG(120, "NamespaceBasePath:'" << NamespaceProps.FilesystemRef->BasePath << "'");

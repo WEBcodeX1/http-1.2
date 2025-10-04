@@ -70,7 +70,11 @@ void Filesystem::processFileProperties()
 
             FindPos = FileName.rfind(".");
             string FileExtension = FileName.substr(FindPos+1, File.length()-FindPos);
-            string MimeType = MimeRelations.at(FileExtension);
+            
+            //- safely get mime type
+            auto mimeIter = MimeRelations.find(FileExtension);
+            string MimeType = (mimeIter != MimeRelations.end()) ? mimeIter->second : "application/octet-stream";
+            
             string ReplacePath = BasePath + Path + "/static";
             string RelPath = FilePath.substr(ReplacePath.length(), FilePath.length()-ReplacePath.length());
             string FileListKey = RelPath + "/" + FileName;
@@ -103,7 +107,13 @@ bool Filesystem::checkFileExists(const string &File)
 
 FileProperties_t Filesystem::getFilePropertiesByFile(const string &File)
 {
-    return _FilesExtended.at(File);
+    auto iter = _FilesExtended.find(File);
+    if (iter != _FilesExtended.end()) {
+        return iter->second;
+    }
+    //- return empty FileProperties if not found (should not happen after checkFileExists)
+    ERR("File not found in _FilesExtended map: " << File);
+    return FileProperties_t{};
 }
 
 string Filesystem::getFileEtag(const string &File) {
