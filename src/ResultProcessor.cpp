@@ -1,6 +1,8 @@
 #include "ResultProcessor.hpp"
 
 #include <memory>
+#include <chrono>
+#include <errno.h>
 
 using namespace std;
 
@@ -32,8 +34,28 @@ void ResultProcessor::terminate(int _ignored)
 int ResultProcessor::_getFDFromParent(uint16_t fd)
 {
     // send the requested FD number to the parent
-    if (write(_FDPassingSocketFD, &fd, sizeof(fd)) != sizeof(fd)) {
-        ERR("Failed to send FD request to parent");
+    // Handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
+    ssize_t written = 0;
+    const int MAX_WRITE_RETRIES = 100;
+    int write_retry = 0;
+    
+    while (written != sizeof(fd) && write_retry < MAX_WRITE_RETRIES) {
+        written = write(_FDPassingSocketFD, &fd, sizeof(fd));
+        
+        if (written != sizeof(fd)) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                // Non-blocking socket is temporarily unavailable, retry after short delay
+                this_thread::sleep_for(chrono::microseconds(100));
+                write_retry++;
+                continue;
+            }
+            ERR("Failed to send FD request to parent, errno=" << errno << " (" << strerror(errno) << ")");
+            return -1;
+        }
+    }
+    
+    if (written != sizeof(fd)) {
+        ERR("Failed to send FD request to parent after " << MAX_WRITE_RETRIES << " retries");
         return -1;
     }
 
