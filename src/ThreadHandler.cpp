@@ -22,7 +22,7 @@ void ThreadHandler::_addRequests(
 
     for (const auto& RequestProps : Requests) {
         if (_RequestsSorted.contains(RequestProps.ClientFD)) {
-            _RequestsSorted.at(RequestProps.ClientFD).push_back(std::move(RequestProps));
+            _RequestsSorted[RequestProps.ClientFD].push_back(std::move(RequestProps));
         }
         else {
             ClientRequestDataVec_t ReqPropsVec;
@@ -151,9 +151,9 @@ void ClientThread::processRequests()
                 continue;
             }
 
-            DBG(120, "RequestType:'" << BaseProps.at(2) << "'");
-            DBG(120, "RequestPath:'" << BaseProps.at(1) << "'");
-            DBG(120, "HTTPVersion:'" << BaseProps.at(0) << "'");
+            DBG(120, "RequestType:'" << BaseProps[2] << "'");
+            DBG(120, "RequestPath:'" << BaseProps[1] << "'");
+            DBG(120, "HTTPVersion:'" << BaseProps[0] << "'");
 
             //- check if Host header exists
             auto hostIter = Headers.find("Host");
@@ -208,8 +208,8 @@ void ClientThread::processRequests()
             DBG(120, "NamespacePath:'" << NamespaceProps.FilesystemRef->Path << "'");
             DBG(120, "NamespaceBasePath:'" << NamespaceProps.FilesystemRef->BasePath << "'");
 
-            if (NamespaceProps.FilesystemRef->checkFileExists(BaseProps.at(1))) {
-                FileProps = NamespaceProps.FilesystemRef->getFilePropertiesByFile(BaseProps.at(1));
+            if (NamespaceProps.FilesystemRef->checkFileExists(BaseProps[1])) {
+                FileProps = NamespaceProps.FilesystemRef->getFilePropertiesByFile(BaseProps[1]);
 
                 DBG(80, "ClientFileDescriptor:" << _ClientRequests[i].ClientFD);
                 DBG(80, "FileDescriptor:" << FileProps.Filedescriptor);
@@ -219,7 +219,8 @@ void ClientThread::processRequests()
                 DBG(80, "JSONConfig:" << NamespaceProps.JSONConfig);
 
                 //- if etags match, send 304 not-modified
-                if (Headers.find("If-None-Match") != Headers.end() && Headers.at("If-None-Match") == FileProps.ETag) {
+                auto etagIter = Headers.find("If-None-Match");
+                if (etagIter != Headers.end() && etagIter->second == FileProps.ETag) {
                     string Response304 = "HTTP/1.1 304 Not Modified\n";
                     Response304.append("Date: ");
                     Response304.append(current_date.str());
