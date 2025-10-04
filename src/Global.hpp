@@ -8,6 +8,9 @@
 #include <vector>
 #include <exception>
 #include <cstdlib>
+#include <thread>
+#include <chrono>
+#include <errno.h>
 
 #include <sys/syscall.h>
 #include <sys/socket.h>
@@ -171,7 +174,26 @@ public:
         msg.msg_control = ctrl_buf;
         msg.msg_controllen = sizeof(ctrl_buf);
 
-        if (recvmsg(socket_fd, &msg, 0) < 0) {
+        // Handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
+        const int MAX_RECV_RETRIES = 100;
+        int recv_retry = 0;
+        ssize_t result = -1;
+        
+        while (result < 0 && recv_retry < MAX_RECV_RETRIES) {
+            result = recvmsg(socket_fd, &msg, 0);
+            
+            if (result < 0) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // Non-blocking socket is temporarily unavailable, retry after short delay
+                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                    recv_retry++;
+                    continue;
+                }
+                return -1;
+            }
+        }
+        
+        if (result < 0) {
             return -1;
         }
 

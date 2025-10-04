@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
-#include <errno.h>
 
 #include <atomic>
 #include <thread>
@@ -45,12 +44,10 @@ private:
     inline void _parseHTTPBaseProps(string&);
     uint16_t _processPythonASResults();
     int _getFDFromParent(uint16_t fd);
-    bool _reconnectFDPassingSocket();
 
     pid_t _ForkResult;
     int _FDPassingSocketFD;
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
-    const char* _FDPassingSocketPath;
 
 };
 

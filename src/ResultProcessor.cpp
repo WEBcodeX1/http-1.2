@@ -1,8 +1,8 @@
 #include "ResultProcessor.hpp"
 
 #include <memory>
-#include <algorithm>
 #include <chrono>
+#include <errno.h>
 
 using namespace std;
 
@@ -31,82 +31,44 @@ void ResultProcessor::terminate(int _ignored)
     RunServer = false;
 }
 
-bool ResultProcessor::_reconnectFDPassingSocket()
-{
-    DBG(120, "Attempting to reconnect FD passing socket");
-    
-    // Close existing socket if open
-    if (_FDPassingSocketFD >= 0) {
-        close(_FDPassingSocketFD);
-        _FDPassingSocketFD = -1;
-    }
-    
-    // Retry connection with exponential backoff
-    const int MAX_RETRIES = 5;
-    int retry_delay_us = 1000; // Start with 1ms
-    
-    for (int retry = 0; retry < MAX_RETRIES; retry++) {
-        _FDPassingSocketFD = Syscall::connectFDPassingClient(_FDPassingSocketPath);
-        
-        if (_FDPassingSocketFD >= 0) {
-            DBG(120, "Successfully reconnected FD passing socket, fd:" << _FDPassingSocketFD);
-            return true;
-        }
-        
-        DBG(120, "Reconnection attempt " << (retry + 1) << "/" << MAX_RETRIES << " failed, retrying in " << retry_delay_us << "us");
-        this_thread::sleep_for(chrono::microseconds(retry_delay_us));
-        
-        // Exponential backoff with max delay of 100ms
-        retry_delay_us = min(retry_delay_us * 2, 100000);
-    }
-    
-    ERR("Failed to reconnect FD passing socket after " << MAX_RETRIES << " attempts");
-    return false;
-}
-
 int ResultProcessor::_getFDFromParent(uint16_t fd)
 {
-    const int MAX_ATTEMPTS = 2; // Try once, and retry once after reconnection
+    // send the requested FD number to the parent
+    // Handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
+    ssize_t written = 0;
+    const int MAX_WRITE_RETRIES = 100;
+    int write_retry = 0;
     
-    for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        // send the requested FD number to the parent
-        ssize_t written = write(_FDPassingSocketFD, &fd, sizeof(fd));
+    while (written != sizeof(fd) && write_retry < MAX_WRITE_RETRIES) {
+        written = write(_FDPassingSocketFD, &fd, sizeof(fd));
         
         if (written != sizeof(fd)) {
-            if (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN || errno == EBADF) {
-                ERR("FD passing socket connection lost (errno=" << errno << "), attempting reconnection");
-                
-                if (attempt < MAX_ATTEMPTS - 1 && _reconnectFDPassingSocket()) {
-                    DBG(120, "Reconnected, retrying FD request");
-                    continue; // Retry with new connection
-                }
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                // Non-blocking socket is temporarily unavailable, retry after short delay
+                this_thread::sleep_for(chrono::microseconds(100));
+                write_retry++;
+                continue;
             }
-            ERR("Failed to send FD request to parent");
+            ERR("Failed to send FD request to parent, errno=" << errno);
             return -1;
         }
-
-        // Receive the FD from the parent
-        int received_fd = Syscall::recvFD(_FDPassingSocketFD);
-
-        if (received_fd < 0) {
-            if (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN || errno == EBADF) {
-                ERR("FD passing socket connection lost during recv (errno=" << errno << "), attempting reconnection");
-                
-                if (attempt < MAX_ATTEMPTS - 1 && _reconnectFDPassingSocket()) {
-                    DBG(120, "Reconnected, retrying FD request");
-                    continue; // Retry with new connection
-                }
-            }
-            ERR("Failed to receive FD from parent");
-            return -1;
-        }
-        
-        DBG(120, "Received FD:" << received_fd << " from parent for requested FD:" << fd);
-        return received_fd;
     }
     
-    ERR("Failed to get FD from parent after " << MAX_ATTEMPTS << " attempts");
-    return -1;
+    if (written != sizeof(fd)) {
+        ERR("Failed to send FD request to parent after " << MAX_WRITE_RETRIES << " retries");
+        return -1;
+    }
+
+    // Receive the FD from the parent
+    int received_fd = Syscall::recvFD(_FDPassingSocketFD);
+
+    if (received_fd < 0) {
+        ERR("Failed to receive FD from parent");
+        return -1;
+    }
+    
+    DBG(120, "Received FD:" << received_fd << " from parent for requested FD:" << fd);
+    return received_fd;
 }
 
 void ResultProcessor::setVHostOffsets(VHostOffsetsPrecalc_t VHostOffsets) {
@@ -138,7 +100,6 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
 
         //- connect to parent's FD passing server
         const char* socket_path = "/tmp/falcon-fd-passing.sock";
-        _FDPassingSocketPath = socket_path;
         _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
 
         if (_FDPassingSocketFD < 0) {
