@@ -49,7 +49,7 @@ int ResultProcessor::_getFDFromParent(uint16_t fd)
                 write_retry++;
                 continue;
             }
-            ERR("Failed to send FD request to parent, errno=" << errno);
+            ERR("Failed to send FD request to parent, errno=" << errno << " (" << strerror(errno) << ")");
             return -1;
         }
     }
