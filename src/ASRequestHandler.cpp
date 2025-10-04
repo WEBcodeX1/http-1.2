@@ -41,10 +41,10 @@ void ASRequestHandler::_calculateOffsets() {
     }
 
     for (const auto &Offset:_VHostOffsets) {
-        uint16_t i = _VHostOffsets.at(Offset.first).OffsetStart;
-        uint16_t n = _VHostOffsets.at(Offset.first).OffsetEnd;
+        uint16_t i = Offset.second.OffsetStart;
+        uint16_t n = Offset.second.OffsetEnd;
         while(i <= n) {
-            _VHostOffsetsPrecalc.at(Offset.first).push_back(i);
+            _VHostOffsetsPrecalc[Offset.first].push_back(i);
             ++i;
         }
     }
@@ -72,7 +72,7 @@ void ASRequestHandler::addRequest(const ASRequestProps_t RequestProps) {
 
 AppServerID_t ASRequestHandler::_getNextFreeAppServerID(string VirtualHost) {
     if (_VHostOffsetsPrecalc.contains(VirtualHost)) {
-        for (const auto &Index:_VHostOffsetsPrecalc.at(VirtualHost)) {
+        for (const auto &Index:_VHostOffsetsPrecalc[VirtualHost]) {
             DBG(180, "Namespace:" << VirtualHost << " Index:" << Index);
             if (!_Requests.contains(Index)) {
                 DBG(140, "Requests do not contain Index, check SHM");

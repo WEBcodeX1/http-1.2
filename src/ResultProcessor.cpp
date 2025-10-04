@@ -206,7 +206,13 @@ uint16_t ResultProcessor::_processPythonASResults()
     uint16_t processed = 0;
 
     for (const auto& Namespace: ConfigRef.Namespaces) {
-        for (const auto &Index: _VHostOffsetsPrecalc.at(Namespace.first)) {
+        auto offsetIter = _VHostOffsetsPrecalc.find(Namespace.first);
+        if (offsetIter == _VHostOffsetsPrecalc.end()) {
+            ERR("_VHostOffsetsPrecalc does not contain Namespace:" << Namespace.first);
+            continue;
+        }
+
+        for (const auto &Index: offsetIter->second) {
             atomic_uint16_t* CanReadAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 0));
             atomic_uint16_t* WriteReadyAddr = static_cast<atomic_uint16_t*>(getMetaAddress(Index, 1));
             if (*(CanReadAddr) == 0 && *(WriteReadyAddr) == 1) {
