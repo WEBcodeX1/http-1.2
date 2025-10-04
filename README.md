@@ -256,6 +256,7 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 - **Detailed Analysis**: [Der IT Prüfer](http://der-it-pruefer.de)
 
 ### Protocol Specifications
+- **HTTP/1.2 Draft/RFP**: [HTTP-1.2-DRAFT.md](HTTP-1.2-DRAFT.md) - Complete protocol specification
 - **WAP/XML Specs**: [WAP-AS-XML-SPECS.md](WAP-AS-XML-SPECS.md)
 - **Internal Libraries**: [lib/README.md](lib/README.md)
 
@@ -299,7 +300,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3 comparisons
 
 ### Long-term Vision
-- [ ] **Protocol Standardization**: Submit HTTP/1.2 as official RFC
+- [ ] **Protocol Standardization**: Submit HTTP/1.2 as official RFC (see [HTTP-1.2-DRAFT.md](HTTP-1.2-DRAFT.md))
 - [ ] **Enterprise Features**: Advanced monitoring, analytics, management
 - [ ] **Proxy Server Component**: Complete the load balancing/reverse proxy module
 
