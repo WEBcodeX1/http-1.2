@@ -34,9 +34,6 @@ void Server::init()
     setupSharedMemory();
     setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
-    //- setup FD passing server
-    setupFDPassingServer();
-
     //- init static filesystem
     ConfigRef.mapStaticFSData();
 
@@ -55,14 +52,14 @@ void Server::init()
     std::set_terminate(SigHandler::myterminate);
     #endif
 
+    //- apply cpu bound processing
+    //setCPUConfig();
+
+    //- setup FD passing server
+    setupFDPassingServer();
+
     //- setup termination handler
     setTerminationHandler();
-
-    //- setup server socket
-    setupSocket();
-
-    //- setup server socket monitoring
-    setupPoll();
 
     //- get ASRequestHandler reference
     ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
@@ -78,12 +75,15 @@ void Server::init()
     setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
+    //- setup server socket
+    setupSocket();
+
+    //- setup server socket monitoring
+    setupPoll();
+
     //- check interpreter count
     const uint ASInterpreterCount = getASInterpreterCount();
     DBG(50, "Sum AS Interpreters:" << ASInterpreterCount);
-
-    //- apply cpu bound processing
-    //setCPUConfig();
 
     //- drop privileges
     Permission::dropPrivileges(ConfigRef.RunAsUnixGroupID, ConfigRef.RunAsUnixUserID);
@@ -319,14 +319,14 @@ void Server::handleFDPassingRequests()
             uint16_t requested_fd;
             ssize_t n = read(client_fd, &requested_fd, sizeof(requested_fd));
             if (n == sizeof(requested_fd)) {
-                DBG(120, "FD passing request for FD:" << requested_fd);
+                DBG(240, "FD passing request for FD:" << requested_fd);
                 // send the requested FD to the client
                 if (Syscall::sendFD(client_fd, requested_fd) < 0) {
                     ERR("Failed to send FD:" << requested_fd);
                     close(client_fd);
                     it = ClientFDs.erase(it);
                 } else {
-                    DBG(120, "Successfully sent FD:" << requested_fd);
+                    DBG(240, "Successfully sent FD:" << requested_fd);
                     ++it;
                 }
             } else if (n == 0) {
@@ -354,7 +354,6 @@ void Server::handleFDPassingRequests()
     DBG(120, "FD Passing handler thread closing client connections");
 
     // clean up
-    //close(client_fd);
     for (const int& fd : ClientFDs) {
         close(fd);
     }

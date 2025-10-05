@@ -133,7 +133,7 @@ public:
         memset(&msg, 0, sizeof(msg));
         memset(ctrl_buf, 0, sizeof(ctrl_buf));
 
-        // Setup iovec for dummy data
+        // setup iovec for dummy data
         iov[0].iov_base = data;
         iov[0].iov_len = sizeof(data);
 
@@ -148,8 +148,17 @@ public:
         cmsg->cmsg_len = CMSG_LEN(sizeof(int));
         *((int*)CMSG_DATA(cmsg)) = fd_to_send;
 
-        if (sendmsg(socket_fd, &msg, 0) < 0) {
-            return -1;
+        // always retry sendmsg
+        const int MAX_SEND_RETRIES = 100;
+        int recv_retry = 0;
+        ssize_t result = -1;
+
+        while (result < 0 && recv_retry < MAX_SEND_RETRIES) {
+            result = sendmsg(socket_fd, &msg, 0);
+            if (result < 0) {
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                recv_retry++;
+            }
         }
 
         return 0;
@@ -174,17 +183,17 @@ public:
         msg.msg_control = ctrl_buf;
         msg.msg_controllen = sizeof(ctrl_buf);
 
-        // Handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
+        // handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
         const int MAX_RECV_RETRIES = 100;
         int recv_retry = 0;
         ssize_t result = -1;
-        
+
         while (result < 0 && recv_retry < MAX_RECV_RETRIES) {
             result = recvmsg(socket_fd, &msg, 0);
-            
+
             if (result < 0) {
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    // Non-blocking socket is temporarily unavailable, retry after short delay
+                if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+                    // non-blocking socket is temporarily unavailable, retry after short delay
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                     recv_retry++;
                     continue;
@@ -192,7 +201,7 @@ public:
                 return -1;
             }
         }
-        
+
         if (result < 0) {
             return -1;
         }
