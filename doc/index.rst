@@ -5,6 +5,8 @@ FalconAS (HTTP Python Application Server) Documentation.
    :maxdepth: 2
    :caption: Contents:
 
+   termination_handling
+
 .. doxygenclass:: Server
    :project: falconas
    :members:
