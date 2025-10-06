@@ -8,7 +8,7 @@ User=root
 Group=root
 
 # Set transparent hugepages before starting
-ExecStartPre=/usr/bin/sysctl -w vm.nr_hugepages=1024
+ExecStartPre=sysctl -w vm.nr_hugepages=1024
 
 # Start the application server
 ExecStart=/usr/local/bin/falcon-as
