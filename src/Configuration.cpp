@@ -18,8 +18,20 @@ Configuration::Configuration() :
         RunAsUnixGroup = jsonData["server"]["runas"]["group"];
 
         BasePath = jsonData["global"]["path"]["base"];
-        ServerAddress = jsonData["server"]["connection"]["ipv4"]["address"];
-        ServerPort = jsonData["server"]["connection"]["ipv4"]["port"];
+        
+        try {
+            ServerAddress = jsonData["server"]["connection"]["ipv4"]["address"];
+        }
+        catch(const std::exception& e) {
+            ServerAddress = "127.0.0.1";
+        }
+
+        try {
+            ServerPort = jsonData["server"]["connection"]["ipv4"]["port"];
+        }
+        catch(const std::exception& e) {
+            ServerPort = 80;
+        }
 
         Mimetypes = jsonData["server"]["mimetypes"];
 
@@ -39,7 +51,7 @@ Configuration::Configuration() :
     }
     catch(const json::exception& e) {
         ERR("JSON Config processing error:" << e.what());
-        std::exit(1);
+        std::exit(EXIT_FAILURE);
     }
 }
 

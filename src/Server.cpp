@@ -16,9 +16,7 @@ void registerChildPIDToServer(pid_t pid)
 }
 
 
-Server::Server() :
-    SocketListenAddress("127.0.0.1"),
-    SocketListenPort(80)
+Server::Server()
 {
     DBG(120, "Constructor");
 }
@@ -40,10 +38,10 @@ void Server::init()
     //- set client handler namespaces
     setClientHandlerConfig();
 
-    //- TODO: only set if exists in config, else default
+    //- set listen address / port
     SocketListenAddress = ConfigRef.ServerAddress;
     SocketListenPort = ConfigRef.ServerPort;
-
+ 
     //- disable OS signals SIGINT, SIGPIPE
     Signal::disableSignals();
 
@@ -156,7 +154,7 @@ void Server::setupSocket()
         int flags = fcntl(ServerSocketFD, F_GETFL, 0);
 
         if (fcntl(ServerSocketFD, F_SETFL, flags | SO_REUSEADDR) < 0) {
-            cout << "Error setting Socket flag SO_REUSEADDR." << endl;
+            ERR("Error setting Socket flag SO_REUSEADDR.");
             exit(EXIT_FAILURE);
         }
 
@@ -175,7 +173,7 @@ void Server::setupSocket()
         int rc = bind(ServerSocketFD, (struct sockaddr*)&SocketAddr, sizeof(SocketAddr));
 
         if (rc != 0) {
-            cout << "Error binding Socket." << endl;
+            ERR("Error binding Socket.");
             exit(EXIT_FAILURE);
         }
 
@@ -193,6 +191,7 @@ void Server::setupPoll()
     ServerConnFD[0].fd = ServerSocketFD;
     ServerConnFD[0].events = POLLIN;
 }
+
 
 void Server::ServerLoop()
 {
@@ -273,15 +272,14 @@ void Server::setupFDPassingServer()
 {
     DBG(120, "Setup FD Passing Server.");
 
-    const char* socket_path = "/tmp/falcon-fd-passing.sock";
-    _FDPassingServerFD = Syscall::createFDPassingServer(socket_path);
+    _FDPassingServerFD = SysCom::createFDPassingServer(CTRL_SOCKET);
 
     if (_FDPassingServerFD < 0) {
         ERR("Failed to create FD passing server socket");
         exit(EXIT_FAILURE);
     }
 
-    DBG(120, "FD Passing Server socket created at:" << socket_path);
+    DBG(120, "FD Passing Server socket created at:" << CTRL_SOCKET);
 
     // start thread to handle FD passing requests
     _FDPassingThread = std::thread(&Server::handleFDPassingRequests, this);
@@ -321,7 +319,7 @@ void Server::handleFDPassingRequests()
             if (n == sizeof(requested_fd)) {
                 DBG(240, "FD passing request for FD:" << requested_fd);
                 // send the requested FD to the client
-                if (Syscall::sendFD(client_fd, requested_fd) < 0) {
+                if (SysCom::sendFD(client_fd, requested_fd) < 0) {
                     ERR("Failed to send FD:" << requested_fd);
                     close(client_fd);
                     it = ClientFDs.erase(it);

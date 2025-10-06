@@ -68,7 +68,7 @@ public:
 };
 
 
-class Syscall {
+class SysCom {
 
 public:
 
@@ -149,14 +149,13 @@ public:
         *((int*)CMSG_DATA(cmsg)) = fd_to_send;
 
         // always retry sendmsg
-        const int MAX_SEND_RETRIES = 100;
         int recv_retry = 0;
         ssize_t result = -1;
 
-        while (result < 0 && recv_retry < MAX_SEND_RETRIES) {
+        while (result < 0 && recv_retry < CTRL_SOCKET_MAX_COM_RETRY_COUNT) {
             result = sendmsg(socket_fd, &msg, 0);
             if (result < 0) {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                std::this_thread::sleep_for(std::chrono::microseconds(CTRL_SOCKET_COM_RETRY_SLEEP_MICROSECS));
                 recv_retry++;
             }
         }
@@ -184,17 +183,16 @@ public:
         msg.msg_controllen = sizeof(ctrl_buf);
 
         // handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
-        const int MAX_RECV_RETRIES = 100;
         int recv_retry = 0;
         ssize_t result = -1;
 
-        while (result < 0 && recv_retry < MAX_RECV_RETRIES) {
+        while (result < 0 && recv_retry < CTRL_SOCKET_MAX_COM_RETRY_COUNT) {
             result = recvmsg(socket_fd, &msg, 0);
 
             if (result < 0) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
                     // non-blocking socket is temporarily unavailable, retry after short delay
-                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                    std::this_thread::sleep_for(std::chrono::microseconds(CTRL_SOCKET_COM_RETRY_SLEEP_MICROSECS));
                     recv_retry++;
                     continue;
                 }
@@ -213,7 +211,6 @@ public:
 
         return *((int*)CMSG_DATA(cmsg));
     }
-
 };
 
 
