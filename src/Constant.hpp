@@ -15,7 +15,7 @@
 
 #define EPOLL_FD_COUNT_MAX 256
 
-#define IDLE_SLEEP_MICROSECONDS 500
+#define IDLE_SLEEP_MICROSECONDS 100
 
 #define HTTP_REQUEST_MAX_SIZE 4096
 #define HTTP_RESPONSE_MAX_SIZE 4096*2
@@ -26,4 +26,9 @@
 #define BACKEND_ROOT_PATH "/backend"
 
 #define CONFIG_FILE "/etc/falcon-http/config.json"
+
+#define CTRL_SOCKET "/run/falcon-as-ctrl.sock"
+#define CTRL_SOCKET_MAX_COM_RETRY_COUNT 100
+#define CTRL_SOCKET_COM_RETRY_SLEEP_MICROSECS 100
+
 #endif
