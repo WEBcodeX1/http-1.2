@@ -27,7 +27,7 @@ public:
         DBG(120, "Contructor");
         SegmentOffset = 0;
         allocateMemory();
-        
+
         #if defined(DEBUG_BUILD)
         // verify alignment in debug builds
         verifyAlignment();
