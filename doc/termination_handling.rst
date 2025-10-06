@@ -71,12 +71,10 @@ Usage
 
 .. code-block:: bash
 
-   # Start server
+   # start server
    ./usr/local/bin/falcon-as
 
-   # Stop server (now works correctly)
+   # stop server (now works correctly)
    pkill falcon-as
    # or
    kill -TERM <pid>
-
-   # No longer need kill -9
