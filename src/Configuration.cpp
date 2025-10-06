@@ -22,14 +22,14 @@ Configuration::Configuration() :
         try {
             ServerAddress = jsonData["server"]["connection"]["ipv4"]["address"];
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             ServerAddress = "127.0.0.1";
         }
 
         try {
             ServerPort = jsonData["server"]["connection"]["ipv4"]["port"];
         }
-        catch(std::exception& e) {
+        catch(const std::exception& e) {
             ServerPort = 80;
         }
 
