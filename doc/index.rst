@@ -1,5 +1,5 @@
-FalconAS (HTTP Python Application Server) Documentation
-========================================================
+HTTP/1.2, FalconAS Documentation
+================================
 
 .. toctree::
    :maxdepth: 2
