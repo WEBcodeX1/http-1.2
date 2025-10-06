@@ -34,18 +34,15 @@ void ResultProcessor::terminate(int _ignored)
 int ResultProcessor::_getFDFromParent(uint16_t fd)
 {
     // send the requested FD number to the parent
-    // Handle EAGAIN/EWOULDBLOCK for non-blocking sockets by retrying
     ssize_t written = 0;
-    const int MAX_WRITE_RETRIES = 100;
     int write_retry = 0;
-    
-    while (written != sizeof(fd) && write_retry < MAX_WRITE_RETRIES) {
+
+    while (written != sizeof(fd) && write_retry < CTRL_SOCKET_MAX_COM_RETRY_COUNT) {
         written = write(_FDPassingSocketFD, &fd, sizeof(fd));
-        
+
         if (written != sizeof(fd)) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // Non-blocking socket is temporarily unavailable, retry after short delay
-                this_thread::sleep_for(chrono::microseconds(100));
+                this_thread::sleep_for(chrono::microseconds(CTRL_SOCKET_COM_RETRY_SLEEP_MICROSECS));
                 write_retry++;
                 continue;
             }
@@ -53,14 +50,14 @@ int ResultProcessor::_getFDFromParent(uint16_t fd)
             return -1;
         }
     }
-    
+
     if (written != sizeof(fd)) {
-        ERR("Failed to send FD request to parent after " << MAX_WRITE_RETRIES << " retries");
+        ERR("Failed to send FD request to parent after " << CTRL_SOCKET_MAX_COM_RETRY_COUNT << " retries");
         return -1;
     }
 
     // Receive the FD from the parent
-    int received_fd = Syscall::recvFD(_FDPassingSocketFD);
+    int received_fd = SysCom::recvFD(_FDPassingSocketFD);
 
     if (received_fd < 0) {
         ERR("Failed to receive FD from parent");
@@ -87,7 +84,7 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
 
     if (_ForkResult == -1) {
         ERR("ResultProcessor Process fork() error.");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     if (_ForkResult > 0) {
@@ -99,12 +96,11 @@ pid_t ResultProcessor::forkProcessResultProcessor(ResultProcessorSHMPointer_t SH
     if (_ForkResult == 0) {
 
         //- connect to parent's FD passing server
-        const char* socket_path = "/tmp/falcon-fd-passing.sock";
-        _FDPassingSocketFD = Syscall::connectFDPassingClient(socket_path);
+        _FDPassingSocketFD = SysCom::connectFDPassingClient(CTRL_SOCKET);
 
         if (_FDPassingSocketFD < 0) {
             ERR("ResultProcessor: Failed to connect to FD passing server");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         DBG(120, "ResultProcessor: Connected to FD passing server");
