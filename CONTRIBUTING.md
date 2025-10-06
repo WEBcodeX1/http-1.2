@@ -37,7 +37,7 @@ Recommended reading: [Clean Code by Robert C. Martin](https://www.goodreads.com/
 ## ❓ Questions, Feature Requests & Improvements
 
 - Email us at [http1-2@webcodex.de](mailto:http1-2@webcodex.de) for questions, feature requests, or improvement ideas.
-- For technical discussions, use [GitHub Discussions](https://github.com/WEBcodeX1/http-1.2/discussions) if enabled.
+- For technical discussions, use [GitHub Discussions](https://github.com/WEBcodeX1/http-1.2/discussions).
 
 ---
 
