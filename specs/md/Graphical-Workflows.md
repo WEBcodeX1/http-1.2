@@ -55,7 +55,7 @@ flowchart TD
     A[addClient ClientFD] --> B[Set Socket Non-blocking]
     B --> C[Create HTTPParser Object]
     C --> D[Insert Client to Map]
-    D --> E[Setup Epoll Event EPOLLIN|EPOLLET]
+    D --> E[Setup Epoll Event EPOLLIN,EPOLLET]
     E --> F[Add FD to Epoll]
 ```
 
