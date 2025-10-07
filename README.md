@@ -167,14 +167,14 @@ apt-get install nlohmann-json3-dev
 
 **Standard Build:**
 ```bash
-cmake CMakeLists.txt .
+cmake .
 make
 make install
 ```
 
 **Debug Build:**
 ```bash
-cmake -DDEBUG_BUILD=1 CMakeLists.txt .
+cmake -DDEBUG_BUILD=1 .
 make
 make install
 ```
@@ -182,7 +182,7 @@ make install
 **Java Backend Build:**
 ```bash
 export JAVA_HOME=/usr/lib/jvm/jdk-24.0.2-oracle-x64/
-cmake -DJAVA_BACKEND=1 CMakeLists.txt .
+cmake -DJAVA_BACKEND=1 .
 make
 make install
 ```
@@ -249,6 +249,8 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 - **Testing Guide**: [test/README.md](/test/README.md)  
 - **Technical Specifications**: [specs/md/README.md](/specs/md/README.md)
 - **Feature Comparison**: [FEATURE-MATRIX.md](FEATURE-MATRIX.md)
+- **Sphinx Rendered**: [Detailed Sphinx](https://docs.webcodex.de/developer/falconas/sphinx/index.html).
+- **Doxygen Rendered**: [Doxygen - UML relations](https://docs.webcodex.de/developer/falconas/doxygen/index.html)
 
 ### Online Resources
 - **CI Documentation**: [/doc/README.md](/doc/README.md)
@@ -295,7 +297,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## :alarm_clock: Future Milestones
 
 ### Short-term Goals
-- [ ] **x0 Framework Integration**: Seamless SPA framework compatibility
+- [x] **x0 Framework Integration**: Seamless SPA framework compatibility
 - [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3 comparisons
 
 ### Long-term Vision
