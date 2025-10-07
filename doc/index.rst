@@ -1,14 +1,16 @@
-HTTP/1.2, FalconAS Documentation
-================================
+FalconAS - HTTP/1.2 Documentation
+=================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   README
-   configuration-file
-   cpp-classes
-   termination_handling
+   Overview
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer:
+
    Main-Server
    ClientHandler
    StaticFSHandler
@@ -19,7 +21,20 @@ HTTP/1.2, FalconAS Documentation
    HTTPLibNet
    IPCHandler
    MemoryAlignment
+   TerminationHandling
    Graphical-Workflows
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Class-Reference:
+
+   CPPClasses
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Configuration:
+
+   Configuration
 
 
 Indices and tables

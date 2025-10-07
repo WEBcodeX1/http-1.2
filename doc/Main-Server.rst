@@ -1,13 +1,13 @@
-1. Main Server
+4. Main Server
 ==============
 
 The Main Server Process initializes all components on startup using configuation from
 XML Configuration file.
 
-1.1. Program Logic
+4.1. Program Logic
 ------------------
 
-1.1.1. Initialization
+4.1.1. Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
 * Setup Shared Memory Segments
@@ -22,15 +22,14 @@ XML Configuration file.
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.3.1.
 
-1.1.2. Main Loop
+4.1.2. Main Loop
 ~~~~~~~~~~~~~~~~
 
-.. code-block:: c++
+.. code-block:: text
 
-* While Static::RunServer is True
-  - Check for Socket Accept Client (New Connection)
-    - Add Client FD to Connection Handler
-  - Process Clients with waiting data (Connection Handler Method)
-
+   - While Static::RunServer is True
+     - Check for Socket Accept Client (New Connection)
+       - Add Client FD to Connection Handler
+     - Process Clients with waiting data (Connection Handler Method)
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.3.2.
