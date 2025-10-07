@@ -54,16 +54,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Assigned to: clauspruefer
 
 #### 📋 **Pull Requests Merged**
-- **PR #157**: Fix v0.1rc
-- **PR #155**: Release v0.1rc
+- **PR #157**: Fix Version v0.1rc
+- **PR #155**: Release Version v0.1rc
 - **PR #156**: Complete Sphinx documentation restructure
 - **PR #153**: Fix Unix Domain Socket Processing
 - **PR #151**: Fix Unix Domain Socket EAGAIN Handling in FD Passing Operations
 - **PR #148**: Fix Map Access Exceptions Causing Server Crashes On Invalid Requests
 
-## [v0.1] - 2025-08-03
+## [v0.1.2] - 2025-08-03
 
-### 📦 **Release 0.1 (Milestone #16) - Completed**
+### 📦 **Release 0.1.2 (Milestone #16) - Completed**
 
 #### ✨ **Added**
 - **Issue #119**: Add Startup Scripts (High Priority)
@@ -119,7 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Assigned to: clauspruefer
 
 #### 📋 **Major Pull Requests**
-- **PR #133**: Release v0.1.2
+- **PR #133**: Release Version v0.1.2
 - **PR #129**: Release Version v0.1.1
 - **PR #127**: Correct README.md
 - **PR #118**: Replace Python Config Processing
