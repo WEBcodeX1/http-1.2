@@ -40,14 +40,14 @@ or SysVinit) will also be automatically installed to ```/etc/systemd/system/``` 
 
 ```bash
 # compile / install
-cmake CMakeLists.txt .
+cmake .
 make
 make install
 ```
 
 ```bash
 # debug build
-cmake -DDEBUG_BUILD=1 CMakeLists.txt .
+cmake -DDEBUG_BUILD=1 .
 make
 make install
 ```
@@ -55,7 +55,7 @@ make install
 ```bash
 # java backend build
 export JAVA_HOME=/usr/lib/jvm/jdk-24.0.2-oracle-x64/
-cmake -DJAVA_BACKEND=1 CMakeLists.txt .
+cmake -DJAVA_BACKEND=1 .
 make
 make install
 ```
@@ -118,4 +118,9 @@ to check if setup is working correctly.
 ```bash
 # test post request
 wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/backend/
+```
+
+```bash
+# test translated get to post request
+wget "http://testapp2.local/backend/endpoint2?param1=test1&param2=test2"
 ```

@@ -13,6 +13,7 @@ HTTPParser::HTTPParser(ClientFD_t ClientFD, NamespacesRef_t NamespacesRef) :
     _HTTPRequestBuffer("")
 {
     DBG(120, "Constructor");
+    _HTTPRequestBuffer.reserve(BUFFER_BYTES);
 }
 
 HTTPParser::~HTTPParser()
