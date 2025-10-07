@@ -198,7 +198,6 @@ This project is developing an HTTP/1.2 implementation with focus on:
 - Multi-backend support (Python and Java)
 
 ### Key Achievements
-- ✅ **Release v0.1pre** - Core functionality with JSON config, startup scripts, and bug fixes
 - ✅ **Release v0.1rc** - Unix Domain Socket fixes and documentation improvements
 - 🚧 **Active Development** - HTTP/1.2 draft completion, CPU binding, and library enhancements
 
