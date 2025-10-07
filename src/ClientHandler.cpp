@@ -7,7 +7,7 @@ extern Configuration ConfigRef;
 
 ClientHandler::ClientHandler() :
     ProcessedClients(0),
-    BufferMemory(CLIENTS_MAX, BUFFER_SIZE)
+    BufferMemory(CLIENTS_MAX, TMP_BUFFER_BYTES)
 {
     DBG(120, "Constructor");
 
@@ -107,7 +107,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
 
         // read data into buffer
         char* Buffer = BufferMemory.getNextMemPointer();
-        uint16_t RcvBytes = read(ReadFD, Buffer, BUFFER_SIZE);
+        uint16_t RcvBytes = read(ReadFD, Buffer, TMP_BUFFER_BYTES);
         DBG(220, "RcvBytes:" << RcvBytes << " ReadFD:" << ReadFD);
 
         //- client close connection
