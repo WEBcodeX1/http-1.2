@@ -135,23 +135,7 @@ Memory alignment is verified through unit tests in `test/unit/memory-alignment/`
 3. **Segment pointer alignment**: Ensures all segment pointers maintain proper alignment
 4. **Atomic type alignment**: Verifies atomic types have correct alignment
 
+
 ## Summary
 
-✅ **Default alignment is already correct**:
-- `malloc` provides alignment for all standard types
-- No over-aligned types are used
-
-✅ **Compile-time alignment is available**:
-- `alignof(T)` provides compile-time constant
-- `MemoryManager::Alignment` member exposes this
-- `getAlignment()` static method for queries
-
-✅ **std::align is not needed**:
-- Single type per MemoryManager instance
-- `malloc` alignment is sufficient
-- No complex buffer subdivision needed
-
-✅ **Verification in place**:
-- Debug builds check alignment
-- Unit tests verify alignment properties
-- Static utilities for alignment checking
+The HTTP/1.2 codebase relies on the alignment guarantees provided by `malloc`, which returns memory aligned to `alignof(max_align_t)`. This is sufficient for all standard types, including atomic types, and is verified through comprehensive unit tests. As a result, explicit use of `std::align` is not required. Additional memory allocation methods, such as `mmap` with `MAP_ANONYMOUS` and hugepage support, provide even stricter alignment. All alignment decisions are documented and verified to ensure correctness and performance.

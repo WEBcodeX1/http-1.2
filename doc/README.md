@@ -1,13 +1,9 @@
 # Internal Class Reference / Interface Documentation
 
-The following documentation will be rendered by Doxygen and a Python
-Doxygen-Sphinx bridge (breathe).
+The following **Doxygen** and **Sphinx** documentation will be rendered separately.
 
-Class hierarchy (Doxygen):
-https://docs.webcodex.de/developer/falconas/doxygen/inherits.html.
-
-Sphinx documentation (C++ members):
-https://docs.webcodex.de/developer/falconas/sphinx/index.html.
+- [Doxygen - UML relations](https://docs.webcodex.de/developer/falconas/doxygen/index.html).
+- [Detailed Sphinx](https://docs.webcodex.de/developer/falconas/sphinx/index.html).
 
 # 1. Prerequisites
 
@@ -15,13 +11,12 @@ The following packages (Ubuntu 22.04) need to be installed:
 
 ```bash
 # install base requirements
-apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe
+apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-sphinxcontrib-mermaid
 ```
 
 # 2. Continuous Integration
 
-In future releases this process will be integrated in CI systems and
-triggered regulary.
+In future releases this process will be integrated in CI systems and triggered regulary.
 
 # 3. Render Documentation
 
@@ -30,7 +25,7 @@ triggered regulary.
 doxygen
 
 # run sphinx-build
-sphinx-build -b html -Dbreathe_projects.falconas=doc_render/xml . doc_render/sphinx/
+sphinx-build -b html . doc_render/sphinx/
 ```
 
 # 4. Rendered Content

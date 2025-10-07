@@ -1,70 +1,40 @@
-FalconAS (HTTP Python Application Server) Documentation.
-========================================================
+FalconAS - HTTP/1.2 Documentation
+=================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   termination_handling
+   Overview
 
-.. doxygenclass:: Server
-   :project: falconas
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer:
 
-.. doxygenclass:: Client
-   :project: falconas
-   :members:
-   :undoc-members:
+   Main-Server
+   ClientHandler
+   StaticFSHandler
+   ASProcessHandler
+   ResultProcessor
+   ResultScheduler
+   HTTPLib
+   HTTPLibNet
+   IPCHandler
+   MemoryAlignment
+   TerminationHandling
+   Graphical-Workflows
 
-.. doxygenclass:: ClientHandler
-   :project: falconas
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 2
+   :caption: Class-Reference:
 
-.. doxygenclass:: Configuration
-   :members:
-   :undoc-members:
+   CPPClasses
 
-.. doxygenclass:: Filesystem
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 2
+   :caption: Configuration:
 
-.. doxygenclass:: CPU
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: ASRequestHandler
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: ASProcessHandler
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: ResultProcessor
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: ResultOrder
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: SHMStaticFS
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: SHMPythonAS
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: ThreadHandler
-   :members:
-   :undoc-members:
-
-.. doxygenclass:: Vector
-   :members:
-   :undoc-members:
+   Configuration
 
 
 Indices and tables
