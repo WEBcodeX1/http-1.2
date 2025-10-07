@@ -193,7 +193,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This project is developing an HTTP/1.2 implementation with focus on:
 - High-performance network processing
-- XML based HTTP/1.2 client library development
+- XML-based HTTP/1.2 client library development
 - JSON-based configuration system
 - Multi-backend support (Python and Java)
 
