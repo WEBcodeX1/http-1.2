@@ -91,7 +91,7 @@ method will be called.
 
 .. note::
 
-   IPCHandler.hpp and IPCHandler.cpp is used to calculate Shared Memory Adress Offsets.
+   IPCHandler.hpp and IPCHandler.cpp is used to calculate Shared Memory Address Offsets.
 
 .. code-block:: text
 
@@ -116,4 +116,4 @@ method will be called.
 
 .. note::
 
-   IPCHandlerAS.hpp and IPCHandlerAS.cpp is used to calculate Shared Memory Adress Offsets.
+   IPCHandlerAS.hpp and IPCHandlerAS.cpp is used to calculate Shared Memory Address Offsets.

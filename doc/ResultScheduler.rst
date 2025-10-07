@@ -38,5 +38,5 @@ compatibility. It never will be implemented into future browser code.
 
 .. note::
 
-   Future releases will offer a seperate **build option** for HTTP/1.1 and HTTP/1.2 making
+   Future releases will offer a separate **build option** for HTTP/1.1 and HTTP/1.2 making
    the ResultProcessor separation / ResultOrdering for HTTP/1.2 obsolete.

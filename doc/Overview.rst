@@ -8,7 +8,7 @@ Our intention is to build good, stable and secure software. This implies detaile
    Do not forget: keep the clean code paradigm in mind.
 
 The following document describes the Base-Layout of ``FalconAS`` / ``HTTP/1.2``, its Base Components
-and Insfrastructural Layout.
+and Infrastructural Layout.
 
 2. Logical Components
 =====================
@@ -84,7 +84,7 @@ Result Ordering will be done for the following types:
 ~~~~~~~~~~~~~~~
 
 Result Ordering. Results must be sent in the exact order how they arrived.
-The Result Ordering Class keeps track of dependend ClientFD Requests / Request Nr. and related.
+The Result Ordering Class keeps track of dependent ClientFD Requests / Request Nr. and related.
 
 2.8.2. HTTP/1.2
 ~~~~~~~~~~~~~~~

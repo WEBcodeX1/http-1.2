@@ -24,19 +24,19 @@ Get all Epoll FDs with waiting data.
 .. note::
 
    If 5000 current Clients are connected and 2000 have waiting buffered data, we get an
-Array of these 2000 Filedescriptor integers.
+   array of these 2000 file descriptor integers.
 
-Process all Filedescriptors calling readClientData().
+Process all file descriptors calling readClientData().
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.2.2.
 
 5.1.3. Read Client Data
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Process all Filedescriptors with waiting data.
+Process all file descriptors with waiting data.
 
 * Close connection when connection-close (0 Bytes received) on Socket Level
-* If Filedesriptor in Client Map found, append received data to Client Objects Buffer
+* If file descriptor in Client Map found, append received data to Client Objects Buffer
 * Parse Request Basic Data, if non-fragmented add to SHM buffer
 * If Clients with data exist, release SHM StaticFS Lock to process
 
