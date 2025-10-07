@@ -249,7 +249,7 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 - **Testing Guide**: [test/README.md](/test/README.md)  
 - **Technical Specifications**: [specs/md/README.md](/specs/md/README.md)
 - **Feature Comparison**: [FEATURE-MATRIX.md](FEATURE-MATRIX.md)
-- **Sphinx Rendered**: [Detailed Sphinx](https://docs.webcodex.de/developer/falconas/sphinx/index.html).
+- **Sphinx Rendered**: [Detailed Sphinx](https://docs.webcodex.de/developer/falconas/sphinx/index.html)
 - **Doxygen Rendered**: [Doxygen - UML relations](https://docs.webcodex.de/developer/falconas/doxygen/index.html)
 
 ### Online Resources
