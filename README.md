@@ -8,7 +8,7 @@
   <a href="https://github.com/WEBcodeX1/http-1.2/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat" alt="License">
   </a>
-  <a href="https://docs.webcodex.de/developer/falconas/doxygen/inherits.html">
+  <a href="https://docs.webcodex.de/developer/falconas/doxygen/index.html">
     <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Oxygen">
   </a>
   <a href="https://docs.webcodex.de/developer/falconas/sphinx/index.html">
