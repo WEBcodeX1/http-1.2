@@ -297,7 +297,9 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## :alarm_clock: Future Milestones
 
 ### Short-term Goals
+- [x] **HTTP/1.1 Compatibility**: Minimal SPA related features
 - [x] **x0 Framework Integration**: Seamless SPA framework compatibility
+- [ ] **HTTP/1.2 Protocol**: Implementation including client library
 - [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3 comparisons
 
 ### Long-term Vision
