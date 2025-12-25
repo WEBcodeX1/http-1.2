@@ -3,7 +3,7 @@ C++ Classes Reference
 
 This section provides detailed documentation for all C++ classes in the FalconAS HTTP/1.2 server.
 
-Detailed Doxygen UML diagrams can be found here: https://docs.webcodex.de/developer/falconas/doxygen/index.html.
+Detailed Doxygen UML diagrams can be found at: https://docs.webcodex.de/developer/falconas/doxygen/index.html.
 
 Core Server Classes
 -------------------
