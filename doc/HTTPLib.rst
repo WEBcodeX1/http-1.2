@@ -1,4 +1,4 @@
-10. HTTP Library (internal)
+10. HTTP Library - Internal
 ===========================
 
 The HTTP Library is split up in three parts:
