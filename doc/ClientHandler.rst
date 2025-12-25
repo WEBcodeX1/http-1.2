@@ -36,7 +36,7 @@ Workflow diagram see: :doc:`Graphical-Workflows` Section 1.2.2.
 Process all file descriptors with waiting data.
 
 * Close connection when connection-close (0 Bytes received) on Socket Level
-* If file descriptor in Client Map found, append received data to Client Objects Buffer
+* If file descriptor in Client Map found, append received data to Client Object's Buffer
 * Parse Request Basic Data, if non-fragmented add to SHM buffer
 * If Clients with data exist, release SHM StaticFS Lock to process
 

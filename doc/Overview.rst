@@ -65,7 +65,7 @@ Result processing process (fork).
 Result Thread Distributor.
 
 Due to looping on Result sendfile(), write() and Header Processing, each ClientFDs requests (plural)
-will be processed by a single Posix Thread.
+will be processed by a single POSIX Thread.
 
 This also guarantees that multiple repeated result writes (in case of congestion) always will be
 processed in serial order.
