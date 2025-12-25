@@ -12,7 +12,7 @@ XML Configuration file.
 
 * Setup Shared Memory Segments
 * Disable Signals / Setup Termination Handling
-* Setup Server Listening Socket / Poll for Server Socket Filedescriptor
+* Setup Server Listening Socket / Poll for Server Socket File Descriptor
 * Load / Init StaticFS recursive Filesystem Snapshot for each Virtual Host
 * Init AS Handler Process (Fork all Application Server Processes)
 * Init Result Processor (Fork Result Processor Process)

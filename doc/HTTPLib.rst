@@ -57,7 +57,7 @@ method will be called.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Set SHM Base Address (SHMGetRequests)
-2. Foreach _SplitRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
+2. For each _SplitRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
 
 
 10.2.4. _parseBaseProps
@@ -91,7 +91,7 @@ method will be called.
 
 .. note::
 
-   IPCHandler.hpp and IPCHandler.cpp is used to calculate Shared Memory Address Offsets.
+   IPCHandler.hpp and IPCHandler.cpp are used to calculate Shared Memory Address Offsets.
 
 .. code-block:: text
 
@@ -116,4 +116,4 @@ method will be called.
 
 .. note::
 
-   IPCHandlerAS.hpp and IPCHandlerAS.cpp is used to calculate Shared Memory Address Offsets.
+   IPCHandlerAS.hpp and IPCHandlerAS.cpp are used to calculate Shared Memory Address Offsets.
