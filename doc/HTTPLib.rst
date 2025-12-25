@@ -20,7 +20,7 @@ Features:
 * GET Requests (without Content-Length header)
 * POST Requests (with Content-Length header and bytes[size] after "\\n\\r" end marker)
 * Multiple HTTP "messages" in one TCP packet
-* Fragmented (partial) messages without end marker "\n\r" (GET) or "Content-Length" (POST)
+* Fragmented (partial) messages without end marker "\\n\\r" (GET) or "Content-Length" (POST)
 
 10.2.1. appendBuffer()
 ~~~~~~~~~~~~~~~~~~~~~~
