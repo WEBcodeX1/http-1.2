@@ -1,7 +1,7 @@
 4. Main Server
 ==============
 
-The Main Server Process initializes all components on startup using configuation from
+The Main Server Process initializes all components on startup using configuration from
 XML Configuration file.
 
 4.1. Program Logic

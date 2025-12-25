@@ -98,7 +98,7 @@ If workdone == 0 (no work done), micro-sleep.
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.4.
 
-1.5.1. Thread 1 (detached)
+8.5.1. Thread 1 (detached)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Thread 1 will sendfile() three results to ClientFD 212 socket.
@@ -119,7 +119,7 @@ Thread sets terminate flag to 1 after execution and waits to be terminated.
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.5.
 
-1.5.2. Thread 2 (detached)
+8.5.2. Thread 2 (detached)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If AS result has been processed in time, Thread2 will sendfile() the first 3 results and
