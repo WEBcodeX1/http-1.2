@@ -7,7 +7,7 @@
 Previously, the HTTP server only responded to SIGKILL (``kill -9``), not to SIGTERM, because:
 
 1. The main server PID (root) would receive SIGTERM and set ``RunServer`` to ``false``
-2. However, child PID (ResultProcessor, multiple ASProcessHandler PIDs) were not notified
+2. However, child PIDs (ResultProcessor, multiple ASProcessHandler PIDs) were not notified
 3. Since child processes run as non-root, they are not automatically terminated on parent exit
 4. This required manual cleanup with ``kill -9`` for each process
 

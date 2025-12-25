@@ -41,7 +41,7 @@ method will be called.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. _SplitRequests Vector will be cleared
-2. All requests inside _HTTPRequest buffer get split by "\\n\\r" or "\\n\\r"+Content-Length
+2. All requests inside _HTTPRequest buffer are split by "\\n\\r" or "\\n\\r"+Content-Length
 3. Single requests will be put inside _SplitRequests Vector
 
 10.2.3. parseRequestsBasic()

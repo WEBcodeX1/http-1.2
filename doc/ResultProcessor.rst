@@ -12,7 +12,7 @@ The Result Processor manages the following tasks:
 
 If Lock::get_read_data (Server Main Loop) == 1, SHM Data with StaticFS requests is ready to read.
 
-Loop on all GET requests and feed into ``ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)``.
+Iterate over all GET requests and feed into ``ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)``.
 
 Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.1.
 
