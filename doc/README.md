@@ -16,7 +16,7 @@ apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-sphinxco
 
 # 2. Continuous Integration
 
-In future releases this process will be integrated in CI systems and triggered regulary.
+In future releases this process will be integrated in CI systems and triggered regularly.
 
 # 3. Render Documentation
 
@@ -30,7 +30,7 @@ sphinx-build -b html . doc_render/sphinx/
 
 # 4. Rendered Content
 
-Rendererd Documentation can be found at the following locations.
+Rendered Documentation can be found at the following locations.
 
 ## 4.1. Doxygen
 
