@@ -64,8 +64,8 @@ Result processing process (fork).
 
 Result Thread Distributor.
 
-Due to looping on Result sendfile(), write() and Header Processing, each ClientFDs request**s** (plural)
-will be processed by a single Posix Thread.
+Due to looping on Result sendfile(), write() and Header Processing, each ClientFDs requests (plural)
+will be processed by a single POSIX Thread.
 
 This also guarantees that multiple repeated result writes (in case of congestion) always will be
 processed in serial order.
@@ -116,7 +116,7 @@ Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space
 
 .. note::
 
-   32bit memory addresses used for simplicity.
+   32-bit memory addresses used for simplicity.
 
 3.1. StaticFS Request SHM #1
 ----------------------------

@@ -16,8 +16,8 @@ IPCHandler Memory (SHM Segment #1) Layout see :doc:`Overview` Section 3.1.
 
 The following describes the functionality in detail.
 
-12.1.1. Construtor
-~~~~~~~~~~~~~~~~~~
+12.1.1. Constructor
+~~~~~~~~~~~~~~~~~~~
 
 Set _OffsetSizes from ``static const SharedMemOffset_t ElementSizes`` (std::vector) defined in IPCHandler.hpp.
 

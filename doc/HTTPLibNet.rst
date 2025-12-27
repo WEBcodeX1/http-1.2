@@ -21,13 +21,13 @@ like this (simple non-blocking data read example excerpt).
        if (timeout_check()) { /* set timeout info rc */ break; }
    }
 
-This is quite sub-optimal code. To handle this spaghetti-like code we should use the mini-lib
+This is sub-optimal code. To handle this complex code structure, we should use the mini-library
 described in the next section.
 
 11.2. Event Library
 -------------------
 
-The Event Library is a very small library to handle simple function callbacks.
+The Event Library is a small library to handle simple function callbacks.
 
 .. note::
 
