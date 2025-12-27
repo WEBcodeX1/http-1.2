@@ -22,7 +22,7 @@
             "param3": 100
         }
     </payload>
-<request>
+</request>
 ```
 
 ### 1.1.2. Data Response (JSON)
