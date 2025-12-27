@@ -85,7 +85,7 @@
 Sending large files via `sendfile()` even in high-speed network environments causes congestion
 (only 1 file can be sent simultaneous over 1 socket until the data has been arrived).
 
-Single files (e.g. 20kb to 300kb) will not cause performance degregation on modern ethernet
+Single files (e.g. 20kb to 300kb) will not cause performance degradation on modern ethernet
 infrastructure including internet routing. Packet retransmissions / dynamic routing issues should
 be "healed" in milliseconds.
 
