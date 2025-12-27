@@ -20,7 +20,7 @@ Implemented proper termination handling where the main server process tracks all
 ------------------
 
 14.3.1. Process Hierarchy
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: text
 
