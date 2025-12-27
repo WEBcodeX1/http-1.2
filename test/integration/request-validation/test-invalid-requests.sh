@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # test post request non-existing backend
 wget --post-data='{"payload": 536}' --header='Content-Type: application/json' http://testapp1.local/backend/xyz

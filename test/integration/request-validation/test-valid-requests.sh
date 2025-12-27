@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # test post request
 wget --post-data='{"payload": 123}' --header='Content-Type: application/json' http://testapp1.local/backend/ >/dev/null 2>&1
