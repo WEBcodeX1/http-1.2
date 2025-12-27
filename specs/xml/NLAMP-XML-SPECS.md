@@ -9,7 +9,7 @@
     <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
     <protocol>NLAP</protocol>
     <version>0.1</version>
-    <subtype>NLAMP</version>
+    <subtype>NLAMP</subtype>
     <header>
         <host>testapp2.local</host>
         <URL>/python/service1</URL>
@@ -32,7 +32,7 @@
     <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
     <protocol>NLAP</protocol>
     <version>0.1</version>
-    <subtype>NLAMP</version>
+    <subtype>NLAMP</subtype>
     <header>
         <mime-type>application/json</mime-type>
         <encoding>UTF-8</encoding>
@@ -53,7 +53,7 @@
     <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
     <protocol>NLAP</protocol>
     <version>0.1</version>
-    <subtype>NLAMP</version>
+    <subtype>NLAMP</subtype>
     <header>
         <mime-type>application/xml</mime-type>
         <encoding>UTF-8</encoding>
