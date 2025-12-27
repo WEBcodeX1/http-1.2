@@ -34,7 +34,7 @@ The ResultScheduler component manages the following things "inside" ResultProces
 --------------------
 
 The development process showed: it is not advisable to implement `RequestUUID` into HTTP/1.1
-compatibility. It never will be implemented into future browser code.
+compatibility. It will never be implemented into future browser code.
 
 .. note::
 

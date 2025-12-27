@@ -1,7 +1,7 @@
-10. HTTP Library (internal)
+10. HTTP Library - Internal
 ===========================
 
-The HTTP Library is split up in three parts:
+The HTTP Library is divided into three parts:
 
 * httpnet.cpp / Network Processing (Tests)
 * httpparser.cpp / HTTP Parsing (Header, Payload)
@@ -10,7 +10,7 @@ The HTTP Library is split up in three parts:
 10.1. Compiling / Linking
 -------------------------
 
-The HTTPLib library gets linked shared because it wil be used by multiple applications (e.g. test).
+The HTTPLib library gets linked shared because it will be used by multiple applications (e.g. test).
 
 10.2. Program Logic (httpparser.cpp)
 ------------------------------------
@@ -18,9 +18,9 @@ The HTTPLib library gets linked shared because it wil be used by multiple applic
 Features:
 
 * GET Requests (without Content-Length header)
-* POST Requests (with Content-Length header and bytes[size] after "\n\r" end marker
+* POST Requests (with Content-Length header and bytes[size] after "\\n\\r" end marker)
 * Multiple HTTP "messages" in one TCP packet
-* Fragmented (partial) messages without end marker "\n\r" (GET) or "Content-Length" (POST)
+* Fragmented (partial) messages without end marker "\\n\\r" (GET) or "Content-Length" (POST)
 
 10.2.1. appendBuffer()
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -34,15 +34,15 @@ Features:
 10.2.1.2. Processing Logic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The passed buffer data will be apended to _HTTPRequest private member. Afterwards _splitRequests()
+The passed buffer data will be appended to _HTTPRequest private member. Afterwards _splitRequests()
 method will be called.
 
 10.2.2. _splitRequests()
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. _SplittedRequests Vector will be cleared
-2. All requests inside _HTTPRequest buffer get split by "\n\r" or "\n\r"+Content-Length
-3. Single requests will be put inside _SplittedRequests Vector
+1. _SplitRequests Vector will be cleared
+2. All requests inside _HTTPRequest buffer are split by "\\n\\r" or "\\n\\r"+Content-Length
+3. Single requests will be put inside _SplitRequests Vector
 
 10.2.3. parseRequestsBasic()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ method will be called.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Set SHM Base Address (SHMGetRequests)
-2. Foreach _SplittedRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
+2. For each _SplitRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
 
 
 10.2.4. _parseBaseProps
@@ -81,7 +81,7 @@ method will be called.
 
 .. code-block:: text
 
-   * On Type SatticFS (SHM Segment #1)
+   * On Type StaticFS (SHM Segment #1)
 
      - Write ClientFD to SHM-StaticFS, increment Pointer Address
      - Write HTTPVersion to SHM-StaticFS, increment Pointer Address
@@ -91,7 +91,7 @@ method will be called.
 
 .. note::
 
-   IPCHandler.hpp and IPCHandler.cpp is used to calculate Shared Memory Address Offsets.
+   IPCHandler.hpp and IPCHandler.cpp are used to calculate Shared Memory Address Offsets.
 
 .. code-block:: text
 
@@ -116,4 +116,4 @@ method will be called.
 
 .. note::
 
-   IPCHandlerAS.hpp and IPCHandlerAS.cpp is used to calculate Shared Memory Address Offsets.
+   IPCHandlerAS.hpp and IPCHandlerAS.cpp are used to calculate Shared Memory Address Offsets.

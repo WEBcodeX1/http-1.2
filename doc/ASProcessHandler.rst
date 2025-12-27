@@ -16,8 +16,8 @@ The Application Server Process Handler manages:
 .. code-block:: text
 
    ASIndex = 0
-   * Loop on Config::VirtualDomains
-     - Loop on VirtualDomain::ASCount
+   * Iterate over Config::VirtualDomains
+     - Iterate over VirtualDomain::ASCount
        - Fork AS[Index] Process / SHM Reference
        - Index++
 

@@ -3,7 +3,7 @@
 
 The StaticFSHandler Component manages Filesystem Data / Mime-Types for Static Data Requests.
 
-All Virtual Host dependend file properties will be loaded at startup into static C++ class
+All Virtual Host dependent file properties will be loaded at startup into static C++ class
 member Objects / Structs.
 
 The File Data will be mmapped() into Kernel-Space for sendfile() usage when requested.
@@ -27,7 +27,7 @@ All found files will be mmapped() (read into memory) for sendfile() processing.
 6.1.2. Get Property
 ~~~~~~~~~~~~~~~~~~~
 
-When a HTTP request for a Static File arrives, the files properties (e.g. SendfileFD) must
+When an HTTP request for a Static File arrives, the file's properties (e.g. SendfileFD) must
 be determined / returned. This happens inside multiple parallel ResultProcessors Threads.
 
 Due to immutable member Objects / Structs a pointer can be used for parallel read access.
