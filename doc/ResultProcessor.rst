@@ -14,7 +14,7 @@ If Lock::get_read_data (Server Main Loop) == 1, SHM Data with StaticFS requests 
 
 Iterate over all GET requests and feed into ``ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)``.
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.1.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.4.1.
 
 8.2. Read AS Results
 --------------------
@@ -26,7 +26,7 @@ If WriteReady == 1 (Existing result):
 * `ResultProcessor::ResultOrder::appendData(ClientFD, DataPointer)`
 * Reset AS Instance Properties to default (CanRead == 1, WriteReady = 0)
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.2.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.4.2.
 
 8.3. Result Scheduler
 ---------------------
@@ -66,7 +66,7 @@ Main Loop Layout.
      - if workdone == 0:
        sleep Config::Microseconds
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.3.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.4.3.
 
 8.4.1. On Idle
 ~~~~~~~~~~~~~~
@@ -96,7 +96,7 @@ If workdone == 0 (no work done), micro-sleep.
    | 403         | 4         | POST /test.py                |
    +-------------+-----------+------------------------------+
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.4.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.4.4.
 
 8.5.1. Thread 1 (detached)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,7 +117,7 @@ Thread 1 will sendfile() three results to ClientFD 212 socket.
 
 Thread sets terminate flag to 1 after execution and waits to be terminated.
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.4.5.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.4.5.
 
 8.5.2. Thread 2 (detached)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
