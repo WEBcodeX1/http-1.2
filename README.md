@@ -1,5 +1,5 @@
 <h1 align="center">🚀 NLAP - FalconAS</h1>
-<p align="center"><em>Lightning-Fast, Next-Level Python / Java Application Server with NLAP (Next Level Application Protocol)</em></p>
+<p align="center"><em>Lightning-Fast Python / Java Application Server with NLAP (Next Level Application Protocol)</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
