@@ -1,5 +1,5 @@
-<h1 align="center">🚀 HTTP/1.2 - FalconAS</h1>
-<p align="center"><em>Lightning-Fast, Next-Level Python / Java Application Server with HTTP/1.2 Protocol</em></p>
+<h1 align="center">🚀 NLAP - FalconAS</h1>
+<p align="center"><em>Lightning-Fast, Next-Level Python / Java Application Server with NLAP (Next Level Application Protocol)</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
@@ -25,10 +25,15 @@
 
 ## :pushpin: Overview
 
-**HTTP/1.2** is a revolutionary approach to web protocols, designed as a simpler, more secure,
-and significantly faster alternative to HTTP/2 and probably HTTP/3.
+**NLAP (Next Level Application Protocol)** is a revolutionary XML-based protocol designed to replace HTTP
+in place of modern web-application requirements.
 
-We are building **HTTP/1.2** - a much more lightweight solution.
+**NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
+- Solid parallel response transmission in a single socket
+- Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
+- Structured data with XML schemas
+- Multiple protocol subtypes (NLAFP for files, NLAMP for metadata)
+- Simple, extensible architecture
 
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
 - ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
@@ -43,7 +48,7 @@ We are building **HTTP/1.2** - a much more lightweight solution.
 
 1. [Quick Start](#racehorse-quick-start)
 2. [Features](#star2-features)
-3. [Why HTTP/1.2?](#mega-why-http12)
+3. [Why NLAP Instead of HTTP/1.2?](#mega-why-nlap-instead-of-http12)
 4. [Build & Installation](#hammer_and_wrench-build--installation)
 5. [Testing](#test_tube-testing)
 6. [Technical Architecture](#gear-technical-architecture)
@@ -57,7 +62,7 @@ We are building **HTTP/1.2** - a much more lightweight solution.
 
 ## :racehorse: Quick Start
 
-Get HTTP/1.2 FalconAS running in minutes:
+Get FalconAS (using HTTP/1.1 or NLAP) running in minutes:
 
 ```bash
 # clone repository
@@ -84,8 +89,8 @@ sudo systemctl start falcon-as
 ```
 
 The server will be available with test applications at:
-- `http://testapp1.local/` 
-- `http://testapp2.local/`
+- `http://testapp1.local/` (HTTP/1.1 compatibility mode)
+- `http://testapp2.local/` (HTTP/1.1 compatibility mode)
 
 For detailed installation instructions, see [BUILD.md](BUILD.md).
 
@@ -96,16 +101,18 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 ### Core Advantages
 - **🚀 Lightning-Fast**: Epoll-based architecture for maximum performance
 - **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
-- **⚡ Zero Bloat**: Eliminates HTTP/2's excessive complexity
-- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
+- **⚡ Zero Bloat**: Clean XML-based protocol without HTTP's legacy complexity
+- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real-time demands
 - **🐍 Python-Powered**: Embedded Python interpreter / scripting integration
 - **☕ Java-Powered**: Embedded Java JNI / scripting integration
 
-### Protocol Innovations
-- **Fixed HTTP/1.1 Pipelining**: Resolves misordered request/reply pairs with UUID headers
-- **Permanent Keep-Alive**: Single socket per client for optimal TCP/IP utilization
-- **Request UUID System**: Eliminates response ordering requirements
-- **Simplified Architecture**: Text-based protocol maintaining HTTP/1.1 simplicity
+### NLAP Protocol Innovations
+- **XML-Based Transport**: Clean, structured request/response format
+- **Native UUID System**: Built-in request/response matching
+- **Multiple Subtypes**: NLAFP for file transfer, NLAMP for application metadata
+- **Extensible Architecture**: XML schemas enable easy protocol evolution
+- **Partial File Transfer**: Efficient handling of large files with chunked transfer
+- **Request/Response Signing**: Built-in cryptographic signing support
 
 ### Technical Features
 - **Static Content Server**: High-performance file serving with sendfile()
@@ -117,7 +124,15 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 
 ---
 
-## :mega: Why HTTP/1.2?
+## :mega: Why NLAP Instead of HTTP/1.2?
+
+### The Problem with HTTP/1.2
+
+**HTTP/1.2 is not being pursued** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
+
+- **Ancient Text-Based Protocol Design**: HTTP's line-based parsing is incompatible with efficient UUID integration
+- **Client Library Overhead**: Client processing must be re-implemented for a dead protocol, this means unnecessary effort,
+better implement intop modern NLAP design
 
 ### The Problem with HTTP/2 & HTTP/3
 
@@ -128,14 +143,20 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - TLS/SSL handling unnecessarily embedded in protocol
 
 **HTTP/3 UDP Issues:**
-- Works only for precalculated CDN data
-- Creates new complexity without solving core issues
+- Solves core issues but moves unneccessary (already worldwide approved and adopted) complexity
+from TCP into UDP (application) layer
 
-### Our Solution: HTTP/1.2
+### Our Solution: NLAP (Next Level Application Protocol)
 
-HTTP/1.2 **fixes** HTTP/1.1's single major flaw (broken pipelining) while **avoiding** HTTP/2's complexity:
+NLAP replaces HTTP's legacy concepts with a clean, modern XML-based and application-centric (not document-centric) protocol.
 
-> **🎯 Key Innovation**: Adding a simple `Request-UUID` header eliminates response ordering issues, making HTTP/2's complex Layer-7 multiplexing unnecessary.
+> **🎯 Key Innovation**: XML transport encapsulation, structured data, reliable concurrent-response transmission and extensibility that HTTP's ancient text format cannot match.
+
+**NLAP Protocol Specifications:**
+- **XML-Based**: Structured, parseable, extensible format
+- **Built-in UUID**: Native request/response correlation
+- **Multiple Subtypes**: NLAFP for file protocol, NLAMP for metadata protocol
+- **First Specs Available**: See `/specs/xml/` for NLAFP and NLAMP documentation
 
 ---
 
@@ -258,7 +279,9 @@ See [test documentation](/test/README.md) for detailed testing procedures.
 - **Detailed Analysis**: [Der IT Prüfer](http://der-it-pruefer.de)
 
 ### Protocol Specifications
-- **WAP/XML Specs**: [WAP-AS-XML-SPECS.md](WAP-AS-XML-SPECS.md)
+- **NLAP XML Specs**: See [/specs/xml/](/specs/xml/) for detailed protocol documentation
+  - [NLAFP (Next Level Application File Protocol)](/specs/xml/NLAFP-XML-SPECS.md)
+  - [NLAMP (Next Level Application Metadata Protocol)](/specs/xml/NLAMP-XML-SPECS.md)
 - **Internal Libraries**: [lib/README.md](lib/README.md)
 
 ---
@@ -299,13 +322,15 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ### Short-term Goals
 - [x] **HTTP/1.1 Compatibility**: Minimal SPA related features
 - [x] **x0 Framework Integration**: Seamless SPA framework compatibility
-- [ ] **HTTP/1.2 Protocol**: Implementation including client library
-- [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3 comparisons
+- [ ] **NLAP Protocol Implementation**: Complete NLAFP and NLAMP implementation
+- [ ] **NLAP Client Library**: Reference implementation for clients
+- [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3, and NLAP comparisons
 
 ### Long-term Vision
-- [ ] **Protocol Standardization**: Submit HTTP/1.2 as official RFC
+- [ ] **Protocol Standardization**: Submit NLAP as official RFC
 - [ ] **Enterprise Features**: Advanced monitoring, analytics, management
 - [ ] **Proxy Server Component**: Complete the load balancing/reverse proxy module
+- [ ] **NLAP Browser Support**: Native NLAP support in modern browsers
 
 See [GitHub Milestones](https://github.com/WEBcodeX1/http-1.2/milestones) for detailed roadmap.
 
