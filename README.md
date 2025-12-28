@@ -102,7 +102,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **🚀 Lightning-Fast**: Epoll-based architecture for maximum performance
 - **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
 - **⚡ Zero Bloat**: Clean XML-based protocol without HTTP's legacy complexity
-- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real time demands
+- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real-time demands
 - **🐍 Python-Powered**: Embedded Python interpreter / scripting integration
 - **☕ Java-Powered**: Embedded Java JNI / scripting integration
 
