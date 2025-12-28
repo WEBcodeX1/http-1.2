@@ -132,7 +132,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 
 ### The Problem with HTTP/1.2
 
-**HTTP/1.2 Will Not Happen** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
+**HTTP/1.2 is not being pursued** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
 
 - **Ancient Text-Based Protocol Design**: HTTP's line-based parsing is incompatible with efficient UUID integration
 - **UUID Integration Not Simple**: Adding UUID headers creates parsing complexity and overhead
