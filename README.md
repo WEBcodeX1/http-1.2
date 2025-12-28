@@ -35,7 +35,7 @@ in place of modern web-application requirements.
 - ✅ Multiple protocol subtypes (NLAFP for files, NLAMP for application server requests)
 - ✅ Simple, extensible architecture
 
-**Main Features**:
+**FalconAS Server Features**:
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
 - ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
 - ✅ **Threaded Static File Delivery**: Threading and in-kernel sendfile() increase scheduling latency
