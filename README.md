@@ -131,9 +131,8 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 **HTTP/1.2 is not being pursued** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
 
 - **Ancient Text-Based Protocol Design**: HTTP's line-based parsing is incompatible with efficient UUID integration
-- **UUID Integration Not Simple**: Adding UUID headers creates parsing complexity and overhead
-- **Legacy Baggage**: Text-based headers, status codes, and methods are rigid and hard to extend
-- **Inefficient for Modern Needs**: String parsing overhead for every request/response
+- **Client Library Overhead**: Client processing must be re-implemented for a dead protocol, this means unneccessary effort,
+better implement intop modern NLAP design
 
 ### The Problem with HTTP/2 & HTTP/3
 
@@ -144,7 +143,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - TLS/SSL handling unnecessarily embedded in protocol
 
 **HTTP/3 UDP Issues:**
-- Solves core issues but moves unneccessary (already worldwide aproved and adopted) complexity
+- Solves core issues but moves unneccessary (already worldwide approved and adopted) complexity
 from TCP into UDP (application) layer
 
 ### Our Solution: NLAP (Next Level Application Protocol)
