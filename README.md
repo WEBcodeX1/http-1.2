@@ -25,16 +25,12 @@
 
 ## :pushpin: Overview
 
-**NLAP (Next Level Application Protocol)** is a revolutionary XML-based protocol designed to replace HTTP/1.2, 
-which will not happen due to fundamental limitations in integrating UUID support into the ancient text-based HTTP protocol design.
-
-**Why HTTP/1.2 is not applicable:**
-- The text-based HTTP protocol design makes it extremely difficult to integrate UUID in a simple and efficient way
-- Adding UUID headers to HTTP/1.1 creates parsing complexity and overhead
-- The ancient protocol structure is incompatible with modern requirements
+**NLAP (Next Level Application Protocol)** is a revolutionary XML-based protocol designed to replace HTTP
+in place for modern web-application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
-- Built-in UUID request/response matching
+- Solid parallel response transmission in a single socket
+- 100% head of line blocking-less, slow responses do not block follow-ups
 - Structured data with XML schemas
 - Multiple protocol subtypes (NLAFP for files, NLAMP for metadata)
 - Simple, extensible architecture
@@ -66,7 +62,7 @@ which will not happen due to fundamental limitations in integrating UUID support
 
 ## :racehorse: Quick Start
 
-Get NLAP FalconAS running in minutes:
+Get FalconAS (using HTTP/1.1 or NLAP) running in minutes:
 
 ```bash
 # clone repository
@@ -111,8 +107,8 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - **☕ Java-Powered**: Embedded Java JNI / scripting integration
 
 ### NLAP Protocol Innovations
-- **XML-Based Transport**: Clean, structured request/response format with native UUID support
-- **Native UUID System**: Built-in request/response matching without HTTP header hacks
+- **XML-Based Transport**: Clean, structured request/response format
+- **Native UUID System**: Built-in request/response matching
 - **Multiple Subtypes**: NLAFP for file transfer, NLAMP for application metadata
 - **Extensible Architecture**: XML schemas enable easy protocol evolution
 - **Partial File Transfer**: Efficient handling of large files with chunked transfer
@@ -148,34 +144,21 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 - TLS/SSL handling unnecessarily embedded in protocol
 
 **HTTP/3 UDP Issues:**
-- Works only for precalculated CDN data
-- Creates new complexity without solving core issues
+- Solves core issues but moves unneccessary (already worldwide aproved and adopted) complexity
+from TCP into UDP (application) layer
 
 ### Our Solution: NLAP (Next Level Application Protocol)
 
-NLAP **replaces** the failed HTTP/1.2 concept with a clean, modern XML-based protocol:
+NLAP **replaces** all unneccessary HTTP/* concepts with a clean, modern XML-based and application-centric
+(not document-centric) protocol:
 
-> **🎯 Key Innovation**: XML transport encapsulation provides native UUID support, structured data, and extensibility that HTTP's ancient text format cannot match.
+> **🎯 Key Innovation**: XML transport encapsulation, structured data, reliable concurrent-response transmission and extensibility that HTTP's ancient text format cannot match.
 
 **NLAP Protocol Specifications:**
 - **XML-Based**: Structured, parseable, extensible format
 - **Built-in UUID**: Native request/response correlation
 - **Multiple Subtypes**: NLAFP for file protocol, NLAMP for metadata protocol
 - **First Specs Available**: See `/specs/xml/` for NLAFP and NLAMP documentation
-
-**Example NLAP Request:**
-```xml
-<request>
-    <UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</UUID>
-    <protocol>NLAP</protocol>
-    <version>0.1</version>
-    <subtype>NLAFP</subtype>
-    <header>
-        <host>testapp1.local</host>
-        <URL>/testpath/index.html</URL>
-    </header>
-</request>
-```
 
 ---
 
