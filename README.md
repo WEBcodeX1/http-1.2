@@ -131,7 +131,7 @@ For detailed installation instructions, see [BUILD.md](BUILD.md).
 **HTTP/1.2 is not being pursued** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
 
 - **Ancient Text-Based Protocol Design**: HTTP's line-based parsing is incompatible with efficient UUID integration
-- **Client Library Overhead**: Client processing must be re-implemented for a dead protocol, this means unneccessary effort,
+- **Client Library Overhead**: Client processing must be re-implemented for a dead protocol, this means unnecessary effort,
 better implement intop modern NLAP design
 
 ### The Problem with HTTP/2 & HTTP/3
