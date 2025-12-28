@@ -149,8 +149,7 @@ from TCP into UDP (application) layer
 
 ### Our Solution: NLAP (Next Level Application Protocol)
 
-NLAP **replaces** all unneccessary HTTP/* concepts with a clean, modern XML-based and application-centric
-(not document-centric) protocol:
+NLAP replaces HTTP's legacy concepts with a clean, modern XML-based and application-centric (not document-centric) protocol.
 
 > **🎯 Key Innovation**: XML transport encapsulation, structured data, reliable concurrent-response transmission and extensibility that HTTP's ancient text format cannot match.
 
