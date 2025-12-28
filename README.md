@@ -30,7 +30,7 @@ in place of modern web-application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
 - Solid parallel response transmission in a single socket
-- 100% head of line blocking-less, slow responses do not block follow-ups
+- Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
 - Structured data with XML schemas
 - Multiple protocol subtypes (NLAFP for files, NLAMP for metadata)
 - Simple, extensible architecture
