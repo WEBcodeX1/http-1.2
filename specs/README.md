@@ -20,5 +20,5 @@ Microsoft Visio Slides [./visio/](./visio).
 
 ## 1.5. XML
 
-Detailed XML service description [./xml/](./xml).
+XML Service Specifications [./xml/](./xml).
 
