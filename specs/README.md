@@ -17,3 +17,8 @@ PDF rendered / from Visio [./pdf/](./pdf).
 ## 1.4. MS Visio
 
 Microsoft Visio Slides [./visio/](./visio).
+
+## 1.5. XML
+
+XML Service Specifications [./xml/](./xml).
+
