@@ -78,7 +78,7 @@ target_link_libraries(
     ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
     nlohmann_json::nlohmann_json
-    libhttp
+    httpparser
 )
 
 # add custom targets
