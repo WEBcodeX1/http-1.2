@@ -1,5 +1,5 @@
 # find boost::python
-find_package(Boost 1.74 REQUIRED COMPONENTS regex)
+find_package(Boost 1.74 REQUIRED)
 
 # add source dir
 aux_source_directory(. SRC_LIST_LIBHTTP)
