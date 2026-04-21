@@ -1,14 +1,11 @@
-#ifndef LibHTTP_parser_hpp
-#define LibHTTP_parser_hpp
+#pragma once
+
 #include "../../src/Debug.cpp"
-#include "../../src/Helper.hpp"
-#include "../../src/IPCHandler.hpp"
-#include "../../src/IPCHandlerAS.hpp"
-#include "../../src/ASRequestHandler.hpp"
 #include "../../src/Client.hpp"
 
 #include <string>
-
+#include <vector>
+#include <unordered_map>
 
 typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
@@ -20,7 +17,7 @@ typedef vector<string> BasePropsResult_t;
 typedef BasePropsResult_t& BasePropsResultRef_t;
 
 
-static const vector<string> HeaderList
+static const vector<string> HTTPHeaderTypes
 {
     "Host",
     "Request-UUID",
@@ -31,26 +28,24 @@ static const vector<string> HeaderList
 };
 
 
-class HTTPParser: private Client, private SHMStaticFS, private SHMPythonAS
+class HTTPParser
 {
 
 public:
 
-    HTTPParser(const ClientFD_t, const NamespacesRef_t);
+    HTTPParser();
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    size_t processRequests(SharedMemAddress_t, const ASRequestHandlerRef_t&);
+    size_t processRequests();
 
 private:
 
     inline void _splitRequests();
-    void _processRequestProperties(const size_t, const ASRequestHandlerRef_t&);
+    void _processRequestProperties(const size_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
-
-    NamespacesRef_t _Namespaces;
 
     size_t _RequestCount;
     size_t _RequestCountGet;
@@ -71,15 +66,46 @@ protected:
         const uint16_t,
         string&
     );
-
-    inline void _processASPayload(
-        const ASRequestHandlerRef_t&,
-        const RequestHeaderResult_t&,
-        const uint16_t,
-        const uint16_t,
-        const uint16_t,
-        const string&
-    );
 };
 
-#endif
+class StringHelper {
+
+public:
+
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    {
+        string SplitElement;
+        auto pos = StringRef.find(Delimiter);
+
+        while (pos != string::npos) {
+            SplitElement = StringRef.substr(0, pos);
+            DBG(220, "SplitElement:'" << SplitElement << "'");
+            ResultRef.push_back(SplitElement);
+            StringRef.erase(0, pos + Delimiter.length());
+            pos = StringRef.find(Delimiter);
+        }
+
+        DBG(200, "String:'" << StringRef << "'");
+    }
+
+    //- TODO: ugly, refactor (lambda?)
+    static void rsplit(string& String, size_t StartPos, const string Delimiter, vector<string>& ResultRef)
+    {
+        size_t FindPos = 0;
+        size_t FindPosLast = 0;
+        string Token;
+        StartPos -= Delimiter.length();
+        while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
+            DBG(200, "FindPos:" << FindPos << " StartPos:" << StartPos);
+            Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
+            DBG(200, "Token:" << Token);
+            ResultRef.push_back(Token);
+            StartPos = FindPos - Delimiter.length();
+            FindPosLast = FindPos;
+        }
+        DBG(200, "End FindPos:" << FindPosLast);
+        Token = String.substr(0, FindPosLast);
+        ResultRef.push_back(Token);
+    }
+
+};

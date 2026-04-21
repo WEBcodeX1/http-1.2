@@ -17,8 +17,6 @@
 #include "MemoryManager.hpp"
 #include "ASRequestHandler.hpp"
 
-#include "../lib/http/httpparser.hpp"
-
 
 typedef std::shared_ptr<HTTPParser> ClientRef_t;
 typedef pair<uint16_t, const ClientRef_t> ClientMapPair_t;

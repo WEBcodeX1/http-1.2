@@ -1,5 +1,4 @@
-#ifndef Client_hpp
-#define Client_hpp
+#pragma once
 
 #include "Debug.cpp"
 
@@ -7,20 +6,18 @@
 #include <string>
 #include <ctime>
 
-
 typedef uint16_t ClientFD_t;
 typedef uint16_t ClientRequestNr_t;
 
-
-class Client
-{
+class Client {
 
 public:
 
     Client(ClientFD_t);
     ~Client();
 
-    ClientRequestNr_t getNextReqNr();
+    void incrementReqNr();
+    ClientRequestNr_t getCurrentReqNr();
 
 protected:
 
@@ -29,17 +26,6 @@ protected:
 private:
 
     ClientRequestNr_t _RequestNr;
-
-    bool _Error;
-    uint16_t _ErrorID;
-
-    time_t _RequestStartTime;
-    time_t _RequestEndTime;
-    time_t _ResponseStartTime;
-    time_t _ResponseEndTime;
-
-    bool _TimeoutReached;
-
+    time_t _SocketConnectTime;
+    time_t _SocketDisconnectTime;
 };
-
-#endif

@@ -3,9 +3,8 @@
 using namespace std;
 
 
-HTTPParser::HTTPParser(ClientFD_t ClientFD, NamespacesRef_t NamespacesRef) :
-    Client(ClientFD),
-    _Namespaces(NamespacesRef),
+HTTPParser::HTTPParser() :
+    //Client(ClientFD),
     _RequestCount(0),
     _RequestCountGet(0),
     _RequestCountPost(0),
@@ -21,20 +20,16 @@ HTTPParser::~HTTPParser()
     DBG(120, "Destructor");
 }
 
-void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
+void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
 {
     //-> reset _SplittedRequests vector
     _SplittedRequests.clear();
 
-    //- workaround
-    if (BufferRef[0] == 0) { return; }
-
-    DBG(250, "size:" << string(BufferRef).length() << "appendBuffer:'" << string(BufferRef) << "'");
-    _HTTPRequestBuffer = _HTTPRequestBuffer + string(BufferRef);
-    //String::hexout(_HTTPRequestBuffer);
+    DBG(250, "Buffer received bytes:" << RecvBytes);
+    _HTTPRequestBuffer.append(BufferRef, RecvBytes);
     DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
 
-    //-> only process on min 1 valid request
+    //-> only process on minimum of 1 http request (end request marker found)
     const size_t EndMarkerFound = _HTTPRequestBuffer.find("\r\n\r\n");
 
     if (EndMarkerFound != string::npos) {
@@ -53,29 +48,26 @@ inline void HTTPParser::_splitRequests()
     _RequestNumber = 1;
 
     //-> split requests into _SplittedRequests vector
-    String::split(_HTTPRequestBuffer, "\r\n\r\n", _SplittedRequests);
+    StringHelper::split(_HTTPRequestBuffer, "\r\n\r\n", _SplittedRequests);
 
     _RequestCount = _SplittedRequests.size();
     DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
     DBG(120, "_HTTPRequestBuffer after split:'" << _HTTPRequestBuffer << "'");
 }
 
-size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t& ASRequestHandlerRef)
+size_t HTTPParser::processRequests()
 {
     DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
 
-    //- set get requests SHM base
-    setBaseAddress(SHMGetRequests);
-
     //- iterate over splitted requests
     for(size_t i=0; i<_SplittedRequests.size(); ++i) {
-        _processRequestProperties(i, ASRequestHandlerRef);
+        _processRequestProperties(i);
     }
 
     return _RequestCountGet;
 }
 
-void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t& ASRequestHandlerRef)
+void HTTPParser::_processRequestProperties(const size_t Index)
 {
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
@@ -94,9 +86,8 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
     //- temp hardcode HTTPVersion
     uint16_t HTTPVersion = 1;
 
-    //- check HTTP/1.2 or HTTP/1.2 (currently unimplemented)
+    //- check for HTTP/1.1 version
     const size_t HTTPVersion1_1Found = BasePropsFound.at(0).find("HTTP/1.1");
-    const size_t HTTPVersion1_2Found = BasePropsFound.at(2).find("HTTP/1.2");
 
     //- if not HTTP/1.1 set request to "" in vector element, return
     if (HTTPVersion1_1Found == string::npos) { return; }
@@ -139,6 +130,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
         //- parse request headers
         _parseRequestHeaders(Request, Headers);
 
+        /*
         const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
         string JSONPayload("{ \"payload\": {");
 
@@ -165,6 +157,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
                 return;
             }
         }
+        */
     }
 
     //- AS POST request
@@ -189,7 +182,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
         //- parse request headers
         _parseRequestHeaders(Request, Headers);
 
-        uint ContentBytes = 0;
+        uint16_t ContentBytes = 0;
 
         //- try get content length header
         try {
@@ -224,11 +217,13 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
         DBG(140, "HTTP POST-AS Payload:" << Payload);
 
+        /*
         if (PayloadFound) {
             _processASPayload(
                 ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, Payload
             );
         }
+        */
     }
 
     //- Standard GET request
@@ -238,6 +233,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
         ++_RequestCountGet;
 
+        /*
         //- set values in get requests shared memory
         const char* MsgCString = Request.c_str();
 
@@ -258,6 +254,7 @@ void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHa
 
         void* NextSegmentAddr = getNextAddress(MsgLength);
         DBG(120, "Set SharedMem ClientFD:" << ClientFDAddr << " PayloadLength:" << MsgLengthAddr << " Payload:" << MsgAddress << " NextSegment:" << NextSegmentAddr);
+        */
     }
 }
 
@@ -274,7 +271,7 @@ void HTTPParser::_parseRequestProperties(string& Request, BasePropsResultRef_t R
     }
 
     //- reverse split
-    String::rsplit(Request, StartPos, " ", ResultRef);
+    StringHelper::rsplit(Request, StartPos, " ", ResultRef);
 
     DBG(120, "HTTP Version:" << ResultRef.at(0) << " File:" << ResultRef.at(1) << " Method:" << ResultRef.at(2) << " Request:" << Request);
 }
@@ -285,7 +282,7 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
 
     //- reverse split header lines
     vector<string> Lines;
-    String::split(Request, "\r\n", Lines);
+    StringHelper::split(Request, "\r\n", Lines);
 
     DBG(120, "Last Header Line:'" << Request << "'");
     Lines.push_back(Request);
@@ -298,7 +295,7 @@ void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t 
         vector<string> HeaderPair;
         if (Line.find(":") != string::npos) {
 
-            String::rsplit(Line, Line.length(), ": ", HeaderPair);
+            StringHelper::rsplit(Line, Line.length(), ": ", HeaderPair);
             string HeaderID = HeaderPair.at(1);
             string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length());
 
@@ -358,26 +355,4 @@ inline string HTTPParser::_getASURLParamValue(
         }
     }
     return "parse-error";
-}
-
-inline void HTTPParser::_processASPayload(
-    const ASRequestHandlerRef_t& ASRequestHandlerRef,
-    const RequestHeaderResult_t& Headers,
-    const uint16_t HTTPMethod,
-    const uint16_t HTTPVersion,
-    const uint16_t RequestNr,
-    const string& Payload
-){
-    //- increment request count
-    ++_RequestCountPostAS;
-
-    //- add ASRequestHandler request
-    ASRequestHandlerRef->addRequest({
-        Headers.at("Host"),
-        _ClientFD,
-        HTTPMethod,
-        HTTPVersion,
-        RequestNr,
-        Payload
-    });
 }

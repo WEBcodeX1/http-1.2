@@ -57,42 +57,6 @@ class String {
 
 public:
 
-    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
-    {
-        string SplitElement;
-        auto pos = StringRef.find(Delimiter);
-
-        while (pos != string::npos) {
-            SplitElement = StringRef.substr(0, pos);
-            DBG(220, "SplitElement:'" << SplitElement << "'");
-            ResultRef.push_back(SplitElement);
-            StringRef.erase(0, pos + Delimiter.length());
-            pos = StringRef.find(Delimiter);
-        }
-
-        DBG(200, "String:'" << StringRef << "'");
-    }
-
-    //- TODO: ugly, refactor (lambda?)
-    static void rsplit(string& String, size_t StartPos, const string Delimiter, vector<string>& ResultRef)
-    {
-        size_t FindPos = 0;
-        size_t FindPosLast = 0;
-        string Token;
-        StartPos -= Delimiter.length();
-        while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
-            DBG(200, "FindPos:" << FindPos << " StartPos:" << StartPos);
-            Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
-            DBG(200, "Token:" << Token);
-            ResultRef.push_back(Token);
-            StartPos = FindPos - Delimiter.length();
-            FindPosLast = FindPos;
-        }
-        DBG(200, "End FindPos:" << FindPosLast);
-        Token = String.substr(0, FindPosLast);
-        ResultRef.push_back(Token);
-    }
-
     static void hexout(string& String)
     {
         for (auto i = String.begin(); i != String.end(); ++i) {
