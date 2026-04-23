@@ -2,8 +2,8 @@
 set(CMAKE_SYSTEM_NAME RISCV32)
 
 # which compilers to use for C and C++
-set(CMAKE_C_COMPILER   /home/cpruefer/.espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-gcc)
-set(CMAKE_CXX_COMPILER /home/cpruefer/.espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-g++)
+set(CMAKE_C_COMPILER   [HOMEDIR]/.espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-gcc)
+set(CMAKE_CXX_COMPILER [HOMEDIR]/.espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-g++)
 
 # where is the target environment located
 set(CMAKE_FIND_ROOT_PATH ~/.espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf)

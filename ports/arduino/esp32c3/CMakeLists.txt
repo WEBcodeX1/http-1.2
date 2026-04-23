@@ -1,8 +1,8 @@
 # project settings
 cmake_minimum_required(VERSION 3.11)
-project(falcon-as-arduino)
+project(esp32c3-httplib)
 
-set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O0 -std=c++11 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Os -std=c++11 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
 
 # add source dir
 aux_source_directory(../../../lib/http/ SRC_LIST_LIBHTTP)
@@ -17,3 +17,5 @@ add_custom_target(
     ../../../lib/http/httpparser.hpp
 )
 
+# install
+install(TARGETS httpparser DESTINATION /usr/local/lib)
