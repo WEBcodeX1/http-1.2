@@ -17,22 +17,17 @@ typedef RequestHeader_t& RequestHeaderRef_t;
 
 typedef unordered_map<string, string> URLParam_t;
 
-struct BaseProperties_t
+struct RequestProperties_t
 {
     uint16_t HTTPVersion;
     uint16_t HTTPMethod;
-    string URL;
-};
-
-typedef BaseProperties_t& BasePropertiesRef_t;
-
-struct RequestProperties_t
-{
-    BaseProperties_t BaseProperties;
     RequestHeader_t RequestHeaders;
+    string URL;
     string Payload;
     URLParam_t URLParams;
 };
+
+typedef RequestProperties_t& RequestPropertiesRef_t;
 
 static const vector<string> HTTPHeaderTypes
 {
@@ -53,27 +48,26 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    inline void processRequests();
 
 private:
 
-    inline void _splitRequests();
+    void _processRequests();
     bool _processRequestProperties(const size_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
 
-    size_t _RequestCount;
     size_t _RequestCountGet;
     size_t _RequestCountPost;
 
     uint16_t _RequestParseError;
+    bool _POSTWaitContentLength;
 
     string _HTTPRequestBuffer;
 
 protected:
 
-    void _parseRequestProperties(string&, BasePropertiesRef_t);
+    void _parseRequestProperties(string&, RequestPropertiesRef_t);
     void _parseRequestHeaders(string&, RequestHeaderRef_t);
 };
 
@@ -124,7 +118,7 @@ class JSON {
 
 public:
 
-    static void convert_get_params()
+    static void get2JSON()
     {
         /*
         const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
