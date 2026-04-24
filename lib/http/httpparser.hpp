@@ -1,16 +1,19 @@
 #pragma once
 
+#include "httpconstants.hpp"
+
 #include <string>
 #include <vector>
+#include <utility>
+#include <algorithm>
 #include <unordered_map>
 
-#include "httpconstants.hpp"
+using namespace std;
 
 typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
 
-typedef RequestHeader_t RequestHeaderResult_t;
-typedef RequestHeader_t& RequestHeaderResultRef_t;
+typedef RequestHeader_t& RequestHeaderRef_t;
 
 typedef unordered_map<string, string> URLParam_t;
 
@@ -19,17 +22,17 @@ struct BaseProperties_t
     uint16_t HTTPVersion;
     uint16_t HTTPMethod;
     string URL;
-}
+};
 
 typedef BaseProperties_t& BasePropertiesRef_t;
 
-struct RequestStruct_t
+struct RequestProperties_t
 {
-    BaseProps_t BaseProperties;
+    BaseProperties_t BaseProperties;
     RequestHeader_t RequestHeaders;
     string Payload;
     URLParam_t URLParams;
-}
+};
 
 static const vector<string> HTTPHeaderTypes
 {
@@ -46,16 +49,16 @@ class HTTPParser
 
 public:
 
-    HTTPParser();
+    HTTPParser(const uint16_t);
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    size_t processRequests();
+    inline void processRequests();
 
 private:
 
     inline void _splitRequests();
-    void _processRequestProperties(const size_t);
+    bool _processRequestProperties(const size_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
@@ -63,29 +66,23 @@ private:
     size_t _RequestCount;
     size_t _RequestCountGet;
     size_t _RequestCountPost;
-    size_t _RequestCountPostAS;
 
-    uint16_t _RequestNumber;
+    uint16_t _RequestParseError;
 
     string _HTTPRequestBuffer;
 
 protected:
 
-    void _parseRequestProperties(string&, BasePropsResultRef_t);
-    void _parseRequestHeaders(string&, RequestHeaderResultRef_t);
-
-    inline uint16_t _getURLParamValue(
-        const string&,
-        const uint16_t,
-        string&
-    );
+    void _parseRequestProperties(string&, BasePropertiesRef_t);
+    void _parseRequestHeaders(string&, RequestHeaderRef_t);
 };
+
 
 class StringHelper {
 
 public:
 
-    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef, bool EraseFromSrc = true)
     {
         string SplitElement;
         auto pos = StringRef.find(Delimiter);
@@ -93,7 +90,9 @@ public:
         while (pos != string::npos) {
             SplitElement = StringRef.substr(0, pos);
             ResultRef.push_back(SplitElement);
-            StringRef.erase(0, pos + Delimiter.length());
+            if (EraseFromSrc == true) {
+                StringRef.erase(0, pos + Delimiter.length());
+            }
             pos = StringRef.find(Delimiter);
         }
     }
@@ -114,4 +113,46 @@ public:
         ResultRef.push_back(Token);
     }
 
+    static bool is_digits(const string& checkdigits)
+    {
+        return all_of(checkdigits.begin(), checkdigits.end(), ::isdigit);
+    }
+
+};
+
+class JSON {
+
+public:
+
+    static void convert_get_params()
+    {
+        /*
+        const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
+        string JSONPayload("{ \"payload\": {");
+
+        for (const auto& [Endpoint, EndpointProps]: NamespaceProps.JSONConfig["access"]["as-get"].items()) {
+            DBG(200, "Endpoint:" << Endpoint);
+            const size_t EndpointFound = BaseProperties.at(1).find("/backend" + Endpoint);
+            if (EndpointFound != string::npos) {
+                DBG(200, "Looping on params");
+                string ProcessURL = BaseProperties.at(1);
+                for (size_t i=0; i<EndpointProps["params"].size(); ++i) {
+                    const string Param = EndpointProps["params"][i];
+                    const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
+                    JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
+                    DBG(200, "ProcessURL: " << ProcessURL << " Param: " << Param << " Value:" << ParamValue);
+                    if (i != EndpointProps["params"].size() - 1) {
+                        JSONPayload += ",";
+                    }
+                }
+                JSONPayload += "}}";
+                DBG(200, "AS GET JSONPayload:" << JSONPayload);
+                _processASPayload(
+                    ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, JSONPayload
+                );
+                return;
+            }
+        }
+        */
+    }
 };
