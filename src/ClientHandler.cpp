@@ -48,11 +48,15 @@ void ClientHandler::addClient(const uint16_t ClientFD)
     //- set client connection non blocking
     Socket::makeNonblocking(ClientFD);
 
-    ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, ConfigRef.Namespaces);
+    //ClientRef_t ClientObj = std::make_shared<Client>(ClientFD);
+    Client_t ClientObj(ClientFD);
 
+    /*
     Clients.emplace(
-        ClientFD, ClientObj
+        ClientFD, move(ClientObj)
     );
+    */
+    ClientsVector.push_back(move(ClientObj));
 
     //- add fd to epoll
     EpollEvent.events = EPOLLIN | EPOLLET;
@@ -121,12 +125,15 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         else {
             //- if filedescriptor exists in map, append buffer data
             if (Clients.contains(ReadFD)) {
-                ClientRef_t ClientRef = Clients[ReadFD];
-                ClientRef->appendBuffer(Buffer, RcvBytes);
 
+                //Clients[ReadFD].appendBuffer(Buffer, RcvBytes);
+                ClientsVector[0].appendBuffer(Buffer, RcvBytes);
+
+                /*
                 if (ClientRef->processRequests(SHMGetRequests, _ASRequestHandlerRef) > 0) {
                     ++ProcessedClients;
                 }
+                */
             }
         }
     }

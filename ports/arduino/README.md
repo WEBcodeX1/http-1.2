@@ -1,2 +1,2 @@
-# ESP32
-The ./esp32 subdir contains ports to ESP32 based boards, especially the ESP32-C3 single core SoC.
+# ESP32-C3
+The ./esp32c3 subdir contains the first port to the ESP32-C3 based RISCV32 single core SoC board.

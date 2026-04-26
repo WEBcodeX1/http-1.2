@@ -10,9 +10,7 @@
 
 using namespace std;
 
-typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
-
 typedef RequestHeader_t& RequestHeaderRef_t;
 
 typedef unordered_map<string, string> URLParam_t;
@@ -29,14 +27,7 @@ struct RequestProperties_t
 
 typedef RequestProperties_t& RequestPropertiesRef_t;
 
-static const vector<string> HTTPHeaderTypes
-{
-    "Host",
-    "Transfer-Encoding",
-    "If-None-Match",
-    "Content-Type",
-    "Content-Length"
-};
+typedef vector<RequestProperties_t> RequestsVector_t;
 
 
 class HTTPParser
@@ -61,9 +52,15 @@ private:
     size_t _RequestCountPost;
 
     uint16_t _RequestParseError;
+
     bool _POSTWaitContentLength;
+    uint16_t _POSTContentLength;
 
     string _HTTPRequestBuffer;
+    uint16_t _HTTPRequestBufferMax;
+
+    RequestProperties_t _RequestProperties;
+    RequestsVector_t _Requests;
 
 protected:
 
@@ -118,7 +115,7 @@ class JSON {
 
 public:
 
-    static void get2JSON()
+    static void getRequest2JSON()
     {
         /*
         const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));

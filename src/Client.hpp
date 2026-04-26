@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Debug.cpp"
+#include "../lib/http/httpparser.cpp"
 
 #include <cstdint>
 #include <string>
@@ -9,7 +10,8 @@
 typedef uint16_t ClientFD_t;
 typedef uint16_t ClientRequestNr_t;
 
-class Client {
+class Client : public HTTPParser
+{
 
 public:
 

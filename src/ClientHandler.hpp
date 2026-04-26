@@ -1,5 +1,4 @@
-#ifndef ClientHandler_hpp
-#define ClientHandler_hpp
+#pragma once
 
 #include "Debug.cpp"
 
@@ -17,10 +16,14 @@
 #include "MemoryManager.hpp"
 #include "ASRequestHandler.hpp"
 
+//typedef std::shared_ptr<Client> ClientRef_t;
+//typedef pair<uint16_t, const ClientRef_t> ClientMapPair_t;
 
-typedef std::shared_ptr<HTTPParser> ClientRef_t;
-typedef pair<uint16_t, const ClientRef_t> ClientMapPair_t;
-typedef unordered_map<uint16_t, const ClientRef_t> ClientMap_t;
+typedef Client Client_t;
+typedef Client& ClientRef_t;
+
+typedef unordered_map<uint16_t, ClientRef_t> ClientMap_t;
+typedef vector<Client_t> ClientVector_t;
 
 typedef struct {
     void* StaticFSPtr;
@@ -52,6 +55,7 @@ public:
 private:
 
     ClientMap_t Clients;
+    ClientVector_t ClientsVector;
 
     struct epoll_event EpollEvent, EpollEvents[EPOLL_FD_COUNT_MAX];
 
@@ -68,5 +72,3 @@ private:
     ASRequestHandlerRef_t _ASRequestHandlerRef;
 
 };
-
-#endif

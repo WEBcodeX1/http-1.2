@@ -1,5 +1,4 @@
-#ifndef ResultProcessor_hpp
-#define ResultProcessor_hpp
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +14,7 @@
 #include "IPCHandler.hpp"
 #include "Configuration.hpp"
 #include "ResultOrder.hpp"
+#include "ASProcessHandler.hpp"
 
 typedef struct {
     void* StaticFSPtr;
@@ -50,5 +50,3 @@ private:
     VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
 
 };
-
-#endif

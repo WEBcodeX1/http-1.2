@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../../../src/Helper.hpp"
+#include "../../../lib/http/httpparser.hpp"
 
 
 using namespace std;
@@ -12,7 +13,7 @@ BOOST_AUTO_TEST_CASE( test_string_split_1 )
 
     vector<string> Result;
     string TestString1("TestValue1-TestValue2-TestValue3");
-    String::split(TestString1, "-", Result);
+    StringHelper::split(TestString1, "-", Result);
 
     cout << "Res[0]:" << Result.at(0) << endl;
     cout << "Res[1]:" << Result.at(1) << endl;
@@ -25,7 +26,7 @@ BOOST_AUTO_TEST_CASE( test_string_split_1 )
 
     Result.clear();
     string TestString2("TestHTTP1\n\rTestHTTP2\n\rTestHTTP3\n\n\rEnd");
-    String::split(TestString2, "\n\r", Result);
+    StringHelper::split(TestString2, "\n\r", Result);
 
     cout << "Res[0]:" << Result.at(0) << endl;
     cout << "Res[1]:" << Result.at(1) << endl;
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_CASE( test_string_split_remains )
 
     vector<string> Result;
     string TestString1("TestHTTP1\n\r");
-    String::split(TestString1, "\n\r", Result);
+    StringHelper::split(TestString1, "\n\r", Result);
 
     cout << "Res[0]:" << Result.at(0) << endl;
 
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE( test_string_rsplit_1 )
     string TestString1("GET /path/to/file.txt HTTP/1.1\n Continues \n Again... ");
     size_t StartPos = TestString1.find("\n");
 
-    String::rsplit(TestString1, StartPos, " ", Result);
+    StringHelper::rsplit(TestString1, StartPos, " ", Result);
 
     cout << "Res[0]:" << Result.at(0) << endl;
     cout << "Res[1]:" << Result.at(1) << endl;
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_string_rsplit_1 )
     string TestString2("GET / HTTP/1.1\nHeader1: HeaderContent1\nHeader2: HeaderContent2\n\r");
     size_t StartPos2 = TestString2.find("\n");
 
-    String::rsplit(TestString2, StartPos2, " ", Result);
+    StringHelper::rsplit(TestString2, StartPos2, " ", Result);
 
     cout << "Res[0]:" << Result.at(0) << endl;
     cout << "Res[1]:" << Result.at(1) << endl;

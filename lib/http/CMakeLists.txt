@@ -11,5 +11,15 @@ add_custom_target(
     ./httpparser.hpp
 )
 
-# install
-install(TARGETS httpparser DESTINATION lib)
+# install static .a library
+install(
+    TARGETS httpparser
+    LIBRARY DESTINATION /usr/local/lib
+)
+
+# install header file
+install(
+    FILES
+    ./httpparser.hpp
+    DESTINATION /usr/local/include
+)

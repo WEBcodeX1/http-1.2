@@ -3,6 +3,7 @@
 using namespace std;
 
 Client::Client(ClientFD_t ClientFD) :
+    HTTPParser(4096),
     _ClientFD(ClientFD),
     _RequestNr(0),
     _SocketConnectTime(0),
@@ -10,8 +11,8 @@ Client::Client(ClientFD_t ClientFD) :
 {
     DBG(120, "Constructor");
 
-    _ClientConnectTime = time(nullptr);
-    _ClientDisconnectTime = time(nullptr);
+    _SocketConnectTime = time(nullptr);
+    _SocketDisconnectTime = time(nullptr);
 }
 
 Client::~Client()

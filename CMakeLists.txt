@@ -86,22 +86,22 @@ add_custom_target(
     ProjectHeaderFiles
     SOURCES
     ./src/Helper.hpp
-    ./src//Global.hpp
-    ./src//Server.hpp
-    ./src//Client.hpp
-    ./src//Filesystem.hpp
-    ./src//Configuration.hpp
-    ./src//MemoryManager.hpp
-    ./src//ThreadHandler.hpp
-    ./src//IPCHandler.hpp
-    ./src//IPCHandlerAS.hpp
-    ./src//ClientHandler.hpp
-    ./src//ASProcessHandler.hpp
-    ./src//ASRequestHandler.hpp
-    ./src//ResultProcessor.hpp
-    ./src//ResultOrder.hpp
-    ./src//Constant.hpp
-    ./src//Vector.hpp
+    ./src/Global.hpp
+    ./src/Server.hpp
+    ./src/Client.hpp
+    ./src/Filesystem.hpp
+    ./src/Configuration.hpp
+    ./src/MemoryManager.hpp
+    ./src/ThreadHandler.hpp
+    ./src/IPCHandler.hpp
+    ./src/IPCHandlerAS.hpp
+    ./src/ClientHandler.hpp
+    ./src/ASProcessHandler.hpp
+    ./src/ASRequestHandler.hpp
+    ./src/ResultProcessor.hpp
+    ./src/ResultOrder.hpp
+    ./src/Constant.hpp
+    ./src/Vector.hpp
 )
 
 # add subdirs

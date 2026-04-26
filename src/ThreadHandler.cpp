@@ -97,7 +97,7 @@ ClientThread::ClientThread(
     Namespaces_t &Namespaces,
     ClientRequestDataVec_t Requests
 ) :
-    HTTPParser(ClientFD, Namespaces),
+    HTTPParser(4096),
     _ClientFD(ClientFD),
     _Namespaces(Namespaces),
     _ClientRequests(Requests)
