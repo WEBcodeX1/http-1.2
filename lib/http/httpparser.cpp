@@ -76,8 +76,6 @@ inline void HTTPParser::_processRequests()
 
 inline bool HTTPParser::_processRequestProperties(const size_t Index)
 {
-    cout << "Processing request properties!" << endl;
-
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
 
@@ -97,19 +95,15 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     //- only process HTTP/1.1 requests
     if (_RequestProperties.HTTPVersion != HTTP_VERSION_1_1) { return false; }
 
-    cout << "Check HTTP method" << endl;
 
     //- if not GET || POST method, return
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_OTHER) { return false; }
-
-    cout << "HTTP method is POST or GET" << endl;
 
     //- parse request headers
     _parseRequestHeaders(Request, _RequestProperties.RequestHeaders);
 
     //- GET request
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_GET) {
-        cout << "HTTP method is GET" << endl;
         //- parse GET parameters
         //- append (move) to requests vector
         _Requests.push_back(move(_RequestProperties));
@@ -117,13 +111,11 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
 
     //- AS POST request
     else if (_RequestProperties.HTTPMethod == HTTP_METHOD_POST) {
-        cout << "HTTP method is POST" << endl;
 
         //- if request does not contain content-length header
         if (_RequestProperties.RequestHeaders.find(HTTP_HEADER_CONTENT_LENGTH) == _RequestProperties.RequestHeaders.end()) {
             return false;
         }
-        cout << "Content-length header found" << endl;
 
         //- if content-length header contains non-digits
         if (StringHelper::is_digits(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH)) == false) {
@@ -131,8 +123,6 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
         }
 
         _POSTContentLength = stoi(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH));
-
-        cout << "POST Content-length: " << _POSTContentLength << endl;
 
         //- if content-length exeeds maximum
         if (_POSTContentLength > HTTP_POST_MAX_CONTENT_LENGTH) {
