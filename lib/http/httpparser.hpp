@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include <iostream>
+#include <sstream>
+
 using namespace std;
 
 typedef unordered_map<string, string> RequestHeader_t;
@@ -39,6 +42,8 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
+    RequestsVector_t getRequests();
+    void getNextRequest(RequestPropertiesRef_t);
 
 private:
 

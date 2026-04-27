@@ -17,12 +17,12 @@ constexpr uint16_t HTTP_POST_MAX_CONTENT_LENGTH = 4096;
 constexpr uint16_t URL_PARAM_NOT_FOUND_ERROR = 10;
 
 //- constant expressions (error)
+constexpr uint16_t HTTP_ERROR_PARSE_BUFFER_EXCEEDED = 10;
 constexpr uint16_t HTTP_ERROR_BAD_REQUEST = 400;
 
-
 //- contant strings
-static const std::string HTTP_1_1_END_MARKER = "\r\n\r\n";
-static const std::string HTTP_HEADER_CONTENT_LENGTH = "Content-Length";
+static const std::string HTTP_1_1_END_MARKER("\r\n\r\n");
+static const std::string HTTP_HEADER_CONTENT_LENGTH("Content-Length");
 
 //- contant multidimensional
 static const std::vector<std::string> HTTPHeaderTypes

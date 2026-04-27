@@ -21,11 +21,18 @@ HTTPParser::~HTTPParser()
 
 void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
 {
+    if (_HTTPRequestBuffer.length()+RecvBytes > _HTTPRequestBufferMax) {
+        return;
+    }
+
     _HTTPRequestBuffer.append(BufferRef, RecvBytes);
 
     //- on incomplete (single) POST request
-    if (_POSTWaitContentLength == true) {
-
+    if (_POSTWaitContentLength == true && _HTTPRequestBuffer.length() >= _POSTContentLength) {
+        _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
+        _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
+        _Requests.push_back(move(_RequestProperties));
+        _POSTWaitContentLength = false;
     }
     else {
         //- reset _SplittedRequests vector
@@ -37,6 +44,19 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
         if (EndMarkerFound != string::npos) {
             _processRequests();
         }
+    }
+}
+
+RequestsVector_t HTTPParser::getRequests()
+{
+    return _Requests;
+}
+
+void HTTPParser::getNextRequest(RequestPropertiesRef_t Request)
+{
+    if (_Requests.size() > 0) {
+        Request = move(_Requests.front());
+        _Requests.erase(_Requests.begin());
     }
 }
 
@@ -56,6 +76,8 @@ inline void HTTPParser::_processRequests()
 
 inline bool HTTPParser::_processRequestProperties(const size_t Index)
 {
+    cout << "Processing request properties!" << endl;
+
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
 
@@ -75,14 +97,19 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     //- only process HTTP/1.1 requests
     if (_RequestProperties.HTTPVersion != HTTP_VERSION_1_1) { return false; }
 
+    cout << "Check HTTP method" << endl;
+
     //- if not GET || POST method, return
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_OTHER) { return false; }
+
+    cout << "HTTP method is POST or GET" << endl;
 
     //- parse request headers
     _parseRequestHeaders(Request, _RequestProperties.RequestHeaders);
 
     //- GET request
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_GET) {
+        cout << "HTTP method is GET" << endl;
         //- parse GET parameters
         //- append (move) to requests vector
         _Requests.push_back(move(_RequestProperties));
@@ -90,11 +117,13 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
 
     //- AS POST request
     else if (_RequestProperties.HTTPMethod == HTTP_METHOD_POST) {
+        cout << "HTTP method is POST" << endl;
 
         //- if request does not contain content-length header
-        if (_RequestProperties.RequestHeaders.find(HTTP_HEADER_CONTENT_LENGTH) != _RequestProperties.RequestHeaders.end()) {
+        if (_RequestProperties.RequestHeaders.find(HTTP_HEADER_CONTENT_LENGTH) == _RequestProperties.RequestHeaders.end()) {
             return false;
         }
+        cout << "Content-length header found" << endl;
 
         //- if content-length header contains non-digits
         if (StringHelper::is_digits(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH)) == false) {
@@ -103,6 +132,8 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
 
         _POSTContentLength = stoi(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH));
 
+        cout << "POST Content-length: " << _POSTContentLength << endl;
+
         //- if content-length exeeds maximum
         if (_POSTContentLength > HTTP_POST_MAX_CONTENT_LENGTH) {
             return false;
@@ -110,7 +141,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
 
         //- on single HTTP POST: payload after endmarker in _HTTPRequestBuffer
         if (_SplittedRequests.size() == 1) {
-            //- if content length bytes already in buffer
+            //- content length bytes already in buffer
             if (_HTTPRequestBuffer.length() >= _POSTContentLength) {
                 _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
                 _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
@@ -137,7 +168,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     return true;
 }
 
-void HTTPParser::_parseRequestProperties(string& Request, RequestPropertiesRef_t ResultBaseProps)
+inline void HTTPParser::_parseRequestProperties(string& Request, RequestPropertiesRef_t ResultBaseProps)
 {
     //- find first line endline
     size_t StartPos = Request.find("\r\n");
@@ -165,7 +196,7 @@ void HTTPParser::_parseRequestProperties(string& Request, RequestPropertiesRef_t
     ResultBaseProps.URL = SplitResult.at(1);
 }
 
-void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t ResultRef)
+inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t ResultRef)
 {
     //- reverse split header lines
     vector<string> Lines;
