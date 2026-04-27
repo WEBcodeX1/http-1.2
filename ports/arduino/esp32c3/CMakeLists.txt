@@ -18,4 +18,14 @@ add_custom_target(
 )
 
 # install
-install(TARGETS httpparser DESTINATION /usr/local/lib)
+install(
+    TARGETS httpparser
+    ARCHIVE DESTINATION /usr/local/lib/esp32c3
+)
+
+# install header file
+install(
+    FILES
+    ../../../lib/http/httpparser.hpp
+    DESTINATION /usr/local/include/esp32c3
+)
