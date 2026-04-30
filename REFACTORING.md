@@ -1,51 +1,67 @@
 # Refactoring
 
-This document describes the refactoring process / migration from version `v0.1` to `v0.2` to `v0.3` in detail.
+This document describes the refactoring and migration process from version `v0.1` to `v0.2` and later to `v0.3`.
 
 > [!NOTE]
-> This document is WIP.
+> This document is a work in progress.
 
 ## Version 0.2
 
-The HTTP parser library in version 0.1 is unclean code. Memory handling is mixed with parser functionality. This prohibits the use of the library in external projects.
+In version `v0.1`, the HTTP parser library is not cleanly structured. Memory handling is mixed with parser functionality, which makes the library difficult to reuse in external projects.
 
-The goal after refactoring is to use the library for the internal arduino microcontroller port and for other projects.
+The goal of the refactoring is to make the library usable both for the internal Arduino microcontroller port and for other external projects.
 
 Version `v0.2` will:
 
 - Remove memory handling from the library completely
-- Provide a rock solid, stable, secure and browser compatible processing (only GET and POST requests)
-- Add / update library documentation
+- Provide stable, secure, and browser-compatible processing for HTTP requests (initially only GET and POST)
+- Add and update library documentation
 
 > [!NOTE]
-> Version 0.2 will provide a tested, 100% working library for use in external projects.
+> Version `v0.2` is intended to provide a tested and reliable library for use in external projects.
 
 ### 1. HTTP-Parser
 
-1. HTTP-Parser should only handle HTTP/1.1 requests
-2. Remove C++ Exceptions, replace with direct (more concrete) object status checking (if clauses)
-3. Remove / decapsulate Shared Memory Management functionality
-4. Improve GET parameter parsing / result handling
-5. Add limits checking to guarantee fail-safe operation
-6. Add requests queuing / requests handling mechanism
-7. Add tests / improve code quality
-8. Ensure C++11 conformity (for embedded size and security)
+1. The HTTP parser should only handle HTTP/1.1 requests
+2. Remove C++ exceptions and replace them with direct, explicit object status checks (`if` clauses)
+3. Remove or decapsulate shared memory management functionality
+4. Improve GET parameter parsing and result handling
+5. Add limit checks to guarantee fail-safe operation
+6. Add a request queueing and request-handling mechanism
+7. Add tests and improve code quality
+8. Ensure C++11 conformity (for embedded compatibility, smaller binaries, and security)
 
 #### 1.1. HTTP/1.1 Requests Only
 
+The parser will be restricted to HTTP/1.1 request handling only. This simplifies the implementation, reduces ambiguity, and avoids the need to support incompatible or unnecessary protocol variants for the embedded target.
+
 #### 1.2. Remove C++ Exceptions
+
+C++ exceptions will be removed from the parser library and replaced with explicit status reporting and conditional checks. This improves portability, makes control flow easier to follow, and is better suited for embedded environments.
 
 #### 1.3. Memory Management
 
+Memory management responsibilities will be removed from the parser or clearly separated from its core functionality. The parser should focus only on protocol parsing and validation so that it can be reused in other projects without depending on a specific memory model.
+
 #### 1.4. GET Parameter Parsing
+
+GET parameter parsing will be improved to produce clearer and more reliable results. This includes better separation of keys and values, more predictable result structures, and safer handling of malformed or incomplete query strings.
 
 #### 1.5. Limits Checking
 
+Additional limit checks will be introduced to guarantee fail-safe behavior. This includes checking request sizes, buffer boundaries, header counts, and other parser limits to prevent invalid input from causing unsafe behavior.
+
 #### 1.6. Result Queuing
+
+A request/result queueing mechanism will be added to improve how parsed requests are handed off for further processing. This is intended to make request handling more robust and to prepare the parser for use in threaded or constrained runtime environments.
 
 #### 1.7. Tests / Code Quality
 
+Test coverage will be expanded and the general code quality will be improved. This includes adding regression tests, validating parser edge cases, and restructuring code where necessary to make behavior easier to verify and maintain.
+
 #### 1.8. C++11 Conformity
+
+The refactored parser will be kept compatible with C++11. This is important for embedded toolchains and helps keep the codebase portable, efficient, and easier to integrate into constrained environments such as Arduino-based targets.
 
 ### 2. HTTP Response Generator
 
@@ -59,16 +75,16 @@ Version `v0.2` will:
 
 ## Version 0.3
 
-- Remove Result Processor / ThreadHandler for results processing completely
-- Move Results Processing into main server process / thread
-- This removes necesserity of clientFD passing between processes / threads
-- This also removes / reduces shared memory processing to application server processes only
-- Fix object relation between ClientHandler -> Client -> ProtocolParser
-- Implement XML protocol parser *library* (with similar result queuing functionality to HTTPParser) - c++ move semantics
-- Remove ResultOrering, implement RequestUUID handling
-- Integrate parsing / encryption (threaded) with fixed thread count and atomic locked *request* **and** *result* queue(s)
+- Remove the result processor / thread handler for result processing completely
+- Move result processing into the main server process or thread
+- This removes the necessity of passing `clientFD` values between processes or threads
+- This also removes or reduces shared-memory handling to application server processes only
+- Fix the object relationships between `ClientHandler`, `Client`, and `ProtocolParser`
+- Implement an XML protocol parser *library* with result queueing functionality similar to `HTTPParser`, using C++ move semantics
+- Remove result ordering and implement request UUID handling
+- Integrate parsing and encryption in a threaded model with a fixed thread count and atomically protected request and result queues
 
 ## Future
 
-- According to changes in `v0.3` implement NLAFP sendfile() single-threaded / in a single process
+- Based on the changes in `v0.3`, implement NLAFP `sendfile()` in a single-threaded or single-process design
 - NETCONF integration
