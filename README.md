@@ -37,8 +37,8 @@ in place of modern web-application requirements.
 
 **FalconAS Server Features**:
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
-- ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- ✅ **Threaded Static File Delivery**: Threading and in-kernel sendfile() increase scheduling latency
+- ✅ **Lightning-Fast Performance**: Epoll-based / multi-socket optimized architecture
+- ✅ **Sendfile Static File Delivery**: In-kernel sendfile() decrease scheduling latency
 - ✅ **Rock-Solid App-Server Security**: Runs with tight backend process-separation model (non-threaded)
 - ✅ **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
 - ✅ **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
