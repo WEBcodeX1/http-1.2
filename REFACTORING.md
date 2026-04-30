@@ -105,39 +105,39 @@ Version `v0.3` will:
 > [!NOTE]
 > The planned `v0.3` work is based on the current source layout in `/src`, especially `Server`, `ClientHandler`, `ASRequestHandler`, `ASProcessHandler`, `ResultProcessor`, `ResultOrder`, and `ThreadHandler`.
 
-#### 3.1. Remove Dedicated Result Processing
+#### 1.1. Remove Dedicated Result Processing
 
 The current implementation uses `ResultProcessor`, `ResultOrder`, and `ThreadHandler` as separate stages for response processing. Version `v0.3` will remove this pipeline and simplify response generation and delivery.
 
-#### 3.2. Move Result Handling into the Main Server Process
+#### 1.2. Move Result Handling into the Main Server Process
 
 Result processing should no longer run in a separate process model. Instead, the main server flow should remain responsible for coordinating request completion and emitting final responses.
 
-#### 3.3. Remove File-Descriptor Passing
+#### 1.3. Remove File-Descriptor Passing
 
 The current architecture requires passing `clientFD` values between processes. Version `v0.3` should eliminate this mechanism so that the component writing the response already owns the client connection.
 
-#### 3.4. Reduce Shared-Memory Usage
+#### 1.4. Reduce Shared-Memory Usage
 
 Shared memory should no longer be used for the full request/response lifecycle. It should be limited to backend or application-server communication where cross-process exchange is still necessary.
 
-#### 3.5. Clarify Client and Parser Responsibilities
+#### 1.5. Clarify Client and Parser Responsibilities
 
 The current relationships between `ClientHandler`, `Client`, and `HTTPParser` are mixed. Version `v0.3` will establish clearer ownership between connection state, request state, and parsing logic.
 
-#### 3.6. Add an XML Protocol Parser Library
+#### 1.6. Add an XML Protocol Parser Library
 
 An additional XML protocol parser library will be introduced following the same principles as the refactored HTTP parser. It should provide structured results, queueing support, and efficient transfer using move semantics.
 
-#### 3.7. Replace Result Ordering with Request UUIDs
+#### 1.7. Replace Result Ordering with Request UUIDs
 
 The current result model depends on explicit ordering logic such as `ReqNr` and `_LastRequest`. Version `v0.3` will replace this approach with request UUID handling.
 
-#### 3.8. Add a Client Request Library
+#### 1.8. Add a Client Request Library
 
 In addition to the protocol parsing library, a client request library with tests will be added for generating and sending requests in external projects.
 
-#### 3.9. Add a Fixed-Size Threaded Processing Model
+#### 1.9. Add a Fixed-Size Threaded Processing Model
 
 Version `v0.3` will introduce a controlled threaded model with a fixed number of worker threads, explicit request and result queues, atomic synchronization, and integrated parsing and encryption stages.
 
