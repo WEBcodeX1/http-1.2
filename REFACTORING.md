@@ -145,5 +145,5 @@ Version `v0.3` will introduce a controlled threaded model with a fixed number of
 
 The following items are planned for later stages after the core `v0.3` refactoring is completed:
 
-- Adapt static file transmission into the **new** NLAFP component
+- Adapt static file transmission into **new** NLAFP component
 - Add NETCONF integration
