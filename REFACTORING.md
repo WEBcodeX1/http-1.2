@@ -65,13 +65,25 @@ The refactored parser will be kept compatible with C++11. This is important for 
 
 ### 2. HTTP Response Generator
 
+In addition to the HTTP parser, the library also contains an HTTP response generator. Its purpose is to build valid and consistent HTTP/1.1 responses in a structured way, so that application code does not need to assemble response messages manually.
+
+The response generator should make it easier to produce standards-compliant responses, reduce duplicated formatting logic, and improve maintainability for both embedded and external use cases. The following sub-topics describe the planned responsibilities and behavior of the response generator in more detail.
+
 #### 2.1. Result Code
+
+The response generator will provide a clear and reliable way to set the HTTP result code for a response, such as `200`, `404`, or `500`. It should ensure that valid status codes are used consistently and that application code can assign them without manually constructing the status line each time.
 
 #### 2.2. Result Message
 
+In addition to the numeric result code, the response generator will handle the associated result message, such as `OK`, `Not Found`, or `Internal Server Error`. This should allow the library to generate complete and readable HTTP status lines while keeping the mapping between result codes and messages predictable and maintainable.
+
 #### 2.3. Date Header
 
+The response generator will automatically support creation of the `Date` header for HTTP responses. This is important for standards compliance and interoperability with browsers and other clients. The implementation should ensure that the date is generated in the correct HTTP format and can be included consistently in every response where required.
+
 #### 2.4. Adding Custom Headers
+
+The response generator will provide a mechanism for adding custom headers to a response in a controlled and extensible way. This includes headers such as `Content-Type`, `Cache-Control`, or application-specific metadata. The design should make it possible to add, update, and serialize headers cleanly without mixing header construction logic directly into application code.
 
 ## Version 0.3
 
