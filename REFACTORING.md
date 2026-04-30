@@ -87,170 +87,63 @@ The response generator will provide a mechanism for adding custom headers to a r
 
 ### Version 0.3
 
-Version `v0.3` focuses on drastically simplifying the runtime architecture that currently exists in `src`.
-At the moment, request parsing, application-server execution, result collection, response ordering, and final socket output are split across multiple components and even separate processes. While this design works as an experiment for concurrency and isolation, it also introduces complexity in process coordination, shared-memory synchronization, socket / file-descriptor passing, and object ownership.
+Version `v0.3` focuses on simplifying the current runtime architecture in `src`.
+At the moment, request parsing, application-server execution, result handling, and socket output are distributed across multiple components and processes. This increases complexity in coordination, shared-memory usage, descriptor passing, and object ownership.
 
-The main goal of version `v0.3` is therefore to
+Version `v0.3` will:
 
-1. Reduce shared memory data exchange (requests and results) to the application server processes only
-2. Move client socket data processing to the main process where the ClientHandler also processes client data receiving
-3. Add epoll filedescriptor checking for clientFD sockets are writeable
-4. Add client buffering if socket write on clientFD is not possible
+1. Remove the dedicated result-processing pipeline
+2. Move result handling back into the main server process
+3. Eliminate client file-descriptor passing between processes or threads
+4. Reduce shared-memory usage to application-server communication only
+5. Clarify the object roles of `ClientHandler`, `Client`, and `HTTPParser`
+6. Add an XML protocol parser library with queueing support
+7. Replace result ordering with request UUID handling
+8. Add a client request library including tests
+9. Integrate parsing and encryption in a fixed-size threaded model with protected request and result queues
 
 > [!NOTE]
 > The planned `v0.3` work is based on the current source layout in `/src`, especially `Server`, `ClientHandler`, `ASRequestHandler`, `ASProcessHandler`, `ResultProcessor`, `ResultOrder`, and `ThreadHandler`.
 
-#### 3.1. Remove the Result Processor / Thread Handler for Result Processing Completely
+#### 3.1. Remove Dedicated Result Processing
 
-The current implementation contains a dedicated `ResultProcessor` process and an additional `ThreadHandler`-based response stage.
+The current implementation uses `ResultProcessor`, `ResultOrder`, and `ThreadHandler` as separate stages for response processing. Version `v0.3` will remove this pipeline and simplify response generation and delivery.
 
-Today, the flow is roughly:
+#### 3.2. Move Result Handling into the Main Server Process
 
-1. `ClientHandler` accepts and reads client data
-2. static-file and backend request metadata are written into shared memory
-3. `ResultProcessor` wakes up and reads both static-file and application-server results
-4. `ResultProcessor` forwards these results into `ResultOrder`
-5. `ResultOrder` groups requests by client and forwards them into `ThreadHandler`
-6. `ThreadHandler` creates `ClientThread` worker threads
-7. each `ClientThread` finally writes the HTTP response to the client socket
+Result processing should no longer run in a separate process model. Instead, the main server flow should remain responsible for coordinating request completion and emitting final responses.
 
-Version `v0.3` removes `ResultProcessor`, `ResultOrder`, and `ThreadHandler` completely.
+#### 3.3. Remove File-Descriptor Passing
 
-#### 3.2. Move Result Processing into the Main Server Process
+The current architecture requires passing `clientFD` values between processes. Version `v0.3` should eliminate this mechanism so that the component writing the response already owns the client connection.
 
-Currently, result processing is performed outside the main server flow.
-This is visible in `Server::init()`, where the server explicitly forks a separate result processor before entering the main event loop.
+#### 3.4. Reduce Shared-Memory Usage
 
-The planned `v0.3` change is to bring result handling back into the main server process, or at least into a server-owned thread that does not require a separate process model.
+Shared memory should no longer be used for the full request/response lifecycle. It should be limited to backend or application-server communication where cross-process exchange is still necessary.
 
-In practical terms, this means:
+#### 3.5. Clarify Client and Parser Responsibilities
 
-- The main event loop should remain responsible not only for accepting and parsing requests, but also for coordinating completion and final response emission
-- Application-server results should be collected directly by server-owned logic instead of by a separate `ResultProcessor`
-- Static-file responses should be emitted directly without being serialized through a secondary result pipeline
-- Response ordering decisions should happen where request state already exists, rather than in an isolated post-processing stage
+The current relationships between `ClientHandler`, `Client`, and `HTTPParser` are mixed. Version `v0.3` will establish clearer ownership between connection state, request state, and parsing logic.
 
-This architecture is a better match for the current code because request ownership begins in `ClientHandler` and socket ownership also logically belongs there. Moving result processing back into the main flow avoids reconstructing client context later from shared memory snapshots.
+#### 3.6. Add an XML Protocol Parser Library
 
-#### 3.3. Remove the Necessity of Passing `clientFD` Values Between Processes or Threads
+An additional XML protocol parser library will be introduced following the same principles as the refactored HTTP parser. It should provide structured results, queueing support, and efficient transfer using move semantics.
 
-One of the clearest indicators of architectural friction in the current code is the special file-descriptor passing mechanism.
+#### 3.7. Replace Result Ordering with Request UUIDs
 
-At the moment:
+The current result model depends on explicit ordering logic such as `ReqNr` and `_LastRequest`. Version `v0.3` will replace this approach with request UUID handling.
 
-- The main server owns accepted client sockets
-- Child processes cannot safely use the parent-owned socket descriptor directly in the intended way
-- `ResultProcessor` therefore requests the descriptor from the parent over a Unix domain socket
-- Helper functions in `Global.hpp` (`createFDPassingServer`, `connectFDPassingClient`, `sendFD`, `recvFD`) exist solely to make that possible
-- `ResultProcessor::_getFDFromParent()` uses this mechanism before writing a response
+#### 3.8. Add a Client Request Library
 
-This entire mechanism exists because response generation happens in a different process from the one that accepted the connection.
+In addition to the protocol parsing library, a client request library with tests will be added for generating and sending requests in external projects.
 
-Version `v0.3` should eliminate this need.
-The component that writes the NLAP response should already be in the same process context that owns the client connection, or should receive a safe internal reference that does not require SCM_RIGHTS-based descriptor transfer.
+#### 3.9. Add a Fixed-Size Threaded Processing Model
 
-This change should remove:
-
-- The FD-passing Unix socket server in `Server`
-- The FD-passing thread in `Server::handleFDPassingRequests()`
-- The descriptor request/retry path in `ResultProcessor::_getFDFromParent()`
-- The extra bookkeeping fields such as `ClientFDShared` that only exist to represent transferred descriptors
-
-#### 3.4. Remove or Reduce Shared-Memory Handling to Application-Server Processes Only
-
-The current design uses shared memory for multiple purposes:
-
-- Static file request forwarding
-- Application-server request metadata
-- Application-server request payloads
-- Application-server result payloads
-
-`Server::setupSharedMemory()` allocates several large shared-memory segments, and both `ClientHandler` and `ResultProcessor` participate in the static-file / result pipeline through those regions.
-
-For version `v0.3`, shared memory should no longer be the transport mechanism for the full response lifecycle.
-Instead, shared memory should be limited to the minimum necessary cross-process communication.
-
-That means:
-
-- Static file request processing should no longer require shared-memory exchange
-- Parsed request metadata that remains local to the server should stay in normal in-process objects
-- Only backend-bound work should be marshalled into shared memory, if backend workers remain separate processes
-
-In the current codebase, the most likely candidate for retention is the application-server communication layer represented by:
-
-- `ASRequestHandler`
-- `IPCHandlerAS`
-- `ASProcessHandler`
-
-Everything else should gradually stop depending on shared-memory slots and atomic flags for normal request/result handling.
-
-#### 3.5. Fix the Object Relationships Between `ClientHandler`, `Client`, and `ProtocolParser`
-
-The current object model is not yet clean.
-
-Observed issues in the current source include:
-
-- `ClientHandler` stores `shared_ptr<HTTPParser>` objects directly in its client map
-- `Client` exists as a separate class, but is not clearly the central runtime owner of per-client state
-- `ClientThread` privately inherits from `HTTPParser`, creating another parser-bearing client-related object
-- Request numbering and client state are partially distributed across parser/client/thread abstractions
-- The parser is used both as a protocol utility and as part of connection/runtime ownership
-
-This suggests that parsing concerns and connection / session concerns are currently mixed. Version `v0.3` will establish clearer roles.
-
-#### 3.6. Implement an XML Protocol Parser *Library*
-
-with Result Queueing Functionality Similar to `HTTPParser`, Using C++ Move Semantics
-
-This item appears to be forward-looking and introduces a second protocol parser library following the same architectural principles as the refactored HTTP parser.
-
-The intent is likely not to embed XML-specific application logic into the HTTP server directly, but to provide a reusable parser module with a queueing/output model similar to the HTTP parsing pipeline.
-
-Based on the current codebase, this should mean:
-
-- The XML parser should be implemented as its own library component
-- It should not depend on server-specific connection classes more than necessary
-- It should produce structured parse results rather than direct side effects
-- Parsed result objects should be moveable so that large payloads are transferred efficiently without unnecessary copying
-
-The XML parser should follow the same separation principles planned for the HTTP parser in `v0.2`:
-
-- Protocol parsing logic only
-- No hidden memory management policy
-- No application-specific execution logic
-- Clear status/result-based behavior
-
-#### 3.7. Remove Result Ordering and Implement Request UUID Handling
-
-The current result model contains explicit request ordering machinery in `ResultOrder`.
-
-Right now:
-
-- Requests are grouped per client
-- HTTP/1.1 responses are forced into sequential order using `ReqNr`
-- HTTP/1.2 responses are treated as unordered
-- `_LastRequest` tracks what can be emitted next for each client
-
-This design reflects a transport-coupled ordering strategy.
-However, once work is distributed across processes and threads, numeric per-client ordering becomes fragile and adds coordination overhead.
-
-The `v0.3` replaces this mechanism with request UUID handling.
-
-#### 3.8. Client Rquest Library
-
-Additional to the *ProtocolParsing* library, a *Client Request* library (including tests) will be added to correctly send requests from a client / to include in external products.
-
-#### 3.9. Integrate Parsing and Encryption in a Threaded Model with a Fixed Thread Count and Atomically Protected Request and Result Queues
-
-For `v0.3`, a controlled threaded architecture is planned with:
-
-- a fixed number of worker threads
-- explicit request queues (already planned to implement in HTTPParser)
-- explicit result queues
-- atomic safely synchronized queue protection
-- integrated parsing and encryption stages
+Version `v0.3` will introduce a controlled threaded model with a fixed number of worker threads, explicit request and result queues, atomic synchronization, and integrated parsing and encryption stages.
 
 ## Future
 
-- Adapt static file transmission into NLAFP component based on the core changes in `v0.3`
-- NETCONF integration
+The following items are planned for later stages after the core `v0.3` refactoring is completed:
+
+- Adapt static file transmission into the NLAFP component
+- Add NETCONF integration
