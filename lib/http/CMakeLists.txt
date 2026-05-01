@@ -14,7 +14,7 @@ add_custom_target(
 # install static .a library
 install(
     TARGETS httpparser
-    LIBRARY DESTINATION /usr/local/lib
+    ARCHIVE DESTINATION /usr/local/lib
 )
 
 # install header file
