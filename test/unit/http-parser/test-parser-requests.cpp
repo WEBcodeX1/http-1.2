@@ -529,4 +529,5 @@ BOOST_AUTO_TEST_CASE( test_urlparamsmap2_json )
 
     cout << "JSON: " << JSONResult << endl;
 
+    BOOST_TEST(JSONResult == "{ \"payload\": { \"here\": \"there\", \"test\": \"test2\", \"hello\": \"hello1\" }}");
 }
