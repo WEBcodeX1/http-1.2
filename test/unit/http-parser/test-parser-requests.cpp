@@ -492,3 +492,41 @@ BOOST_AUTO_TEST_CASE( test_valid_get_parameters_2 )
     BOOST_TEST(rg3 == "there");
 
 }
+
+BOOST_AUTO_TEST_CASE( test_urlparamsmap2_json )
+{
+    cout << "Check urlparamsmap to JSON conversion." << endl;
+
+    RequestsVector_t Requests;
+
+    unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
+
+    parser->appendBuffer(HTTP_REQUEST_GET_OK2.c_str(), HTTP_REQUEST_GET_OK2.length());
+    Requests = parser->getRequests();
+
+    auto rs = Requests.size();
+    auto rv = Requests.at(0).HTTPVersion;
+    auto rm = Requests.at(0).HTTPMethod;
+    auto ru = Requests.at(0).URL;
+    auto rh = Requests.at(0).RequestHeaders.at("Header2");
+    auto rg1 = Requests.at(0).URLParams.at("hello");
+    auto rg2 = Requests.at(0).URLParams.at("test");
+    auto rg3 = Requests.at(0).URLParams.at("here");
+
+    cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
+
+    BOOST_TEST(rs == 1);
+    BOOST_TEST(rv == 1);
+    BOOST_TEST(rm == 1);
+    BOOST_TEST(ru == "/test2.html?hello=hello1&test=test2&here=there");
+    BOOST_TEST(rh == "two");
+    BOOST_TEST(rg1 == "hello1");
+    BOOST_TEST(rg2 == "test2");
+    BOOST_TEST(rg3 == "there");
+
+    string JSONResult;
+    JSON::URLParamsMap2JSON(Requests.at(0).URLParams, JSONResult);
+
+    cout << "JSON: " << JSONResult << endl;
+
+}

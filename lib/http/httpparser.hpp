@@ -120,35 +120,18 @@ class JSON {
 
 public:
 
-    static void getRequest2JSON()
+    static void URLParamsMap2JSON(URLParamMapRef_t URLParamsMap, string& JSONPayload)
     {
-        /*
-        const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
-        string JSONPayload("{ \"payload\": {");
+        JSONPayload = "{ \"payload\": {";
 
-        for (const auto& [Endpoint, EndpointProps]: NamespaceProps.JSONConfig["access"]["as-get"].items()) {
-            DBG(200, "Endpoint:" << Endpoint);
-            const size_t EndpointFound = BaseProperties.at(1).find("/backend" + Endpoint);
-            if (EndpointFound != string::npos) {
-                DBG(200, "Looping on params");
-                string ProcessURL = BaseProperties.at(1);
-                for (size_t i=0; i<EndpointProps["params"].size(); ++i) {
-                    const string Param = EndpointProps["params"][i];
-                    const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
-                    JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
-                    DBG(200, "ProcessURL: " << ProcessURL << " Param: " << Param << " Value:" << ParamValue);
-                    if (i != EndpointProps["params"].size() - 1) {
-                        JSONPayload += ",";
-                    }
-                }
-                JSONPayload += "}}";
-                DBG(200, "AS GET JSONPayload:" << JSONPayload);
-                _processASPayload(
-                    ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, JSONPayload
-                );
-                return;
+        uint16_t i = 0;
+        for (const auto& [ParamName, ParamValue]: URLParamsMap) {
+            JSONPayload += " \"" + ParamName + "\": \"" + ParamValue + "\"";
+            if (i != URLParamsMap.size()-1) {
+                JSONPayload += ",";
             }
+            ++i;
         }
-        */
+        JSONPayload += " }}";
     }
 };
