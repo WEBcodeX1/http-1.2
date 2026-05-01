@@ -12,11 +12,3 @@ The **HTTP/1.1 Library** is used to
 
 - Parse HTTP Requests / Headers
 - Generate HTTP Requests / Headers
-
-### 2.1. HTTP Parser
-
-Detailed Documentation following.
-
-### 2.2 HTTP Message Generator
-
-Detailed Documentation following.
