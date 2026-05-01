@@ -8,12 +8,16 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include <iostream>
+#include <sstream>
+
 using namespace std;
 
 typedef unordered_map<string, string> RequestHeader_t;
 typedef RequestHeader_t& RequestHeaderRef_t;
 
-typedef unordered_map<string, string> URLParam_t;
+typedef unordered_map<string, string> URLParamMap_t;
+typedef URLParamMap_t& URLParamMapRef_t;
 
 struct RequestProperties_t
 {
@@ -22,7 +26,7 @@ struct RequestProperties_t
     RequestHeader_t RequestHeaders;
     string URL;
     string Payload;
-    URLParam_t URLParams;
+    URLParamMap_t URLParams;
 };
 
 typedef RequestProperties_t& RequestPropertiesRef_t;
@@ -40,7 +44,7 @@ public:
 
     void appendBuffer(const char*, const uint16_t);
     RequestsVector_t getRequests();
-    void getNextRequest(RequestPropertiesRef_t);
+    void getNextRequest(const RequestPropertiesRef_t);
 
 private:
 
@@ -66,8 +70,9 @@ private:
 
 protected:
 
-    void _parseRequestProperties(string&, RequestPropertiesRef_t);
+    void _parseRequestProperties(string&, const RequestPropertiesRef_t);
     void _parseRequestHeaders(string&, RequestHeaderRef_t);
+    void _parseGETParameter(const string&, URLParamMapRef_t);
 };
 
 
@@ -75,7 +80,7 @@ class StringHelper {
 
 public:
 
-    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef, bool EraseFromSrc = true)
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
     {
         string SplitElement;
         auto pos = StringRef.find(Delimiter);
@@ -83,9 +88,7 @@ public:
         while (pos != string::npos) {
             SplitElement = StringRef.substr(0, pos);
             ResultRef.push_back(SplitElement);
-            if (EraseFromSrc == true) {
-                StringRef.erase(0, pos + Delimiter.length());
-            }
+            StringRef.erase(0, pos + Delimiter.length());
             pos = StringRef.find(Delimiter);
         }
     }

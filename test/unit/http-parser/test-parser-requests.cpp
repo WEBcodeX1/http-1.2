@@ -16,6 +16,9 @@ static const string HTTP_REQUEST_POST_PARTIAL1("POST /other/path HTTP/1.1\r\nHos
 static const string HTTP_REQUEST_POST_PARTIAL2("net\r\nContent-Type: application/json\r\nContent-Length: 10\r");
 static const string HTTP_REQUEST_POST_PARTIAL3("\n\r\n{12345678}");
 
+static const string HTTP_REQUEST_GET_OK1("GET /test/test.html?a=1&b=2 HTTP/1.1\r\nCustomHeader1: three\r\n\r\n");
+static const string HTTP_REQUEST_GET_OK2("GET /test2.html?hello=hello1&test=test2&here=there HTTP/1.1\r\nHeader2: two\r\n\r\n");
+
 
 BOOST_AUTO_TEST_CASE( test_single_valid_get_request_full_transmit )
 {
@@ -424,4 +427,68 @@ BOOST_AUTO_TEST_CASE( test_single_valid_post_request_partial_1byte_transmit )
     BOOST_TEST(rm == 2);
     BOOST_TEST(ru == "/other/path");
     BOOST_TEST(rh == "application/json");
+}
+
+BOOST_AUTO_TEST_CASE( test_valid_get_parameters_1 )
+{
+    cout << "Check valid GET parameters request 1." << endl;
+
+    RequestsVector_t Requests;
+
+    unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
+
+    parser->appendBuffer(HTTP_REQUEST_GET_OK1.c_str(), HTTP_REQUEST_GET_OK1.length());
+    Requests = parser->getRequests();
+
+    auto rs = Requests.size();
+    auto rv = Requests.at(0).HTTPVersion;
+    auto rm = Requests.at(0).HTTPMethod;
+    auto ru = Requests.at(0).URL;
+    auto rh = Requests.at(0).RequestHeaders.at("CustomHeader1");
+    auto rg1 = Requests.at(0).URLParams.at("a");
+    auto rg2 = Requests.at(0).URLParams.at("b");
+
+    cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
+
+    BOOST_TEST(rs == 1);
+    BOOST_TEST(rv == 1);
+    BOOST_TEST(rm == 1);
+    BOOST_TEST(ru == "/test/test.html?a=1&b=2");
+    BOOST_TEST(rh == "three");
+    BOOST_TEST(rg1 == "1");
+    BOOST_TEST(rg2 == "2");
+
+}
+
+BOOST_AUTO_TEST_CASE( test_valid_get_parameters_2 )
+{
+    cout << "Check valid GET parameters request 2." << endl;
+
+    RequestsVector_t Requests;
+
+    unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
+
+    parser->appendBuffer(HTTP_REQUEST_GET_OK2.c_str(), HTTP_REQUEST_GET_OK2.length());
+    Requests = parser->getRequests();
+
+    auto rs = Requests.size();
+    auto rv = Requests.at(0).HTTPVersion;
+    auto rm = Requests.at(0).HTTPMethod;
+    auto ru = Requests.at(0).URL;
+    auto rh = Requests.at(0).RequestHeaders.at("Header2");
+    auto rg1 = Requests.at(0).URLParams.at("hello");
+    auto rg2 = Requests.at(0).URLParams.at("test");
+    auto rg3 = Requests.at(0).URLParams.at("here");
+
+    cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
+
+    BOOST_TEST(rs == 1);
+    BOOST_TEST(rv == 1);
+    BOOST_TEST(rm == 1);
+    BOOST_TEST(ru == "/test2.html?hello=hello1&test=test2&here=there");
+    BOOST_TEST(rh == "two");
+    BOOST_TEST(rg1 == "hello1");
+    BOOST_TEST(rg2 == "test2");
+    BOOST_TEST(rg3 == "there");
+
 }

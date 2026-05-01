@@ -52,7 +52,7 @@ RequestsVector_t HTTPParser::getRequests()
     return _Requests;
 }
 
-void HTTPParser::getNextRequest(RequestPropertiesRef_t Request)
+void HTTPParser::getNextRequest(const RequestPropertiesRef_t Request)
 {
     if (_Requests.size() > 0) {
         Request = move(_Requests.front());
@@ -95,7 +95,6 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     //- only process HTTP/1.1 requests
     if (_RequestProperties.HTTPVersion != HTTP_VERSION_1_1) { return false; }
 
-
     //- if not GET || POST method, return
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_OTHER) { return false; }
 
@@ -105,11 +104,13 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     //- GET request
     if (_RequestProperties.HTTPMethod == HTTP_METHOD_GET) {
         //- parse GET parameters
+        _parseGETParameter(_RequestProperties.URL, _RequestProperties.URLParams);
+
         //- append (move) to requests vector
         _Requests.push_back(move(_RequestProperties));
     }
 
-    //- AS POST request
+    //- POST request
     else if (_RequestProperties.HTTPMethod == HTTP_METHOD_POST) {
 
         //- if request does not contain content-length header
@@ -158,7 +159,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     return true;
 }
 
-inline void HTTPParser::_parseRequestProperties(string& Request, RequestPropertiesRef_t ResultBaseProps)
+inline void HTTPParser::_parseRequestProperties(string& Request, const RequestPropertiesRef_t ResultBaseProps)
 {
     //- find first line endline
     size_t StartPos = Request.find("\r\n");
@@ -188,7 +189,7 @@ inline void HTTPParser::_parseRequestProperties(string& Request, RequestProperti
 
 inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t ResultRef)
 {
-    //- reverse split header lines
+    //- split / reverse split header lines
     vector<string> Lines;
     StringHelper::split(Request, "\r\n", Lines);
 
@@ -201,12 +202,42 @@ inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t
         if (Line.find(":") != string::npos) {
 
             StringHelper::rsplit(Line, Line.length(), ": ", HeaderPair);
-            string HeaderID = HeaderPair.at(1);
-            string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length());
 
             ResultRef.emplace(
-                HeaderID, HeaderValue
+                HeaderPair.at(1), HeaderPair.at(0).substr(0, HeaderPair.at(0).length())
             );
+        }
+    }
+}
+
+inline void HTTPParser::_parseGETParameter(const string& RequestURL, URLParamMapRef_t ResultRef)
+{
+    //- only process on init character "?" found
+    const size_t URLParamsStartPos = RequestURL.find("?");
+
+    if (URLParamsStartPos != string::npos && RequestURL.length() > URLParamsStartPos) {
+
+        string URLParamsPart = RequestURL.substr(URLParamsStartPos+1, RequestURL.length());
+
+        vector<string> ParamValuePairs;
+        StringHelper::split(URLParamsPart, "&", ParamValuePairs);
+
+        ParamValuePairs.push_back(URLParamsPart);
+
+        //- loop over param-value pairs
+        for (auto &ParamValuePair:ParamValuePairs) {
+
+            const size_t PVPDelimiterPos = ParamValuePair.find("=");
+            cout << "loop in: " << ParamValuePair << " pos: " << PVPDelimiterPos << endl;
+
+            if (PVPDelimiterPos != string::npos && PVPDelimiterPos != 0 && ParamValuePair.length() > PVPDelimiterPos) {
+                string key = ParamValuePair.substr(0, PVPDelimiterPos);
+                string value = ParamValuePair.substr(PVPDelimiterPos+1, ParamValuePair.length());
+                cout << "emplace key:" << key << " value:" << value << endl;
+                ResultRef.emplace(
+                    ParamValuePair.substr(0, PVPDelimiterPos), ParamValuePair.substr(PVPDelimiterPos+1, ParamValuePair.length())
+                );
+            }
         }
     }
 }
