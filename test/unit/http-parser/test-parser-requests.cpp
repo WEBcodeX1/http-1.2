@@ -889,28 +889,56 @@ BOOST_AUTO_TEST_CASE( test_garbage_repeated_end_markers )
 // Category 4: Binary file input (/bin/kmod)
 // =========================================================================
 
+// Synthetic ELF-like binary data used as a fallback when /bin/kmod is absent.
+// An ELF header starts with the 4-byte magic 0x7F 'E' 'L' 'F'; the rest of
+// these bytes fill a realistic 64-byte blob that cannot form valid HTTP/1.1.
+static const unsigned char SYNTHETIC_BINARY_BLOB[] = {
+    0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x02, 0x00, 0x3E, 0x00, 0x01, 0x00, 0x00, 0x00,
+    0xB0, 0x10, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xF8, 0xC5, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x38, 0x00,
+    0x09, 0x00, 0x40, 0x00, 0x1E, 0x00, 0x1D, 0x00
+};
+
 BOOST_AUTO_TEST_CASE( test_binary_file_kmod_full_chunks )
 {
-    cout << "Check binary input: /bin/kmod fed in 2048-byte chunks." << endl;
+    cout << "Check binary input: /bin/kmod fed in 2048-byte chunks (fallback: synthetic ELF blob)." << endl;
 
     ifstream binFile("/bin/kmod", ios::binary);
-    BOOST_REQUIRE_MESSAGE(binFile.is_open(), "Cannot open /bin/kmod for binary input test");
 
-    const size_t chunkSize = 2048;
-    vector<char> chunk(chunkSize);
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
-    // Feed up to 4 chunks (8 KB) of binary data
-    for (int i = 0; i < 4 && binFile; ++i) {
-        binFile.read(chunk.data(), chunkSize);
-        streamsize bytesRead = binFile.gcount();
-        if (bytesRead > 0) {
+    if (binFile.is_open()) {
+        const size_t chunkSize = 2048;
+        vector<char> chunk(chunkSize);
+
+        // Feed up to 4 chunks (8 KB) of binary data
+        for (int i = 0; i < 4 && binFile; ++i) {
+            binFile.read(chunk.data(), chunkSize);
+            streamsize bytesRead = binFile.gcount();
+            if (bytesRead > 0) {
+                BOOST_CHECK_NO_THROW(
+                    parser->appendBuffer(chunk.data(), static_cast<uint16_t>(bytesRead))
+                );
+            }
+        }
+        binFile.close();
+    } else {
+        // /bin/kmod not available – use the synthetic ELF-like blob repeated
+        // to fill the parser buffer with realistic binary content.
+        BOOST_TEST_MESSAGE("/bin/kmod not found; using synthetic binary fallback");
+        for (int i = 0; i < 64; ++i) {
             BOOST_CHECK_NO_THROW(
-                parser->appendBuffer(chunk.data(), static_cast<uint16_t>(bytesRead))
+                parser->appendBuffer(
+                    reinterpret_cast<const char*>(SYNTHETIC_BINARY_BLOB),
+                    sizeof(SYNTHETIC_BINARY_BLOB)
+                )
             );
         }
     }
-    binFile.close();
 
     RequestsMap_t Requests;
     BOOST_CHECK_NO_THROW(Requests = parser->getRequests());
@@ -922,19 +950,29 @@ BOOST_AUTO_TEST_CASE( test_binary_file_kmod_full_chunks )
 
 BOOST_AUTO_TEST_CASE( test_binary_file_kmod_byte_by_byte )
 {
-    cout << "Check binary input: /bin/kmod fed 1 byte at a time (first 512 bytes)." << endl;
+    cout << "Check binary input: /bin/kmod fed 1 byte at a time (first 512 bytes; fallback: synthetic ELF blob)." << endl;
 
+    vector<char> data;
     ifstream binFile("/bin/kmod", ios::binary);
-    BOOST_REQUIRE_MESSAGE(binFile.is_open(), "Cannot open /bin/kmod for byte-by-byte binary test");
 
-    vector<char> data(512);
-    binFile.read(data.data(), data.size());
-    streamsize bytesRead = binFile.gcount();
-    binFile.close();
+    if (binFile.is_open()) {
+        data.resize(512);
+        binFile.read(data.data(), data.size());
+        streamsize bytesRead = binFile.gcount();
+        data.resize(static_cast<size_t>(bytesRead));
+        binFile.close();
+    } else {
+        // /bin/kmod not available – use the synthetic ELF-like blob
+        BOOST_TEST_MESSAGE("/bin/kmod not found; using synthetic binary fallback");
+        data.assign(
+            reinterpret_cast<const char*>(SYNTHETIC_BINARY_BLOB),
+            reinterpret_cast<const char*>(SYNTHETIC_BINARY_BLOB) + sizeof(SYNTHETIC_BINARY_BLOB)
+        );
+    }
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
-    for (streamsize i = 0; i < bytesRead; ++i) {
+    for (size_t i = 0; i < data.size(); ++i) {
         BOOST_CHECK_NO_THROW(parser->appendBuffer(&data[i], 1));
     }
 
