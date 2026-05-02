@@ -144,8 +144,8 @@ public:
         JSONPayload = "{ \"payload\": {";
 
         uint16_t i = 0;
-        for (const auto& [ParamName, ParamValue]: URLParamsMap) {
-            JSONPayload += " \"" + ParamName + "\": \"" + ParamValue + "\"";
+        for (const auto& ParamPair: URLParamsMap) {
+            JSONPayload += " \"" + ParamPair.first + "\": \"" + ParamPair.second + "\"";
             if (i != URLParamsMap.size()-1) {
                 JSONPayload += ",";
             }
