@@ -9,6 +9,8 @@ HTTPParser::HTTPParser(const uint16_t BufferSize) :
     _RequestParseError(0),
     _POSTWaitContentLength(false),
     _POSTContentLength(0),
+    _ReqAddIndex(0),
+    _ReqNextIndex(0),
     _HTTPRequestBuffer("")
 {
     _HTTPRequestBuffer.reserve(BufferSize);
@@ -31,7 +33,9 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
     if (_POSTWaitContentLength == true && _HTTPRequestBuffer.length() >= _POSTContentLength) {
         _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
         _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
-        _Requests.push_back(move(_RequestProperties));
+        //_Requests.push_back(_RequestProperties);
+        _Requests.emplace(_ReqAddIndex, _RequestProperties);
+        _ReqAddIndex += 1;
         _POSTWaitContentLength = false;
     }
     else {
@@ -47,18 +51,27 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
     }
 }
 
-RequestsVector_t HTTPParser::getRequests()
+RequestsMap_t HTTPParser::getRequests()
 {
     return _Requests;
 }
 
-void HTTPParser::getNextRequest(const RequestPropertiesRef_t Request)
+RequestPropertiesPtr_t HTTPParser::getNextRequest()
 {
     if (_Requests.size() > 0) {
-        Request = move(_Requests.front());
-        _Requests.erase(_Requests.begin());
+        _ReqNextIndex += 1;
+        return make_shared<RequestProperties_t>(_Requests.at(_ReqNextIndex-1));
+    }
+    return nullptr;
+}
+
+void HTTPParser::removeRequest(uint16_t Index)
+{
+    if (_Requests.find(Index) != _Requests.end()) {
+        _Requests.erase(Index);
     }
 }
+
 
 inline void HTTPParser::_processRequests()
 {
@@ -90,7 +103,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     };
 
     //- parse base properties
-    _parseRequestProperties(Request, _RequestProperties);
+    if (_parseRequestProperties(Request, _RequestProperties) == false) { return false; }
 
     //- only process HTTP/1.1 requests
     if (_RequestProperties.HTTPVersion != HTTP_VERSION_1_1) { return false; }
@@ -106,8 +119,10 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
         //- parse GET parameters
         _parseGETParameter(_RequestProperties.URL, _RequestProperties.URLParams);
 
-        //- append (move) to requests vector
-        _Requests.push_back(move(_RequestProperties));
+        //- add request to requests map
+        //_Requests.push_back(_RequestProperties);
+        _Requests.emplace(_ReqAddIndex, _RequestProperties);
+        _ReqAddIndex += 1;
     }
 
     //- POST request
@@ -136,7 +151,10 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
             if (_HTTPRequestBuffer.length() >= _POSTContentLength) {
                 _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
                 _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
-                _Requests.push_back(move(_RequestProperties));
+                //- add request to requests map
+                //_Requests.push_back(_RequestProperties);
+                _Requests.emplace(_ReqAddIndex, _RequestProperties);
+                _ReqAddIndex += 1;
             }
             else {
                 //- set flag to wait until content-length reached
@@ -149,7 +167,10 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
             if (NextRequest.length() >= _POSTContentLength) {
                 _RequestProperties.Payload = NextRequest.substr(0, _POSTContentLength);
                 NextRequest.replace(0, _POSTContentLength, "");
-                _Requests.push_back(move(_RequestProperties));
+                //- add request to requests map
+                //_Requests.push_back(_RequestProperties);
+                _Requests.emplace(_ReqAddIndex, _RequestProperties);
+                _ReqAddIndex += 1;
             }
             else {
                 return false;
@@ -159,7 +180,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     return true;
 }
 
-inline void HTTPParser::_parseRequestProperties(string& Request, const RequestPropertiesRef_t ResultBaseProps)
+inline bool HTTPParser::_parseRequestProperties(string& Request, const RequestPropertiesRef_t ResultBaseProps)
 {
     //- find first line endline
     size_t StartPos = Request.find("\r\n");
@@ -173,6 +194,9 @@ inline void HTTPParser::_parseRequestProperties(string& Request, const RequestPr
     vector<string> SplitResult;
     StringHelper::rsplit(Request, StartPos, " ", SplitResult);
 
+    //- on invalid vector size (!=3) abort
+    if (SplitResult.size() != 3) { return false; }
+
     if (SplitResult.at(0).find("HTTP/1.1") != string::npos) {
         ResultBaseProps.HTTPVersion = HTTP_VERSION_1_1;
     }
@@ -185,6 +209,8 @@ inline void HTTPParser::_parseRequestProperties(string& Request, const RequestPr
     }
 
     ResultBaseProps.URL = SplitResult.at(1);
+
+    return true;
 }
 
 inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t ResultRef)
@@ -228,12 +254,8 @@ inline void HTTPParser::_parseGETParameter(const string& RequestURL, URLParamMap
         for (auto &ParamValuePair:ParamValuePairs) {
 
             const size_t PVPDelimiterPos = ParamValuePair.find("=");
-            cout << "loop in: " << ParamValuePair << " pos: " << PVPDelimiterPos << endl;
 
             if (PVPDelimiterPos != string::npos && PVPDelimiterPos != 0 && ParamValuePair.length() > PVPDelimiterPos) {
-                string key = ParamValuePair.substr(0, PVPDelimiterPos);
-                string value = ParamValuePair.substr(PVPDelimiterPos+1, ParamValuePair.length());
-                cout << "emplace key:" << key << " value:" << value << endl;
                 ResultRef.emplace(
                     ParamValuePair.substr(0, PVPDelimiterPos), ParamValuePair.substr(PVPDelimiterPos+1, ParamValuePair.length())
                 );

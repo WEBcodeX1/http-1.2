@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
@@ -30,8 +31,9 @@ struct RequestProperties_t
 };
 
 typedef RequestProperties_t& RequestPropertiesRef_t;
+typedef shared_ptr<RequestProperties_t> RequestPropertiesPtr_t;
 
-typedef vector<RequestProperties_t> RequestsVector_t;
+typedef unordered_map<uint16_t, RequestProperties_t> RequestsMap_t;
 
 
 class HTTPParser
@@ -43,8 +45,9 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    RequestsVector_t getRequests();
-    void getNextRequest(const RequestPropertiesRef_t);
+    RequestsMap_t getRequests();
+    RequestPropertiesPtr_t getNextRequest();
+    void removeRequest(uint16_t);
 
 private:
 
@@ -62,15 +65,19 @@ private:
     bool _POSTWaitContentLength;
     uint16_t _POSTContentLength;
 
+    uint16_t _ReqAddIndex;
+    uint16_t _ReqNextIndex;
+
     string _HTTPRequestBuffer;
+
     uint16_t _HTTPRequestBufferMax;
 
     RequestProperties_t _RequestProperties;
-    RequestsVector_t _Requests;
+    RequestsMap_t _Requests;
 
 protected:
 
-    void _parseRequestProperties(string&, const RequestPropertiesRef_t);
+    bool _parseRequestProperties(string&, const RequestPropertiesRef_t);
     void _parseRequestHeaders(string&, RequestHeaderRef_t);
     void _parseGETParameter(const string&, URLParamMapRef_t);
 };

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( test_single_valid_get_request_full_transmit )
 {
     cout << "Check single GET request (full buffer transmit at once)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request_full_transmit )
 {
     cout << "Check single POST request (full buffer transmit at once)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_valid_get_request_full_transmit )
 {
     cout << "Check multiple GET requests (full buffer transmit at once)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_valid_get_and_post_requests_full_transmit )
 {
     cout << "Check multiple GET and POST requests (full buffer transmit at once)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE( test_single_valid_post_request_partial_transmit )
 {
     cout << "Check single POST request (partial transmit)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE( test_single_valid_get_request_1byte_transmit )
 {
     cout << "Check single GET request (1-byte buffer transmit)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE( test_single_post_request_1byte_transmit )
 {
     cout << "Check single POST request (1-byte buffer transmit)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_valid_get_request_1byte_transmit )
 {
     cout << "Check multiple GET requests (1-byte buffer transmit)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_valid_get_and_post_requests_1byte_transmit )
 {
     cout << "Check multiple GET and POST requests (1-byte buffer transmit)." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -397,7 +397,7 @@ BOOST_AUTO_TEST_CASE( test_multiple_valid_get_and_post_requests_1byte_transmit )
 BOOST_AUTO_TEST_CASE( test_single_valid_post_request_partial_1byte_transmit )
 {
     cout << "Check single POST request (partial 1-byte buffer transmit)." << endl;
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE( test_valid_get_parameters_1 )
 {
     cout << "Check valid GET parameters request 1." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -464,7 +464,7 @@ BOOST_AUTO_TEST_CASE( test_valid_get_parameters_2 )
 {
     cout << "Check valid GET parameters request 2." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE( test_urlparamsmap2_json )
 {
     cout << "Check urlparamsmap to JSON conversion." << endl;
 
-    RequestsVector_t Requests;
+    RequestsMap_t Requests;
 
     unique_ptr<HTTPParser> parser = make_unique<HTTPParser>(4096);
 
