@@ -920,9 +920,11 @@ BOOST_AUTO_TEST_CASE( test_binary_file_kmod_full_chunks )
             binFile.read(chunk.data(), chunkSize);
             streamsize bytesRead = binFile.gcount();
             if (bytesRead > 0) {
-                BOOST_CHECK_NO_THROW(
-                    parser->appendBuffer(chunk.data(), static_cast<uint16_t>(bytesRead))
-                );
+                // chunkSize (2048) is always within uint16_t range; clamp defensively
+                const uint16_t toSend = (bytesRead <= 0xFFFF)
+                    ? static_cast<uint16_t>(bytesRead)
+                    : static_cast<uint16_t>(0xFFFF);
+                BOOST_CHECK_NO_THROW(parser->appendBuffer(chunk.data(), toSend));
             }
         }
         binFile.close();
