@@ -102,10 +102,18 @@ public:
         size_t FindPos = 0;
         size_t FindPosLast = 0;
         string Token;
+        if (StartPos < Delimiter.length()) {
+            ResultRef.push_back(String.substr(0, StartPos));
+            return;
+        }
         StartPos -= Delimiter.length();
         while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
             Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
             ResultRef.push_back(Token);
+            if (FindPos < Delimiter.length()) {
+                FindPosLast = FindPos;
+                break;
+            }
             StartPos = FindPos - Delimiter.length();
             FindPosLast = FindPos;
         }
