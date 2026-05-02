@@ -536,9 +536,9 @@ BOOST_AUTO_TEST_CASE( test_urlparamsmap2_json )
 }
 
 
-// =========================================================================
+// ======================================================================
 // Category 1: Malformed headers (missing space or disallowed characters)
-// =========================================================================
+// ======================================================================
 
 BOOST_AUTO_TEST_CASE( test_malformed_header_missing_space_after_colon )
 {
@@ -986,9 +986,9 @@ BOOST_AUTO_TEST_CASE( test_binary_file_kmod_byte_by_byte )
 }
 
 
-// =========================================================================
+// ===========================================================================
 // Category 5: Requests designed to stress-test / potentially crash the parser
-// =========================================================================
+// ===========================================================================
 
 BOOST_AUTO_TEST_CASE( test_crash_request_line_method_only )
 {

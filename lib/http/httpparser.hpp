@@ -102,31 +102,28 @@ public:
         size_t FindPos = 0;
         size_t FindPosLast = 0;
         string Token;
-        // Guard: if StartPos is smaller than the delimiter length, a plain
-        // subtraction would underflow (size_t is unsigned).  Just return the
-        // substring up to StartPos as the sole token.
+
         if (StartPos < Delimiter.length()) {
             ResultRef.push_back(String.substr(0, StartPos));
             return;
         }
+
         StartPos -= Delimiter.length();
+
         while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
+
             Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
             ResultRef.push_back(Token);
-            // Guard: if the delimiter sits at the very start (or closer to the
-            // start than its own length), another subtraction would underflow.
-            // Record the position and break; the final substr(0, FindPosLast)
-            // below will correctly capture the token before this delimiter.
+
             if (FindPos < Delimiter.length()) {
                 FindPosLast = FindPos;
                 break;
             }
+
             StartPos = FindPos - Delimiter.length();
             FindPosLast = FindPos;
         }
-        // Push the leading token: the substring from 0 up to the position of
-        // the last delimiter found (FindPosLast), which is 0 when no delimiter
-        // was found (producing an empty string as the sentinel).
+
         Token = String.substr(0, FindPosLast);
         ResultRef.push_back(Token);
     }

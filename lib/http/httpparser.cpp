@@ -33,7 +33,6 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
     if (_POSTWaitContentLength == true && _HTTPRequestBuffer.length() >= _POSTContentLength) {
         _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
         _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
-        //_Requests.push_back(_RequestProperties);
         _Requests.emplace(_ReqAddIndex, _RequestProperties);
         _ReqAddIndex += 1;
         _POSTWaitContentLength = false;
@@ -120,7 +119,6 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
         _parseGETParameter(_RequestProperties.URL, _RequestProperties.URLParams);
 
         //- add request to requests map
-        //_Requests.push_back(_RequestProperties);
         _Requests.emplace(_ReqAddIndex, _RequestProperties);
         _ReqAddIndex += 1;
     }
@@ -152,7 +150,6 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
                 _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
                 _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
                 //- add request to requests map
-                //_Requests.push_back(_RequestProperties);
                 _Requests.emplace(_ReqAddIndex, _RequestProperties);
                 _ReqAddIndex += 1;
             }
@@ -168,7 +165,6 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
                 _RequestProperties.Payload = NextRequest.substr(0, _POSTContentLength);
                 NextRequest.replace(0, _POSTContentLength, "");
                 //- add request to requests map
-                //_Requests.push_back(_RequestProperties);
                 _Requests.emplace(_ReqAddIndex, _RequestProperties);
                 _ReqAddIndex += 1;
             }
