@@ -229,9 +229,11 @@ inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t
 
             StringHelper::rsplit(Line, Line.length(), ": ", HeaderPair);
 
-            ResultRef.emplace(
-                HeaderPair.at(1), HeaderPair.at(0).substr(0, HeaderPair.at(0).length())
-            );
+            if (HeaderPair.size() == 2) {
+                ResultRef.emplace(
+                    HeaderPair.at(1), HeaderPair.at(0).substr(0, HeaderPair.at(0).length())
+                );
+            }
         }
     }
 }
