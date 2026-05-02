@@ -1,85 +1,159 @@
-#ifndef LibHTTP_parser_hpp
-#define LibHTTP_parser_hpp
-#include "../../src/Debug.cpp"
-#include "../../src/Helper.hpp"
-#include "../../src/IPCHandler.hpp"
-#include "../../src/IPCHandlerAS.hpp"
-#include "../../src/ASRequestHandler.hpp"
-#include "../../src/Client.hpp"
+#pragma once
+
+#include "httpconstants.hpp"
 
 #include <string>
+#include <vector>
+#include <memory>
+#include <utility>
+#include <algorithm>
+#include <unordered_map>
 
+using namespace std;
 
-typedef pair<string, string> HeaderPair_t;
 typedef unordered_map<string, string> RequestHeader_t;
+typedef RequestHeader_t& RequestHeaderRef_t;
 
-typedef RequestHeader_t RequestHeaderResult_t;
-typedef RequestHeader_t& RequestHeaderResultRef_t;
+typedef unordered_map<string, string> URLParamMap_t;
+typedef URLParamMap_t& URLParamMapRef_t;
 
-typedef vector<string> BasePropsResult_t;
-typedef BasePropsResult_t& BasePropsResultRef_t;
-
-
-static const vector<string> HeaderList
+struct RequestProperties_t
 {
-    "Host",
-    "Request-UUID",
-    "Transfer-Encoding",
-    "If-None-Match",
-    "Content-Type",
-    "Content-Length"
+    uint16_t HTTPVersion;
+    uint16_t HTTPMethod;
+    RequestHeader_t RequestHeaders;
+    string URL;
+    string Payload;
+    URLParamMap_t URLParams;
 };
 
+typedef RequestProperties_t& RequestPropertiesRef_t;
+typedef shared_ptr<RequestProperties_t> RequestPropertiesPtr_t;
 
-class HTTPParser: private Client, private SHMStaticFS, private SHMPythonAS
+typedef unordered_map<uint16_t, RequestProperties_t> RequestsMap_t;
+
+
+class HTTPParser
 {
 
 public:
 
-    HTTPParser(const ClientFD_t, const NamespacesRef_t);
+    HTTPParser(const uint16_t);
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    size_t processRequests(SharedMemAddress_t, const ASRequestHandlerRef_t&);
+    RequestsMap_t getRequests();
+    RequestPropertiesPtr_t getNextRequest();
+    void removeRequest(uint16_t);
 
 private:
 
-    inline void _splitRequests();
-    void _processRequestProperties(const size_t, const ASRequestHandlerRef_t&);
+    void _processRequests();
+    bool _processRequestProperties(const size_t);
 
     RequestHeader_t _RequestHeaders;
     vector<string> _SplittedRequests;
 
-    NamespacesRef_t _Namespaces;
-
-    size_t _RequestCount;
     size_t _RequestCountGet;
     size_t _RequestCountPost;
-    size_t _RequestCountPostAS;
 
-    uint16_t _RequestNumber;
+    uint16_t _RequestParseError;
+
+    bool _POSTWaitContentLength;
+    uint16_t _POSTContentLength;
+
+    uint16_t _ReqAddIndex;
+    uint16_t _ReqNextIndex;
 
     string _HTTPRequestBuffer;
 
+    uint16_t _HTTPRequestBufferMax;
+
+    RequestProperties_t _RequestProperties;
+    RequestsMap_t _Requests;
+
 protected:
 
-    void _parseRequestProperties(string&, BasePropsResultRef_t);
-    void _parseRequestHeaders(string&, RequestHeaderResultRef_t);
-
-    inline string _getASURLParamValue(
-        const string&,
-        const uint16_t,
-        string&
-    );
-
-    inline void _processASPayload(
-        const ASRequestHandlerRef_t&,
-        const RequestHeaderResult_t&,
-        const uint16_t,
-        const uint16_t,
-        const uint16_t,
-        const string&
-    );
+    bool _parseRequestProperties(string&, const RequestPropertiesRef_t);
+    void _parseRequestHeaders(string&, RequestHeaderRef_t);
+    void _parseGETParameter(const string&, URLParamMapRef_t);
 };
 
-#endif
+
+class StringHelper {
+
+public:
+
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    {
+        string SplitElement;
+        auto pos = StringRef.find(Delimiter);
+
+        while (pos != string::npos) {
+            SplitElement = StringRef.substr(0, pos);
+            ResultRef.push_back(SplitElement);
+            StringRef.erase(0, pos + Delimiter.length());
+            pos = StringRef.find(Delimiter);
+        }
+    }
+
+    static void rsplit(string& String, size_t StartPos, const string Delimiter, vector<string>& ResultRef)
+    {
+        size_t FindPos = 0;
+        size_t FindPosLast = 0;
+        string Token;
+        // Guard: if StartPos is smaller than the delimiter length, a plain
+        // subtraction would underflow (size_t is unsigned).  Just return the
+        // substring up to StartPos as the sole token.
+        if (StartPos < Delimiter.length()) {
+            ResultRef.push_back(String.substr(0, StartPos));
+            return;
+        }
+        StartPos -= Delimiter.length();
+        while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
+            Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
+            ResultRef.push_back(Token);
+            // Guard: if the delimiter sits at the very start (or closer to the
+            // start than its own length), another subtraction would underflow.
+            // Record the position and break; the final substr(0, FindPosLast)
+            // below will correctly capture the token before this delimiter.
+            if (FindPos < Delimiter.length()) {
+                FindPosLast = FindPos;
+                break;
+            }
+            StartPos = FindPos - Delimiter.length();
+            FindPosLast = FindPos;
+        }
+        // Push the leading token: the substring from 0 up to the position of
+        // the last delimiter found (FindPosLast), which is 0 when no delimiter
+        // was found (producing an empty string as the sentinel).
+        Token = String.substr(0, FindPosLast);
+        ResultRef.push_back(Token);
+    }
+
+    static bool is_digits(const string& checkdigits)
+    {
+        return all_of(checkdigits.begin(), checkdigits.end(), ::isdigit);
+    }
+
+};
+
+class JSON {
+
+public:
+
+    static void URLParamsMap2JSON(URLParamMapRef_t URLParamsMap, string& JSONPayload)
+    {
+        JSONPayload = "{ \"payload\": {";
+
+        uint16_t i = 0;
+        for (const auto& [ParamName, ParamValue]: URLParamsMap) {
+            JSONPayload += " \"" + ParamName + "\": \"" + ParamValue + "\"";
+            if (i != URLParamsMap.size()-1) {
+                JSONPayload += ",";
+            }
+            ++i;
+        }
+        JSONPayload += " }}";
+    }
+};

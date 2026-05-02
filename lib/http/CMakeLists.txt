@@ -1,22 +1,25 @@
-# find boost::python
-find_package(Boost 1.74 REQUIRED COMPONENTS regex)
-
 # add source dir
 aux_source_directory(. SRC_LIST_LIBHTTP)
 
 # add library
-add_library(libhttp STATIC ${SRC_LIST_LIBHTTP})
+add_library(httpparser STATIC ${SRC_LIST_LIBHTTP})
 
 # add lib parser and network
 add_custom_target(
-    libhttpheader
+    httpparserheader
     SOURCES
     ./httpparser.hpp
-    ./httpnet.hpp
 )
 
-# set target link libraries
-target_link_libraries(libhttp ${Boost_LIBRARIES})
+# install static .a library
+install(
+    TARGETS httpparser
+    ARCHIVE DESTINATION /usr/local/lib
+)
 
-# install
-install(TARGETS libhttp DESTINATION lib)
+# install header file
+install(
+    FILES
+    ./httpparser.hpp
+    DESTINATION /usr/local/include
+)

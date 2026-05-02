@@ -3,18 +3,16 @@
 using namespace std;
 
 Client::Client(ClientFD_t ClientFD) :
+    HTTPParser(4096),
     _ClientFD(ClientFD),
     _RequestNr(0),
-    _Error(false),
-    _ErrorID(0),
-    _RequestStartTime(0),
-    _RequestEndTime(0),
-    _TimeoutReached(false)
+    _SocketConnectTime(0),
+    _SocketDisconnectTime(0)
 {
     DBG(120, "Constructor");
 
-    _RequestStartTime = time(nullptr);
-    _ResponseStartTime = time(nullptr);
+    _SocketConnectTime = time(nullptr);
+    _SocketDisconnectTime = time(nullptr);
 }
 
 Client::~Client()
@@ -22,8 +20,12 @@ Client::~Client()
     DBG(120, "Destructor");
 }
 
-ClientRequestNr_t Client::getNextReqNr()
+ClientRequestNr_t Client::getCurrentReqNr()
+{
+    return _RequestNr;
+}
+
+void Client::incrementReqNr()
 {
     _RequestNr += 1;
-    return _RequestNr;
 }

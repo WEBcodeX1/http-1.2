@@ -3,268 +3,185 @@
 using namespace std;
 
 
-HTTPParser::HTTPParser(ClientFD_t ClientFD, NamespacesRef_t NamespacesRef) :
-    Client(ClientFD),
-    _Namespaces(NamespacesRef),
-    _RequestCount(0),
+HTTPParser::HTTPParser(const uint16_t BufferSize) :
     _RequestCountGet(0),
     _RequestCountPost(0),
-    _RequestCountPostAS(0),
+    _RequestParseError(0),
+    _POSTWaitContentLength(false),
+    _POSTContentLength(0),
+    _ReqAddIndex(0),
+    _ReqNextIndex(0),
     _HTTPRequestBuffer("")
 {
-    DBG(120, "Constructor");
-    _HTTPRequestBuffer.reserve(BUFFER_BYTES);
+    _HTTPRequestBuffer.reserve(BufferSize);
+    _HTTPRequestBufferMax = BufferSize;
 }
 
 HTTPParser::~HTTPParser()
 {
-    DBG(120, "Destructor");
 }
 
-void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t BufferSize)
+void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
 {
-    //-> reset _SplittedRequests vector
-    _SplittedRequests.clear();
+    if (_HTTPRequestBuffer.length()+RecvBytes > _HTTPRequestBufferMax) {
+        return;
+    }
 
-    //- workaround
-    if (BufferRef[0] == 0) { return; }
+    _HTTPRequestBuffer.append(BufferRef, RecvBytes);
 
-    DBG(250, "size:" << string(BufferRef).length() << "appendBuffer:'" << string(BufferRef) << "'");
-    _HTTPRequestBuffer = _HTTPRequestBuffer + string(BufferRef);
-    //String::hexout(_HTTPRequestBuffer);
-    DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
+    //- on incomplete (single) POST request
+    if (_POSTWaitContentLength == true && _HTTPRequestBuffer.length() >= _POSTContentLength) {
+        _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
+        _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
+        //_Requests.push_back(_RequestProperties);
+        _Requests.emplace(_ReqAddIndex, _RequestProperties);
+        _ReqAddIndex += 1;
+        _POSTWaitContentLength = false;
+    }
+    else {
+        //- reset _SplittedRequests vector
+        _SplittedRequests.clear();
 
-    //-> only process on min 1 valid request
-    const size_t EndMarkerFound = _HTTPRequestBuffer.find("\r\n\r\n");
+        //- only process on minimum of 1 http request (end marker found)
+        const size_t EndMarkerFound = _HTTPRequestBuffer.find(HTTP_1_1_END_MARKER);
 
-    if (EndMarkerFound != string::npos) {
-        _splitRequests();
+        if (EndMarkerFound != string::npos) {
+            _processRequests();
+        }
     }
 }
 
-inline void HTTPParser::_splitRequests()
+RequestsMap_t HTTPParser::getRequests()
 {
-    //DBG(180, "splitRequests Buffer:'" << _HTTPRequestBuffer << "'");
-
-    //- reset request counters
-    _RequestCountGet = 0;
-    _RequestCountPost = 0;
-    _RequestCountPostAS = 0;
-    _RequestNumber = 1;
-
-    //-> split requests into _SplittedRequests vector
-    String::split(_HTTPRequestBuffer, "\r\n\r\n", _SplittedRequests);
-
-    _RequestCount = _SplittedRequests.size();
-    DBG(120, "splitRequests count after splitted into Vector:" << _RequestCount);
-    DBG(120, "_HTTPRequestBuffer after split:'" << _HTTPRequestBuffer << "'");
+    return _Requests;
 }
 
-size_t HTTPParser::processRequests(SharedMemAddress_t SHMGetRequests, const ASRequestHandlerRef_t& ASRequestHandlerRef)
+RequestPropertiesPtr_t HTTPParser::getNextRequest()
 {
-    DBG(250, "_HTTPRequestBuffer:'" << _HTTPRequestBuffer << "'");
+    if (_Requests.size() > 0) {
+        _ReqNextIndex += 1;
+        return make_shared<RequestProperties_t>(_Requests.at(_ReqNextIndex-1));
+    }
+    return nullptr;
+}
 
-    //- set get requests SHM base
-    setBaseAddress(SHMGetRequests);
+void HTTPParser::removeRequest(uint16_t Index)
+{
+    if (_Requests.find(Index) != _Requests.end()) {
+        _Requests.erase(Index);
+    }
+}
+
+
+inline void HTTPParser::_processRequests()
+{
+    //- split requests into _SplittedRequests vector
+    StringHelper::split(_HTTPRequestBuffer, HTTP_1_1_END_MARKER, _SplittedRequests);
 
     //- iterate over splitted requests
     for(size_t i=0; i<_SplittedRequests.size(); ++i) {
-        _processRequestProperties(i, ASRequestHandlerRef);
+        if (_processRequestProperties(i) == false) {
+            _RequestParseError = HTTP_ERROR_BAD_REQUEST;
+            break;
+        }
     }
-
-    return _RequestCountGet;
 }
 
-void HTTPParser::_processRequestProperties(const size_t Index, const ASRequestHandlerRef_t& ASRequestHandlerRef)
+inline bool HTTPParser::_processRequestProperties(const size_t Index)
 {
     //- get request ref at vector index
     auto &Request = _SplittedRequests.at(Index);
 
     //- on empty request return
-    if (Request.empty()) { return; }
+    if (Request.empty()) { return false; }
 
-    DBG(140, "Processing Index:" << Index << " Request:'" << Request << "'");
+    //- init unparsed base properties with default values
+    _RequestProperties = {
+        .HTTPVersion = HTTP_VERSION_UNKNOWN,
+        .HTTPMethod = HTTP_METHOD_OTHER,
+        .URL = "/"
+    };
 
-    BasePropsResult_t BasePropsFound;
-    _parseRequestProperties(Request, BasePropsFound);
+    //- parse base properties
+    if (_parseRequestProperties(Request, _RequestProperties) == false) { return false; }
 
-    DBG(140, "HTTP Version:" << BasePropsFound.at(0) << " File:" << BasePropsFound.at(1) << " Method:" << BasePropsFound.at(2));
-    DBG(140, "Complete Request:" << Request.c_str());
+    //- only process HTTP/1.1 requests
+    if (_RequestProperties.HTTPVersion != HTTP_VERSION_1_1) { return false; }
 
-    //- temp hardcode HTTPVersion
-    uint16_t HTTPVersion = 1;
+    //- if not GET || POST method, return
+    if (_RequestProperties.HTTPMethod == HTTP_METHOD_OTHER) { return false; }
 
-    //- check HTTP/1.2 or HTTP/1.2 (currently unimplemented)
-    const size_t HTTPVersion1_1Found = BasePropsFound.at(0).find("HTTP/1.1");
-    const size_t HTTPVersion1_2Found = BasePropsFound.at(2).find("HTTP/1.2");
+    //- parse request headers
+    _parseRequestHeaders(Request, _RequestProperties.RequestHeaders);
 
-    //- if not HTTP/1.1 set request to "" in vector element, return
-    if (HTTPVersion1_1Found == string::npos) { return; }
+    //- GET request
+    if (_RequestProperties.HTTPMethod == HTTP_METHOD_GET) {
+        //- parse GET parameters
+        _parseGETParameter(_RequestProperties.URL, _RequestProperties.URLParams);
 
-    //- check for method GET || POST
-    const size_t HTTPMethodPOST = BasePropsFound.at(2).find("POST");
-    const size_t HTTPMethodGET = BasePropsFound.at(2).find("GET");
-
-    //- set numerical http method (GET: 1, POST: 2)
-    uint16_t HTTPMethod = 0;
-
-    if (HTTPMethodGET != string::npos) { HTTPMethod = 1; }
-    if (HTTPMethodPOST != string::npos) { HTTPMethod = 2; }
-
-    DBG(140, "HTTPMethod:" << HTTPMethod);
-
-    //- if not GET || POST, return
-    if (HTTPMethod == 0) { return; }
-
-    //- check if POST request is a POSTAS request
-    const size_t AppServerReqFound = BasePropsFound.at(1).find("/backend/");
-
-    //- if not POSTAS, return
-    if (HTTPMethod == 2 && AppServerReqFound == string::npos) {
-        ++_RequestCountPost;
-        return;
+        //- add request to requests map
+        //_Requests.push_back(_RequestProperties);
+        _Requests.emplace(_ReqAddIndex, _RequestProperties);
+        _ReqAddIndex += 1;
     }
 
-    //- get unique request nr
-    const uint16_t RequestNr = _RequestNumber;
-    ++_RequestNumber;
+    //- POST request
+    else if (_RequestProperties.HTTPMethod == HTTP_METHOD_POST) {
 
-    DBG(140, "HTTP RequestNr:" << RequestNr);
+        //- if request does not contain content-length header
+        if (_RequestProperties.RequestHeaders.find(HTTP_HEADER_CONTENT_LENGTH) == _RequestProperties.RequestHeaders.end()) {
+            return false;
+        }
 
-    RequestHeaderResult_t Headers;
+        //- if content-length header contains non-digits
+        if (StringHelper::is_digits(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH)) == false) {
+            return false;
+        }
 
-    //- AS GET request
-    if (HTTPMethod == 1 && AppServerReqFound != string::npos) {
+        _POSTContentLength = stoi(_RequestProperties.RequestHeaders.at(HTTP_HEADER_CONTENT_LENGTH));
 
-        //- parse request headers
-        _parseRequestHeaders(Request, Headers);
+        //- if content-length exeeds maximum
+        if (_POSTContentLength > HTTP_POST_MAX_CONTENT_LENGTH) {
+            return false;
+        }
 
-        const NamespaceProps_t NamespaceProps = _Namespaces.at(Headers.at("Host"));
-        string JSONPayload("{ \"payload\": {");
-
-        for (const auto& [Endpoint, EndpointProps]: NamespaceProps.JSONConfig["access"]["as-get"].items()) {
-            DBG(200, "Endpoint:" << Endpoint);
-            const size_t EndpointFound = BasePropsFound.at(1).find("/backend" + Endpoint);
-            if (EndpointFound != string::npos) {
-                DBG(200, "Looping on params");
-                string ProcessURL = BasePropsFound.at(1);
-                for (size_t i=0; i<EndpointProps["params"].size(); ++i) {
-                    const string Param = EndpointProps["params"][i];
-                    const string ParamValue = _getASURLParamValue(Param, i, ProcessURL);
-                    JSONPayload += "\"" + Param + "\": \"" + ParamValue + "\"";
-                    DBG(200, "ProcessURL: " << ProcessURL << " Param: " << Param << " Value:" << ParamValue);
-                    if (i != EndpointProps["params"].size() - 1) {
-                        JSONPayload += ",";
-                    }
-                }
-                JSONPayload += "}}";
-                DBG(200, "AS GET JSONPayload:" << JSONPayload);
-                _processASPayload(
-                    ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, JSONPayload
-                );
-                return;
+        //- on single HTTP POST: payload after endmarker in _HTTPRequestBuffer
+        if (_SplittedRequests.size() == 1) {
+            //- content length bytes already in buffer
+            if (_HTTPRequestBuffer.length() >= _POSTContentLength) {
+                _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
+                _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
+                //- add request to requests map
+                //_Requests.push_back(_RequestProperties);
+                _Requests.emplace(_ReqAddIndex, _RequestProperties);
+                _ReqAddIndex += 1;
+            }
+            else {
+                //- set flag to wait until content-length reached
+                _POSTWaitContentLength = true;
             }
         }
-    }
-
-    //- AS POST request
-    if (HTTPMethod == 2 && AppServerReqFound != string::npos) {
-
-        DBG(140, "Request Type ASRequest:" << Request);
-
-        //- check first line end exists
-        size_t FirstLineEndMarker = Request.find("\r\n");
-
-        //- if not truncated
-        if (FirstLineEndMarker == string::npos) {
-            DBG(200, "Truncated POST Request - no First Line end");
-            return;
-        }
-
-        //- cut first properties line from request
-        if (FirstLineEndMarker != string::npos) {
-            Request.replace(0, FirstLineEndMarker+2, "");
-        }
-
-        //- parse request headers
-        _parseRequestHeaders(Request, Headers);
-
-        uint ContentBytes = 0;
-
-        //- try get content length header
-        try {
-            ContentBytes = stoi(Headers.at("Content-Length"));
-        }
-        catch(const std::exception& e) {
-            DBG(200, "Truncated POST Request - no Content-Length");
-            return;
-        }
-
-        bool PayloadFound = false;
-        string Payload = "";
-
-        //- try payload in next (vector index +1) request
-        try {
+        //- otherwise payload in next splitted message
+        else if (_SplittedRequests.size() > Index) {
             auto &NextRequest = _SplittedRequests.at(Index+1);
-            if (NextRequest.length() >= ContentBytes) {
-                Payload = NextRequest.substr(0, ContentBytes);
-                NextRequest.replace(0, ContentBytes, "");
-                PayloadFound = true;
+            if (NextRequest.length() >= _POSTContentLength) {
+                _RequestProperties.Payload = NextRequest.substr(0, _POSTContentLength);
+                NextRequest.replace(0, _POSTContentLength, "");
+                //- add request to requests map
+                //_Requests.push_back(_RequestProperties);
+                _Requests.emplace(_ReqAddIndex, _RequestProperties);
+                _ReqAddIndex += 1;
+            }
+            else {
+                return false;
             }
         }
-        catch(const std::exception& e) {
-            DBG(200, "Next vector does not exist, trying in rest of _HTTPRequestBuffer");
-            //- try payload in _HTTPRequestBuffer
-            if (_HTTPRequestBuffer.length() >= ContentBytes) {
-                Payload = _HTTPRequestBuffer.substr(0, ContentBytes);
-                _HTTPRequestBuffer.replace(0, ContentBytes, "");
-                PayloadFound = true;
-            }
-        }
-
-        DBG(140, "HTTP POST-AS Payload:" << Payload);
-
-        if (PayloadFound) {
-            _processASPayload(
-                ASRequestHandlerRef, Headers, HTTPMethod, HTTPVersion, RequestNr, Payload
-            );
-        }
     }
-
-    //- Standard GET request
-    if (HTTPMethod == 1 && AppServerReqFound == string::npos) {
-
-        DBG(140, "Request Type GET:" << Request);
-
-        ++_RequestCountGet;
-
-        //- set values in get requests shared memory
-        const char* MsgCString = Request.c_str();
-
-        void* ClientFDAddr = getCurrentOffsetAddress();
-        void* HTTPVersionAddr = getNextAddress();
-        void* RequestNrAddr = getNextAddress();
-        void* MsgLengthAddr = getNextAddress();
-
-        new(HTTPVersionAddr) uint16_t(HTTPVersion);
-        new(RequestNrAddr) uint16_t(RequestNr);
-        new(ClientFDAddr) ClientFD_t(_ClientFD);
-
-        uint16_t MsgLength = Request.length();
-        new(MsgLengthAddr) uint16_t(MsgLength);
-
-        void* MsgAddress = getNextAddress();
-        memcpy(MsgAddress, &MsgCString[0], MsgLength);
-
-        void* NextSegmentAddr = getNextAddress(MsgLength);
-        DBG(120, "Set SharedMem ClientFD:" << ClientFDAddr << " PayloadLength:" << MsgLengthAddr << " Payload:" << MsgAddress << " NextSegment:" << NextSegmentAddr);
-    }
+    return true;
 }
 
-void HTTPParser::_parseRequestProperties(string& Request, BasePropsResultRef_t ResultRef)
+inline bool HTTPParser::_parseRequestProperties(string& Request, const RequestPropertiesRef_t ResultBaseProps)
 {
-    DBG(120, "HTTP Request:'" << Request << "'");
-
     //- find first line endline
     size_t StartPos = Request.find("\r\n");
 
@@ -273,111 +190,78 @@ void HTTPParser::_parseRequestProperties(string& Request, BasePropsResultRef_t R
         StartPos = Request.length();
     }
 
-    //- reverse split
-    String::rsplit(Request, StartPos, " ", ResultRef);
+    //- get base request properties
+    vector<string> SplitResult;
+    StringHelper::rsplit(Request, StartPos, " ", SplitResult);
 
-    DBG(120, "HTTP Version:" << ResultRef.at(0) << " File:" << ResultRef.at(1) << " Method:" << ResultRef.at(2) << " Request:" << Request);
+    //- on invalid vector size (!=3) abort
+    if (SplitResult.size() != 3) { return false; }
+
+    if (SplitResult.at(0).find("HTTP/1.1") != string::npos) {
+        ResultBaseProps.HTTPVersion = HTTP_VERSION_1_1;
+    }
+
+    if (SplitResult.at(2).find("GET") != string::npos) {
+        ResultBaseProps.HTTPMethod = HTTP_METHOD_GET;
+    }
+    else if (SplitResult.at(2).find("POST") != string::npos) {
+        ResultBaseProps.HTTPMethod = HTTP_METHOD_POST;
+    }
+
+    ResultBaseProps.URL = SplitResult.at(1);
+
+    return true;
 }
 
-void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderResultRef_t ResultRef)
+inline void HTTPParser::_parseRequestHeaders(string& Request, RequestHeaderRef_t ResultRef)
 {
-    DBG(120, "HTTP Request:'" << Request << "'");
-
-    //- reverse split header lines
+    //- split / reverse split header lines
     vector<string> Lines;
-    String::split(Request, "\r\n", Lines);
+    StringHelper::split(Request, "\r\n", Lines);
 
-    DBG(120, "Last Header Line:'" << Request << "'");
     Lines.push_back(Request);
 
     //- loop over lines, split, put into result map
     for (auto &Line:Lines) {
 
-        DBG(120, "Line:'" << Line << "'");
-
         vector<string> HeaderPair;
         if (Line.find(":") != string::npos) {
 
-            String::rsplit(Line, Line.length(), ": ", HeaderPair);
-            string HeaderID = HeaderPair.at(1);
-            string HeaderValue = HeaderPair.at(0).substr(0, HeaderPair.at(0).length());
+            StringHelper::rsplit(Line, Line.length(), ": ", HeaderPair);
 
-            DBG(120, "HeaderID:'" << HeaderID << "'");
-            DBG(120, "HeaderValue:'" << HeaderValue << "'");
-
-            ResultRef.emplace(
-                HeaderID, HeaderValue
-            );
+            if (HeaderPair.size() == 2 && !HeaderPair.at(1).empty()) {
+                ResultRef.emplace(
+                    HeaderPair.at(1), HeaderPair.at(0).substr(0, HeaderPair.at(0).length())
+                );
+            }
         }
     }
-    DBG(120, "End parse headers.");
 }
 
-inline string HTTPParser::_getASURLParamValue(
-    const string& Param,
-    const uint16_t Index,
-    string& ReqURL
-){
-    DBG(200, "ReqURL:" << ReqURL);
-    //- process first ? parameter
-    if (Index == 0) {
-        const size_t StartMarkerPos = ReqURL.find("?");
-        const size_t MidMarkerPos = ReqURL.find("=");
-        const size_t EndMarkerPos = ReqURL.find("&");
-        const size_t CompletePos = ReqURL.find("?" + Param + "=");
-        const size_t CheckMidPos = CompletePos+Param.size()+1;
+inline void HTTPParser::_parseGETParameter(const string& RequestURL, URLParamMapRef_t ResultRef)
+{
+    //- only process on init character "?" found
+    const size_t URLParamsStartPos = RequestURL.find("?");
 
-        if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
-            const size_t EndPos = (EndMarkerPos == string::npos) ? ReqURL.size() : EndMarkerPos;
-            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
-            DBG(200, "ReqURL StartMarkerPos:" << StartMarkerPos << " EndPos:" << EndPos);
-            ReqURL.replace(StartMarkerPos, EndPos-StartMarkerPos, "");
-            return ReturnString;
-        }
-        else {
-            return "not-found";
-        }
-    }
-    //- process next & parameter(s)
-    if (Index > 0) {
-        const size_t StartMarkerPos = ReqURL.find("&");
-        const size_t MidMarkerPos = ReqURL.find("=");
-        const size_t CompletePos = ReqURL.find("&" + Param + "=");
-        const size_t CheckMidPos = CompletePos+Param.size()+1;
+    if (URLParamsStartPos != string::npos && RequestURL.length() > URLParamsStartPos) {
 
-        if (CompletePos != string::npos && StartMarkerPos != string::npos && MidMarkerPos != string::npos && MidMarkerPos == CheckMidPos) {
-            const size_t NextMarkerPos = ReqURL.find("&", MidMarkerPos);
-            const size_t EndPos = (NextMarkerPos == string::npos) ? ReqURL.size() : NextMarkerPos;
-            const string ReturnString = ReqURL.substr(MidMarkerPos+1, EndPos-(MidMarkerPos+1));
-            DBG(200, "ReqURL StartMarkerPos:" << StartMarkerPos << " EndPos:" << EndPos);
-            ReqURL.replace(StartMarkerPos, EndPos-StartMarkerPos, "");
-            return ReturnString;
-        }
-        else {
-            return "not-found";
+        string URLParamsPart = RequestURL.substr(URLParamsStartPos+1, RequestURL.length());
+
+        vector<string> ParamValuePairs;
+        StringHelper::split(URLParamsPart, "&", ParamValuePairs);
+
+        ParamValuePairs.push_back(URLParamsPart);
+
+        //- loop over param-value pairs
+        for (auto &ParamValuePair:ParamValuePairs) {
+
+            const size_t PVPDelimiterPos = ParamValuePair.find("=");
+
+            if (PVPDelimiterPos != string::npos && PVPDelimiterPos != 0 && ParamValuePair.length() > PVPDelimiterPos) {
+                ResultRef.emplace(
+                    ParamValuePair.substr(0, PVPDelimiterPos), ParamValuePair.substr(PVPDelimiterPos+1, ParamValuePair.length())
+                );
+            }
         }
     }
-    return "parse-error";
-}
-
-inline void HTTPParser::_processASPayload(
-    const ASRequestHandlerRef_t& ASRequestHandlerRef,
-    const RequestHeaderResult_t& Headers,
-    const uint16_t HTTPMethod,
-    const uint16_t HTTPVersion,
-    const uint16_t RequestNr,
-    const string& Payload
-){
-    //- increment request count
-    ++_RequestCountPostAS;
-
-    //- add ASRequestHandler request
-    ASRequestHandlerRef->addRequest({
-        Headers.at("Host"),
-        _ClientFD,
-        HTTPMethod,
-        HTTPVersion,
-        RequestNr,
-        Payload
-    });
 }

@@ -1,5 +1,4 @@
-#ifndef Vector_hpp
-#define Vector_hpp
+#pragma once
 
 #include <vector>
 #include <iterator>
@@ -36,5 +35,3 @@ public:
     }
 
 };
-
-#endif

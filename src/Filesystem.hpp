@@ -1,5 +1,4 @@
-#ifndef Filesystem_hpp
-#define Filesystem_hpp
+#pragma once
 
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -73,5 +72,3 @@ private:
     FileListExtended_t _FilesExtended;
     string _CompletePath;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef CPU_hpp
-#define CPU_hpp
+#pragma once
 
 #include <vector>
 #include <thread>
@@ -27,5 +26,3 @@ private:
     CPUConfig_t _CPUs;
     cpu_set_t _cpuset;
 };
-
-#endif

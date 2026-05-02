@@ -23,6 +23,7 @@ ClientHandler::~ClientHandler()
     DBG(120, "Destructor");
 }
 
+/*
 void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPointer) {
     _SHMStaticFS = SharedMemPointer.StaticFSPtr;
     _SHMPythonASMeta = SharedMemPointer.PostASMetaPtr;
@@ -40,6 +41,7 @@ void ClientHandler::setClientHandlerConfig() {
 ASRequestHandler& ClientHandler::getClientHandlerASRequestHandlerRef() {
     return *_ASRequestHandlerRef;
 }
+*/
 
 void ClientHandler::addClient(const uint16_t ClientFD)
 {
@@ -48,11 +50,15 @@ void ClientHandler::addClient(const uint16_t ClientFD)
     //- set client connection non blocking
     Socket::makeNonblocking(ClientFD);
 
-    ClientRef_t ClientObj = std::make_shared<HTTPParser>(ClientFD, ConfigRef.Namespaces);
+    //ClientRef_t ClientObj = std::make_shared<Client>(ClientFD);
+    Client_t ClientObj(ClientFD);
 
+    /*
     Clients.emplace(
-        ClientFD, ClientObj
+        ClientFD, move(ClientObj)
     );
+    */
+    ClientsVector.push_back(move(ClientObj));
 
     //- add fd to epoll
     EpollEvent.events = EPOLLIN | EPOLLET;
@@ -88,7 +94,7 @@ void ClientHandler::processClients()
     }
 
     //- process appserver queue
-    ProcessedClients += _ASRequestHandlerRef->processQueue();
+    //ProcessedClients += _ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)
@@ -121,12 +127,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         else {
             //- if filedescriptor exists in map, append buffer data
             if (Clients.contains(ReadFD)) {
-                ClientRef_t ClientRef = Clients[ReadFD];
-                ClientRef->appendBuffer(Buffer, RcvBytes);
-
-                if (ClientRef->processRequests(SHMGetRequests, _ASRequestHandlerRef) > 0) {
-                    ++ProcessedClients;
-                }
+                //Clients[ReadFD].appendBuffer(Buffer, RcvBytes);
             }
         }
     }
