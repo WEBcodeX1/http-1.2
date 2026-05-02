@@ -1,5 +1,4 @@
-#ifndef Helper_hpp
-#define Helper_hpp
+#pragma once
 
 #include "Debug.cpp"
 
@@ -65,5 +64,3 @@ public:
         std::cout << endl;
     }
 };
-
-#endif

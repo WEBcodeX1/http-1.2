@@ -23,6 +23,7 @@ ClientHandler::~ClientHandler()
     DBG(120, "Destructor");
 }
 
+/*
 void ClientHandler::setSharedMemPointer(ClientHandlerSHMPointer_t SharedMemPointer) {
     _SHMStaticFS = SharedMemPointer.StaticFSPtr;
     _SHMPythonASMeta = SharedMemPointer.PostASMetaPtr;
@@ -40,6 +41,7 @@ void ClientHandler::setClientHandlerConfig() {
 ASRequestHandler& ClientHandler::getClientHandlerASRequestHandlerRef() {
     return *_ASRequestHandlerRef;
 }
+*/
 
 void ClientHandler::addClient(const uint16_t ClientFD)
 {
@@ -92,7 +94,7 @@ void ClientHandler::processClients()
     }
 
     //- process appserver queue
-    ProcessedClients += _ASRequestHandlerRef->processQueue();
+    //ProcessedClients += _ASRequestHandlerRef->processQueue();
 }
 
 void ClientHandler::readClientData(const uint16_t FDCount)
@@ -125,15 +127,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         else {
             //- if filedescriptor exists in map, append buffer data
             if (Clients.contains(ReadFD)) {
-
                 //Clients[ReadFD].appendBuffer(Buffer, RcvBytes);
-                ClientsVector[0].appendBuffer(Buffer, RcvBytes);
-
-                /*
-                if (ClientRef->processRequests(SHMGetRequests, _ASRequestHandlerRef) > 0) {
-                    ++ProcessedClients;
-                }
-                */
             }
         }
     }

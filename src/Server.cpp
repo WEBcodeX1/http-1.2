@@ -30,13 +30,12 @@ void Server::init()
 {
     //- setup shared memory
     setupSharedMemory();
-    setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    //setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- init static filesystem
     ConfigRef.mapStaticFSData();
 
     //- set client handler namespaces
-    setClientHandlerConfig();
 
     //- set listen address / port
     SocketListenAddress = ConfigRef.ServerAddress;
@@ -59,6 +58,7 @@ void Server::init()
     //- setup termination handler
     setTerminationHandler();
 
+    /*
     //- get ASRequestHandler reference
     ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
 
@@ -72,6 +72,7 @@ void Server::init()
     //- fork application server processes
     setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
     forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
+    */
 
     //- setup server socket
     setupSocket();
@@ -79,9 +80,11 @@ void Server::init()
     //- setup server socket monitoring
     setupPoll();
 
+    /*
     //- check interpreter count
     const uint ASInterpreterCount = getASInterpreterCount();
     DBG(50, "Sum AS Interpreters:" << ASInterpreterCount);
+    */
 
     //- drop privileges
     Permission::dropPrivileges(ConfigRef.RunAsUnixGroupID, ConfigRef.RunAsUnixUserID);

@@ -92,14 +92,8 @@ add_custom_target(
     ./src/Filesystem.hpp
     ./src/Configuration.hpp
     ./src/MemoryManager.hpp
-    ./src/ThreadHandler.hpp
-    ./src/IPCHandler.hpp
-    ./src/IPCHandlerAS.hpp
     ./src/ClientHandler.hpp
     ./src/ASProcessHandler.hpp
-    ./src/ASRequestHandler.hpp
-    ./src/ResultProcessor.hpp
-    ./src/ResultOrder.hpp
     ./src/Constant.hpp
     ./src/Vector.hpp
 )

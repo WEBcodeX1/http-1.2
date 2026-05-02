@@ -14,7 +14,6 @@
 #include "Global.hpp"
 #include "Configuration.hpp"
 #include "MemoryManager.hpp"
-#include "ASRequestHandler.hpp"
 
 //typedef std::shared_ptr<Client> ClientRef_t;
 //typedef pair<uint16_t, const ClientRef_t> ClientMapPair_t;
@@ -44,10 +43,12 @@ public:
     void addClient(const uint16_t);
     void processClients();
     void readClientData(const uint16_t);
+
+    /*
     void setSharedMemPointer(ClientHandlerSHMPointer_t);
     void setClientHandlerConfig();
-
     ASRequestHandler& getClientHandlerASRequestHandlerRef();
+    */
 
     uint16_t ProcessedClients;
     MemoryManager<char> BufferMemory;
@@ -69,6 +70,6 @@ private:
     void* _SHMPythonASRequests;
     void* _SHMPythonASResults;
 
-    ASRequestHandlerRef_t _ASRequestHandlerRef;
+    //ASRequestHandlerRef_t _ASRequestHandlerRef;
 
 };

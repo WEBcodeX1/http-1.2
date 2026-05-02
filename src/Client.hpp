@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Debug.cpp"
-#include "../lib/http/httpparser.cpp"
+#include "../lib/http/httpparser.hpp"
 
 #include <cstdint>
 #include <string>

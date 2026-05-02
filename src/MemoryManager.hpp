@@ -1,5 +1,4 @@
-#ifndef MemoryManager_hpp
-#define MemoryManager_hpp
+#pragma once
 
 #include "Debug.cpp"
 
@@ -102,5 +101,3 @@ private:
     }
 
 };
-
-#endif

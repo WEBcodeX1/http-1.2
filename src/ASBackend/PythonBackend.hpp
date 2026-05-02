@@ -46,12 +46,14 @@ namespace Backend {
                 DBG(120, "Python call 'invoke()' method Error.");
             }
 
+            /*
             //- copy result into correct memory region
             char* Payload = new(ProcessHandlerPtr->getResultAddress(Index)) char[strlen(ResultCharArray)];
             memcpy(Payload, &ResultCharArray[0], strlen(ResultCharArray));
 
             //- set result payload length
             new(ProcessHandlerPtr->getMetaAddress(Index, 7)) HTTPPayloadLength_t(strlen(ResultCharArray));
+            */
         }
 
     };

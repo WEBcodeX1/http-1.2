@@ -1,5 +1,4 @@
-#ifndef Constant_hpp
-#define Constant_hpp
+#pragma once
 
 #define RUNAS_USER_DEFAULT 2000
 #define RUNAS_GROUP_DEFAULT 2000
@@ -31,5 +30,3 @@
 #define CTRL_SOCKET "/run/falcon-as-ctrl.sock"
 #define CTRL_SOCKET_MAX_COM_RETRY_COUNT 100
 #define CTRL_SOCKET_COM_RETRY_SLEEP_MICROSECS 100
-
-#endif
