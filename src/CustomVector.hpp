@@ -20,7 +20,7 @@
  * - The data memory uses contiguous segment-based addressing
  * - Does not own the memory (no malloc/free)
  * - Template parameter T should be trivially copyable for optimal shared memory usage
- * - Thread-safe getNextElement() and eraseAt() operations using std::atomic_flag
+ * - All operations are thread-safe using std::atomic_flag spinlock
  * 
  * Usage:
  *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
@@ -81,13 +81,26 @@ public:
     CustomVector& operator=(const CustomVector&) = delete;
 
     /**
-     * Reserves memory for the specified number of elements
+     * Reserves memory for the specified number of elements (thread-safe)
      * @param element_count Number of elements to reserve space for
      * @throws std::bad_alloc if requested capacity exceeds available shared memory
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     void reserve(size_t element_count) {
         if (element_count <= capacity_) {
             return; // Already have enough capacity
+        }
+
+        // Acquire spinlock
+        while (lock_.test_and_set(std::memory_order_acquire)) {
+            // Spin wait
+        }
+
+        // Double-check after acquiring lock (another thread might have reserved)
+        if (element_count <= capacity_) {
+            lock_.clear(std::memory_order_release);
+            return;
         }
 
         // Calculate total memory needed
@@ -95,63 +108,128 @@ public:
         
         // Check if we have enough shared memory
         if (total_bytes > memory_total_bytes_) {
+            lock_.clear(std::memory_order_release);
             throw std::bad_alloc(); // Not enough shared memory
         }
 
         // Since we're using pre-allocated shared memory, we just update capacity
         // No need to move elements as memory_base_ stays the same
         capacity_ = element_count;
+
+        // Release spinlock
+        lock_.clear(std::memory_order_release);
     }
 
     /**
-     * Adds an element to the end of the vector
+     * Adds an element to the end of the vector (thread-safe)
      * @param element The element to add
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     void push_back(const T& element) {
+        // Acquire spinlock
+        while (lock_.test_and_set(std::memory_order_acquire)) {
+            // Spin wait
+        }
+
         // Expand capacity if needed
         if (size_ >= capacity_) {
             size_t new_capacity = (capacity_ == 0) ? 1 : capacity_ * 2;
-            reserve(new_capacity);
+            
+            // Calculate total memory needed
+            size_t total_bytes = new_capacity * segment_size_bytes_;
+            
+            // Check if we have enough shared memory
+            if (total_bytes > memory_total_bytes_) {
+                lock_.clear(std::memory_order_release);
+                throw std::bad_alloc(); // Not enough shared memory
+            }
+            
+            capacity_ = new_capacity;
         }
 
         // Construct element at the next available position
         T* position = get_element_ptr(size_);
         new (position) T(element);
         ++size_;
+
+        // Release spinlock
+        lock_.clear(std::memory_order_release);
     }
 
     /**
-     * Gets element at the specified index
+     * Gets element at the specified index (thread-safe)
      * @param index Index of the element
      * @return Reference to the element
      * @throws std::out_of_range if index is out of bounds
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     T& at(size_t index) {
+        // Acquire spinlock for safe read
+        while (lock_.test_and_set(std::memory_order_acquire)) {
+            // Spin wait
+        }
+        
         if (index >= size_) {
+            lock_.clear(std::memory_order_release);
             throw std::out_of_range("Index out of bounds");
         }
-        return *get_element_ptr(index);
+        
+        T& result = *get_element_ptr(index);
+        
+        // Release spinlock
+        lock_.clear(std::memory_order_release);
+        
+        return result;
     }
 
     /**
-     * Gets element at the specified index (const version)
+     * Gets element at the specified index (const version, thread-safe)
      * @param index Index of the element
      * @return Const reference to the element
      * @throws std::out_of_range if index is out of bounds
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     const T& at(size_t index) const {
+        // Acquire spinlock for safe read
+        // Note: const_cast is safe here as we're only using it for the lock
+        while (const_cast<std::atomic_flag&>(lock_).test_and_set(std::memory_order_acquire)) {
+            // Spin wait
+        }
+        
         if (index >= size_) {
+            const_cast<std::atomic_flag&>(lock_).clear(std::memory_order_release);
             throw std::out_of_range("Index out of bounds");
         }
-        return *get_element_ptr(index);
+        
+        const T& result = *get_element_ptr(index);
+        
+        // Release spinlock
+        const_cast<std::atomic_flag&>(lock_).clear(std::memory_order_release);
+        
+        return result;
     }
 
     /**
-     * Returns the number of elements in the vector
+     * Returns the number of elements in the vector (thread-safe)
      * @return Number of elements
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     size_t size() const {
-        return size_;
+        // Acquire spinlock for safe read
+        while (const_cast<std::atomic_flag&>(lock_).test_and_set(std::memory_order_acquire)) {
+            // Spin wait
+        }
+        
+        size_t result = size_;
+        
+        // Release spinlock
+        const_cast<std::atomic_flag&>(lock_).clear(std::memory_order_release);
+        
+        return result;
     }
 
     /**

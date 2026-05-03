@@ -14,7 +14,7 @@ Key Features
 3. **Contiguous addressing**: Next segment address = previous address + segment_size_bytes
 4. **No iterators**: Designed to be 100% compatible with shared memory (no types that rely on other memory regions)
 5. **Simple interface**: Provides essential vector operations only
-6. **Thread-safe operations**: ``getNextElement()`` and ``eraseAt()`` are thread-safe using ``std::atomic_flag`` spinlock for high-performance multi-process/multi-threaded access
+6. **Fully thread-safe**: All operations (``push_back()``, ``at()``, ``size()``, ``reserve()``, ``eraseAt()``, ``getNextElement()``) are thread-safe using ``std::atomic_flag`` spinlock for high-performance multi-process/multi-threaded access
 
 Required Functions
 ------------------
@@ -233,7 +233,7 @@ reserve()
 
     void reserve(size_t element_count)
 
-Reserves capacity for the specified number of elements. Throws ``std::bad_alloc`` if requested capacity exceeds available shared memory.
+**Thread-safe** operation that reserves capacity for the specified number of elements. Throws ``std::bad_alloc`` if requested capacity exceeds available shared memory.
 
 push_back()
 ~~~~~~~~~~~
@@ -242,7 +242,7 @@ push_back()
 
     void push_back(const T& element)
 
-Adds an element to the end of the vector. Automatically expands capacity if needed.
+**Thread-safe** operation that adds an element to the end of the vector. Automatically expands capacity if needed.
 
 at()
 ~~~~
@@ -252,7 +252,7 @@ at()
     T& at(size_t index)
     const T& at(size_t index) const
 
-Returns reference to element at specified index. Throws ``std::out_of_range`` if index is out of bounds.
+**Thread-safe** operation that returns reference to element at specified index. Throws ``std::out_of_range`` if index is out of bounds.
 
 size()
 ~~~~~~
@@ -261,7 +261,7 @@ size()
 
     size_t size() const
 
-Returns the current number of elements in the vector.
+**Thread-safe** operation that returns the current number of elements in the vector.
 
 capacity()
 ~~~~~~~~~~
@@ -331,12 +331,20 @@ This function is thread-safe and can be called from multiple threads or processe
 
 **Thread-Safety:**
 
-The ``getNextElement()`` and ``eraseAt()`` functions use an ``std::atomic_flag`` spinlock, making them safe for:
+All CustomVector operations use an ``std::atomic_flag`` spinlock, making them safe for:
 
 - Multi-threaded access within a single process
 - Multi-process access when the CustomVector is in shared memory
 
-The spinlock provides lock-free, high-performance synchronization that is more efficient than pthread mutex for short critical sections.
+Thread-safe operations include:
+- ``push_back()`` - Add elements without race conditions
+- ``at()`` - Safe element access
+- ``size()`` - Consistent size reading
+- ``reserve()`` - Safe capacity expansion
+- ``eraseAt()`` - Thread-safe element removal
+- ``getNextElement()`` - Atomic get-and-remove operation
+
+The spinlock provides lock-free, high-performance synchronization that is more efficient than pthread mutex for short critical sections, making CustomVector ideal for high-throughput producer-consumer patterns.
 
 Testing
 -------
