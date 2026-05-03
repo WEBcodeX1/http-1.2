@@ -285,7 +285,7 @@ Run the test suite:
 
 .. code-block:: bash
 
-    cd /home/runner/work/http-1.2/http-1.2
+    # Navigate to the project root directory
     cmake .
     make test-CustomVector
     ./test/integration/custom-vector/test-CustomVector
