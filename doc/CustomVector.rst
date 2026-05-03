@@ -14,7 +14,7 @@ Key Features
 3. **Contiguous addressing**: Next segment address = previous address + segment_size_bytes
 4. **No iterators**: Designed to be 100% compatible with shared memory (no types that rely on other memory regions)
 5. **Simple interface**: Provides essential vector operations only
-6. **Thread-safe operations**: ``getNextElement()`` is thread-safe for multi-process/multi-threaded access
+6. **Thread-safe operations**: ``getNextElement()`` and ``eraseAt()`` are thread-safe using ``std::atomic_flag`` spinlock for high-performance multi-process/multi-threaded access
 
 Required Functions
 ------------------
@@ -315,7 +315,7 @@ getNextElement()
 
 **Thread-safe** operation that returns the first element and removes it from the vector. Throws ``std::out_of_range`` if vector is empty.
 
-This function is thread-safe and can be called from multiple threads or processes. It uses a process-shared mutex to ensure atomic get-and-remove operation, making it suitable for producer-consumer patterns in shared memory.
+This function is thread-safe and can be called from multiple threads or processes. It uses an ``std::atomic_flag`` spinlock to ensure atomic get-and-remove operation, making it suitable for producer-consumer patterns in shared memory.
 
 **Example:**
 
@@ -331,10 +331,12 @@ This function is thread-safe and can be called from multiple threads or processe
 
 **Thread-Safety:**
 
-The ``getNextElement()`` function uses a pthread mutex with ``PTHREAD_PROCESS_SHARED`` attribute, making it safe for:
+The ``getNextElement()`` and ``eraseAt()`` functions use an ``std::atomic_flag`` spinlock, making them safe for:
 
 - Multi-threaded access within a single process
 - Multi-process access when the CustomVector is in shared memory
+
+The spinlock provides lock-free, high-performance synchronization that is more efficient than pthread mutex for short critical sections.
 
 Testing
 -------

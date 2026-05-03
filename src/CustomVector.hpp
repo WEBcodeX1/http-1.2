@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <new>
-#include <pthread.h>
+#include <atomic>
 #include <cstring>
 #include <string>
 
@@ -20,7 +20,7 @@
  * - The data memory uses contiguous segment-based addressing
  * - Does not own the memory (no malloc/free)
  * - Template parameter T should be trivially copyable for optimal shared memory usage
- * - Thread-safe getNextElement() operation using pthread mutex
+ * - Thread-safe getNextElement() and eraseAt() operations using std::atomic_flag
  * 
  * Usage:
  *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
@@ -37,7 +37,7 @@ private:
     size_t size_;                // Current number of elements
     char* memory_base_;          // Base address of shared memory
     size_t memory_total_bytes_;  // Total size of shared memory region
-    pthread_mutex_t mutex_;      // Mutex for thread-safe operations
+    std::atomic_flag lock_;      // Spinlock for thread-safe operations
 
 public:
     /**
@@ -51,7 +51,8 @@ public:
           capacity_(0),
           size_(0),
           memory_base_(static_cast<char*>(shared_memory_ptr)),
-          memory_total_bytes_(shared_memory_size) {
+          memory_total_bytes_(shared_memory_size),
+          lock_(ATOMIC_FLAG_INIT) {
         if (segment_size_bytes == 0) {
             throw std::invalid_argument("Segment size must be greater than 0");
         }
@@ -61,27 +62,6 @@ public:
         if (shared_memory_size == 0) {
             throw std::invalid_argument("Shared memory size must be greater than 0");
         }
-        
-        // Initialize mutex with process-shared attribute for cross-process synchronization
-        pthread_mutexattr_t attr;
-        int ret = pthread_mutexattr_init(&attr);
-        if (ret != 0) {
-            throw std::runtime_error("Failed to initialize mutex attributes: error code " + std::to_string(ret));
-        }
-        
-        ret = pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-        if (ret != 0) {
-            pthread_mutexattr_destroy(&attr);
-            throw std::runtime_error("Failed to set mutex process-shared attribute: error code " + std::to_string(ret));
-        }
-        
-        ret = pthread_mutex_init(&mutex_, &attr);
-        if (ret != 0) {
-            pthread_mutexattr_destroy(&attr);
-            throw std::runtime_error("Failed to initialize mutex: error code " + std::to_string(ret));
-        }
-        
-        pthread_mutexattr_destroy(&attr);
     }
 
     /**
@@ -93,8 +73,6 @@ public:
         for (size_t i = 0; i < size_; ++i) {
             get_element_ptr(i)->~T();
         }
-        // Destroy the mutex
-        pthread_mutex_destroy(&mutex_);
         // Note: We do NOT free memory_base_ as it's externally managed (e.g., via munmap)
     }
 
@@ -202,18 +180,15 @@ public:
      * This function is thread-safe and can be called from multiple threads or processes.
      */
     void eraseAt(size_t index) {
-        int ret = pthread_mutex_lock(&mutex_);
-        if (ret != 0) {
-            throw std::runtime_error("Failed to lock mutex in eraseAt: error code " + std::to_string(ret));
+        // Acquire spinlock
+        while (lock_.test_and_set(std::memory_order_acquire)) {
+            // Spin wait
         }
         
-        try {
-            eraseAt_unlocked(index);
-            pthread_mutex_unlock(&mutex_);
-        } catch (...) {
-            pthread_mutex_unlock(&mutex_);
-            throw;
-        }
+        eraseAt_unlocked(index);
+        
+        // Release spinlock
+        lock_.clear(std::memory_order_release);
     }
 
     /**
@@ -222,32 +197,29 @@ public:
      * @throws std::out_of_range if vector is empty
      * 
      * This function is thread-safe and can be called from multiple threads or processes.
-     * It uses a mutex to ensure atomic get-and-remove operation.
+     * It uses an atomic spinlock to ensure atomic get-and-remove operation.
      */
     T getNextElement() {
-        int ret = pthread_mutex_lock(&mutex_);
-        if (ret != 0) {
-            throw std::runtime_error("Failed to lock mutex in getNextElement: error code " + std::to_string(ret));
+        // Acquire spinlock
+        while (lock_.test_and_set(std::memory_order_acquire)) {
+            // Spin wait
         }
         
-        try {
-            if (size_ == 0) {
-                pthread_mutex_unlock(&mutex_);
-                throw std::out_of_range("Cannot get next element: vector is empty");
-            }
-
-            // Get a copy of the first element
-            T result = *get_element_ptr(0);
-
-            // Remove the first element (unlocked version since we already hold the lock)
-            eraseAt_unlocked(0);
-
-            pthread_mutex_unlock(&mutex_);
-            return result;
-        } catch (...) {
-            pthread_mutex_unlock(&mutex_);
-            throw;
+        if (size_ == 0) {
+            lock_.clear(std::memory_order_release);
+            throw std::out_of_range("Cannot get next element: vector is empty");
         }
+
+        // Get a copy of the first element
+        T result = *get_element_ptr(0);
+
+        // Remove the first element (unlocked version since we already hold the lock)
+        eraseAt_unlocked(0);
+
+        // Release spinlock
+        lock_.clear(std::memory_order_release);
+        
+        return result;
     }
 
 private:
