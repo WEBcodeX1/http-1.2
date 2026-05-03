@@ -7,6 +7,7 @@ find_package(Boost 1.74 REQUIRED COMPONENTS system python)
 # set binary executable
 add_executable(test-boost-python test-boost-python.cpp)
 add_executable(test-pointer-ref test-pointer-ref.cpp)
+add_executable(test-shmem-vector test-shmem-vector.cpp)
 
 # set include
 target_include_directories(test-boost-python PRIVATE ${Python3_INCLUDE_DIRS})
@@ -16,6 +17,8 @@ target_link_libraries(test-boost-python ${PYTHON_LIBRARIES})
 target_link_libraries(test-boost-python ${Boost_LIBRARIES})
 
 target_link_libraries(test-pointer-ref ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+target_link_libraries(test-shmem-vector ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 # add subdirs
 add_subdirectory(ResultOrder)
