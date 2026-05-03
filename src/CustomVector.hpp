@@ -11,14 +11,17 @@
  * The next segment's memory address is always: previous_segment_address + segment_size_bytes
  * 
  * Design for shared memory compatibility:
+ * - Uses externally provided shared memory (e.g., from mmap)
  * - No iterators or complex types that rely on separate memory regions
  * - Uses simple POD-style data members only
  * - The data memory uses contiguous segment-based addressing
+ * - Does not own the memory (no malloc/free)
  * - Template parameter T should be trivially copyable for optimal shared memory usage
  * 
- * Note: This implementation uses absolute pointers. For cross-process shared memory,
- * the entire CustomVector structure would need to be allocated within the shared memory
- * region and adjusted for process address spaces.
+ * Usage:
+ *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE | PROT_EXEC, 
+ *                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+ *   CustomVector<int> vec(sizeof(int), shmem, 640000);
  * 
  * Template parameter T can be any type.
  */
@@ -28,35 +31,43 @@ private:
     size_t segment_size_bytes_;  // Size of each segment in bytes
     size_t capacity_;            // Total number of elements that can be stored
     size_t size_;                // Current number of elements
-    char* memory_base_;          // Base address of allocated memory
+    char* memory_base_;          // Base address of shared memory
+    size_t memory_total_bytes_;  // Total size of shared memory region
 
 public:
     /**
      * Constructor: creates a new vector with specified segment size in bytes
      * @param segment_size_bytes Size of each memory segment in bytes
+     * @param shared_memory_ptr Pointer to externally allocated shared memory (e.g., from mmap)
+     * @param shared_memory_size Total size of the shared memory region in bytes
      */
-    explicit CustomVector(size_t segment_size_bytes) 
+    CustomVector(size_t segment_size_bytes, void* shared_memory_ptr, size_t shared_memory_size) 
         : segment_size_bytes_(segment_size_bytes),
           capacity_(0),
           size_(0),
-          memory_base_(nullptr) {
+          memory_base_(static_cast<char*>(shared_memory_ptr)),
+          memory_total_bytes_(shared_memory_size) {
         if (segment_size_bytes == 0) {
             throw std::invalid_argument("Segment size must be greater than 0");
+        }
+        if (shared_memory_ptr == nullptr) {
+            throw std::invalid_argument("Shared memory pointer cannot be null");
+        }
+        if (shared_memory_size == 0) {
+            throw std::invalid_argument("Shared memory size must be greater than 0");
         }
     }
 
     /**
-     * Destructor: frees allocated memory
+     * Destructor: destroys constructed elements but does NOT free memory
+     * (memory is owned externally and must be freed by the caller)
      */
     ~CustomVector() {
         // Destroy all constructed elements
         for (size_t i = 0; i < size_; ++i) {
             get_element_ptr(i)->~T();
         }
-        // Free raw memory
-        if (memory_base_ != nullptr) {
-            free(memory_base_);
-        }
+        // Note: We do NOT free memory_base_ as it's externally managed (e.g., via munmap)
     }
 
     // Disable copy constructor and copy assignment
@@ -66,6 +77,7 @@ public:
     /**
      * Reserves memory for the specified number of elements
      * @param element_count Number of elements to reserve space for
+     * @throws std::bad_alloc if requested capacity exceeds available shared memory
      */
     void reserve(size_t element_count) {
         if (element_count <= capacity_) {
@@ -75,30 +87,13 @@ public:
         // Calculate total memory needed
         size_t total_bytes = element_count * segment_size_bytes_;
         
-        // Allocate new memory
-        char* new_memory = static_cast<char*>(malloc(total_bytes));
-        if (new_memory == nullptr) {
-            throw std::bad_alloc();
+        // Check if we have enough shared memory
+        if (total_bytes > memory_total_bytes_) {
+            throw std::bad_alloc(); // Not enough shared memory
         }
 
-        // Move existing elements to new memory if we have any
-        if (memory_base_ != nullptr && size_ > 0) {
-            for (size_t i = 0; i < size_; ++i) {
-                T* old_element = reinterpret_cast<T*>(memory_base_ + i * segment_size_bytes_);
-                T* new_element = reinterpret_cast<T*>(new_memory + i * segment_size_bytes_);
-                
-                // Move construct into new location
-                new (new_element) T(std::move(*old_element));
-                
-                // Destroy old element
-                old_element->~T();
-            }
-            
-            // Free old memory
-            free(memory_base_);
-        }
-
-        memory_base_ = new_memory;
+        // Since we're using pre-allocated shared memory, we just update capacity
+        // No need to move elements as memory_base_ stays the same
         capacity_ = element_count;
     }
 
