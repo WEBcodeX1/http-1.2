@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <new>
+#include <pthread.h>
+#include <cstring>
 
 /**
  * Minimalistic vector implementation with custom memory management.
@@ -17,6 +19,7 @@
  * - The data memory uses contiguous segment-based addressing
  * - Does not own the memory (no malloc/free)
  * - Template parameter T should be trivially copyable for optimal shared memory usage
+ * - Thread-safe getNextElement() operation using pthread mutex
  * 
  * Usage:
  *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
@@ -33,6 +36,7 @@ private:
     size_t size_;                // Current number of elements
     char* memory_base_;          // Base address of shared memory
     size_t memory_total_bytes_;  // Total size of shared memory region
+    pthread_mutex_t mutex_;      // Mutex for thread-safe operations
 
 public:
     /**
@@ -56,6 +60,13 @@ public:
         if (shared_memory_size == 0) {
             throw std::invalid_argument("Shared memory size must be greater than 0");
         }
+        
+        // Initialize mutex with process-shared attribute for cross-process synchronization
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+        pthread_mutex_init(&mutex_, &attr);
+        pthread_mutexattr_destroy(&attr);
     }
 
     /**
@@ -67,6 +78,8 @@ public:
         for (size_t i = 0; i < size_; ++i) {
             get_element_ptr(i)->~T();
         }
+        // Destroy the mutex
+        pthread_mutex_destroy(&mutex_);
         // Note: We do NOT free memory_base_ as it's externally managed (e.g., via munmap)
     }
 
@@ -162,6 +175,68 @@ public:
      */
     size_t segment_size() const {
         return segment_size_bytes_;
+    }
+
+    /**
+     * Removes element at specified index
+     * @param index Index of the element to remove
+     * @throws std::out_of_range if index is out of bounds
+     * 
+     * This operation shifts all elements after the removed element forward by one position.
+     * Time complexity: O(n) where n is the number of elements after the removed element.
+     */
+    void eraseAt(size_t index) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of bounds");
+        }
+
+        // Destroy the element at the index
+        get_element_ptr(index)->~T();
+
+        // Shift all elements after the erased element forward
+        for (size_t i = index; i < size_ - 1; ++i) {
+            T* current = get_element_ptr(i);
+            T* next = get_element_ptr(i + 1);
+            
+            // Use placement new to copy-construct in place
+            new (current) T(*next);
+            
+            // Destroy the old element
+            next->~T();
+        }
+
+        --size_;
+    }
+
+    /**
+     * Thread-safe operation: returns the first element and removes it from the vector
+     * @return Copy of the first element
+     * @throws std::out_of_range if vector is empty
+     * 
+     * This function is thread-safe and can be called from multiple threads or processes.
+     * It uses a mutex to ensure atomic get-and-remove operation.
+     */
+    T getNextElement() {
+        pthread_mutex_lock(&mutex_);
+        
+        try {
+            if (size_ == 0) {
+                pthread_mutex_unlock(&mutex_);
+                throw std::out_of_range("Cannot get next element: vector is empty");
+            }
+
+            // Get a copy of the first element
+            T result = *get_element_ptr(0);
+
+            // Remove the first element
+            eraseAt(0);
+
+            pthread_mutex_unlock(&mutex_);
+            return result;
+        } catch (...) {
+            pthread_mutex_unlock(&mutex_);
+            throw;
+        }
     }
 
 private:

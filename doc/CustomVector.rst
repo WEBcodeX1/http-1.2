@@ -14,6 +14,7 @@ Key Features
 3. **Contiguous addressing**: Next segment address = previous address + segment_size_bytes
 4. **No iterators**: Designed to be 100% compatible with shared memory (no types that rely on other memory regions)
 5. **Simple interface**: Provides essential vector operations only
+6. **Thread-safe operations**: ``getNextElement()`` is thread-safe for multi-process/multi-threaded access
 
 Required Functions
 ------------------
@@ -23,6 +24,8 @@ Required Functions
 3. ✅ **push_back** element
 4. ✅ **get element** at element index
 5. ✅ **get elements count**
+6. ✅ **eraseAt** (remove element at specific index)
+7. ✅ **getNextElement** (thread-safe: get first element and remove it)
 
 Usage Example
 -------------
@@ -277,6 +280,59 @@ segment_size()
     size_t segment_size() const
 
 Returns the segment size in bytes.
+
+eraseAt()
+~~~~~~~~~
+
+.. code-block:: cpp
+
+    void eraseAt(size_t index)
+
+Removes element at specified index. Throws ``std::out_of_range`` if index is out of bounds.
+
+This operation shifts all elements after the removed element forward by one position. Time complexity is O(n) where n is the number of elements after the removed element.
+
+**Example:**
+
+.. code-block:: cpp
+
+    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+    
+    vec.eraseAt(1);  // Removes element at index 1 (value 20)
+    // Vector now contains: [10, 30]
+
+getNextElement()
+~~~~~~~~~~~~~~~~
+
+.. code-block:: cpp
+
+    T getNextElement()
+
+**Thread-safe** operation that returns the first element and removes it from the vector. Throws ``std::out_of_range`` if vector is empty.
+
+This function is thread-safe and can be called from multiple threads or processes. It uses a process-shared mutex to ensure atomic get-and-remove operation, making it suitable for producer-consumer patterns in shared memory.
+
+**Example:**
+
+.. code-block:: cpp
+
+    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    vec.push_back(100);
+    vec.push_back(200);
+    
+    int first = vec.getNextElement();  // Returns 100, removes it
+    int second = vec.getNextElement(); // Returns 200, removes it
+    // Vector is now empty
+
+**Thread-Safety:**
+
+The ``getNextElement()`` function uses a pthread mutex with ``PTHREAD_PROCESS_SHARED`` attribute, making it safe for:
+
+- Multi-threaded access within a single process
+- Multi-process access when the CustomVector is in shared memory
 
 Testing
 -------

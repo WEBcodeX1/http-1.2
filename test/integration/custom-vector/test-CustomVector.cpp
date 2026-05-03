@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sys/mman.h>
 #include <cstring>
+#include <vector>
 
 using namespace std;
 
@@ -345,3 +346,169 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_placement_new_in_shared_memory) {
     
     munmap(shmpointer, 640000);
 }
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_eraseAt) {
+    cout << "Test CustomVector eraseAt function" << endl;
+    
+    void* shmem = allocate_shared_memory(4096);
+    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    
+    // Add some elements
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+    vec.push_back(40);
+    vec.push_back(50);
+    
+    BOOST_CHECK_EQUAL(vec.size(), 5);
+    cout << "Added 5 elements: 10, 20, 30, 40, 50" << endl;
+    
+    // Test: Erase element at index 2 (value 30)
+    vec.eraseAt(2);
+    BOOST_CHECK_EQUAL(vec.size(), 4);
+    BOOST_CHECK_EQUAL(vec.at(0), 10);
+    BOOST_CHECK_EQUAL(vec.at(1), 20);
+    BOOST_CHECK_EQUAL(vec.at(2), 40);  // 40 should have shifted forward
+    BOOST_CHECK_EQUAL(vec.at(3), 50);
+    cout << "After erasing index 2: [10, 20, 40, 50]" << endl;
+    
+    // Test: Erase first element
+    vec.eraseAt(0);
+    BOOST_CHECK_EQUAL(vec.size(), 3);
+    BOOST_CHECK_EQUAL(vec.at(0), 20);
+    BOOST_CHECK_EQUAL(vec.at(1), 40);
+    BOOST_CHECK_EQUAL(vec.at(2), 50);
+    cout << "After erasing index 0: [20, 40, 50]" << endl;
+    
+    // Test: Erase last element
+    vec.eraseAt(2);
+    BOOST_CHECK_EQUAL(vec.size(), 2);
+    BOOST_CHECK_EQUAL(vec.at(0), 20);
+    BOOST_CHECK_EQUAL(vec.at(1), 40);
+    cout << "After erasing index 2: [20, 40]" << endl;
+    
+    // Test: Erase out of bounds should throw
+    BOOST_CHECK_THROW(vec.eraseAt(5), std::out_of_range);
+    cout << "Correctly threw exception for out of bounds erase" << endl;
+    
+    free_shared_memory(shmem, 4096);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement) {
+    cout << "Test CustomVector getNextElement function" << endl;
+    
+    void* shmem = allocate_shared_memory(4096);
+    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    
+    // Add some elements
+    vec.push_back(100);
+    vec.push_back(200);
+    vec.push_back(300);
+    
+    BOOST_CHECK_EQUAL(vec.size(), 3);
+    cout << "Added 3 elements: 100, 200, 300" << endl;
+    
+    // Test: Get first element (should return 100 and remove it)
+    int first = vec.getNextElement();
+    BOOST_CHECK_EQUAL(first, 100);
+    BOOST_CHECK_EQUAL(vec.size(), 2);
+    BOOST_CHECK_EQUAL(vec.at(0), 200);
+    BOOST_CHECK_EQUAL(vec.at(1), 300);
+    cout << "Got next element: 100, remaining: [200, 300]" << endl;
+    
+    // Test: Get second element (should return 200 and remove it)
+    int second = vec.getNextElement();
+    BOOST_CHECK_EQUAL(second, 200);
+    BOOST_CHECK_EQUAL(vec.size(), 1);
+    BOOST_CHECK_EQUAL(vec.at(0), 300);
+    cout << "Got next element: 200, remaining: [300]" << endl;
+    
+    // Test: Get third element (should return 300 and remove it)
+    int third = vec.getNextElement();
+    BOOST_CHECK_EQUAL(third, 300);
+    BOOST_CHECK_EQUAL(vec.size(), 0);
+    cout << "Got next element: 300, remaining: []" << endl;
+    
+    // Test: Get from empty vector should throw
+    BOOST_CHECK_THROW(vec.getNextElement(), std::out_of_range);
+    cout << "Correctly threw exception for empty vector" << endl;
+    
+    free_shared_memory(shmem, 4096);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement_with_struct) {
+    cout << "Test CustomVector getNextElement with struct type" << endl;
+    
+    struct Payload_t {
+        char Payload[128];
+        uint16_t PayloadLength;
+    };
+    
+    void* shmem = allocate_shared_memory(4096);
+    CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 4096);
+    
+    // Add some struct elements
+    Payload_t p1;
+    strcpy(p1.Payload, "First payload");
+    p1.PayloadLength = 13;
+    vec.push_back(p1);
+    
+    Payload_t p2;
+    strcpy(p2.Payload, "Second payload");
+    p2.PayloadLength = 14;
+    vec.push_back(p2);
+    
+    BOOST_CHECK_EQUAL(vec.size(), 2);
+    cout << "Added 2 struct elements" << endl;
+    
+    // Test: Get first struct element
+    Payload_t first = vec.getNextElement();
+    BOOST_CHECK_EQUAL(std::string(first.Payload), "First payload");
+    BOOST_CHECK_EQUAL(first.PayloadLength, 13);
+    BOOST_CHECK_EQUAL(vec.size(), 1);
+    cout << "Got next element: '" << first.Payload << "' (length: " << first.PayloadLength << ")" << endl;
+    
+    // Test: Get second struct element
+    Payload_t second = vec.getNextElement();
+    BOOST_CHECK_EQUAL(std::string(second.Payload), "Second payload");
+    BOOST_CHECK_EQUAL(second.PayloadLength, 14);
+    BOOST_CHECK_EQUAL(vec.size(), 0);
+    cout << "Got next element: '" << second.Payload << "' (length: " << second.PayloadLength << ")" << endl;
+    
+    free_shared_memory(shmem, 4096);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_thread_safety) {
+    cout << "Test CustomVector getNextElement thread safety" << endl;
+    
+    void* shmem = allocate_shared_memory(8192);
+    CustomVector<int> vec(sizeof(int), shmem, 8192);
+    
+    // Add many elements
+    const int NUM_ELEMENTS = 100;
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        vec.push_back(i);
+    }
+    
+    BOOST_CHECK_EQUAL(vec.size(), NUM_ELEMENTS);
+    cout << "Added " << NUM_ELEMENTS << " elements" << endl;
+    
+    // Test: Sequential getNextElement should work correctly
+    std::vector<int> retrieved;
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        int val = vec.getNextElement();
+        retrieved.push_back(val);
+    }
+    
+    BOOST_CHECK_EQUAL(vec.size(), 0);
+    BOOST_CHECK_EQUAL(retrieved.size(), NUM_ELEMENTS);
+    
+    // Verify all elements were retrieved in order
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        BOOST_CHECK_EQUAL(retrieved[i], i);
+    }
+    cout << "Successfully retrieved all " << NUM_ELEMENTS << " elements in order" << endl;
+    
+    free_shared_memory(shmem, 8192);
+}
+
