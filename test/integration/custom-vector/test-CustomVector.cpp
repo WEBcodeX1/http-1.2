@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sys/mman.h>
+#include <cstring>
 
 using namespace std;
 
@@ -223,4 +224,57 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_shared_memory) {
     cout << "First element: " << vec.at(0) << ", Middle: " << vec.at(50) << ", Last: " << vec.at(99) << endl;
     
     munmap(shmpointer, 640000);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_struct_type) {
+    cout << "Test CustomVector with struct types" << endl;
+    
+    // Test 11: Test with struct type as requested by user
+    struct Payload_t {
+        char Payload[4096];
+        uint16_t PayloadLength;
+    };
+    
+    void* shmem = allocate_shared_memory(640000);
+    CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
+    
+    // Create and add first payload
+    Payload_t payload1;
+    strcpy(payload1.Payload, "Payload char array");
+    payload1.PayloadLength = 18;
+    vec.push_back(payload1);
+    
+    // Create and add second payload
+    Payload_t payload2;
+    strcpy(payload2.Payload, "Second payload test");
+    payload2.PayloadLength = 19;
+    vec.push_back(payload2);
+    
+    // Create and add third payload
+    Payload_t payload3;
+    strcpy(payload3.Payload, "Third payload");
+    payload3.PayloadLength = 13;
+    vec.push_back(payload3);
+    
+    // Verify size
+    BOOST_CHECK_EQUAL(vec.size(), 3);
+    
+    // Verify first payload
+    BOOST_CHECK_EQUAL(vec.at(0).PayloadLength, 18);
+    BOOST_CHECK_EQUAL(strcmp(vec.at(0).Payload, "Payload char array"), 0);
+    
+    // Verify second payload
+    BOOST_CHECK_EQUAL(vec.at(1).PayloadLength, 19);
+    BOOST_CHECK_EQUAL(strcmp(vec.at(1).Payload, "Second payload test"), 0);
+    
+    // Verify third payload
+    BOOST_CHECK_EQUAL(vec.at(2).PayloadLength, 13);
+    BOOST_CHECK_EQUAL(strcmp(vec.at(2).Payload, "Third payload"), 0);
+    
+    cout << "Struct vector test passed with " << vec.size() << " elements" << endl;
+    cout << "Element[0]: '" << vec.at(0).Payload << "' (length: " << vec.at(0).PayloadLength << ")" << endl;
+    cout << "Element[1]: '" << vec.at(1).Payload << "' (length: " << vec.at(1).PayloadLength << ")" << endl;
+    cout << "Element[2]: '" << vec.at(2).Payload << "' (length: " << vec.at(2).PayloadLength << ")" << endl;
+    
+    munmap(shmem, 640000);
 }

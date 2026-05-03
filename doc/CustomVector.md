@@ -54,6 +54,40 @@ size_t count = vec.size();  // Returns 3
 munmap(shmpointer, 640000);
 ```
 
+## Working with Struct Types
+
+CustomVector works perfectly with struct types, making it ideal for storing structured data in shared memory:
+
+```cpp
+#include <cstring>
+
+// Define your struct type
+struct Payload_t {
+    char Payload[4096];
+    uint16_t PayloadLength;
+};
+
+// Allocate shared memory
+void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE,
+                   MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+
+// Create vector for struct type
+CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
+
+// Create and add struct instances
+Payload_t payload1;
+strcpy(payload1.Payload, "Payload char array");
+payload1.PayloadLength = 18;
+vec.push_back(payload1);
+
+// Access struct members
+std::cout << "Payload: " << vec.at(0).Payload << std::endl;
+std::cout << "Length: " << vec.at(0).PayloadLength << std::endl;
+
+// Clean up
+munmap(shmem, 640000);
+```
+
 ## Custom Segment Sizes
 
 You can use segment sizes larger than the type size for alignment or spacing:
