@@ -278,3 +278,70 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_struct_type) {
     
     munmap(shmem, 640000);
 }
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_placement_new_in_shared_memory) {
+    cout << "Test CustomVector with placement new in shared memory" << endl;
+    
+    // Test 12: Reproduce the user's issue - placing CustomVector object itself in shared memory
+    void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
+                            MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    BOOST_CHECK(shmpointer != MAP_FAILED);
+    
+    cout << "SHMEM address: " << shmpointer << endl;
+    
+    struct Payload_t {
+        char Payload[1024];
+        uint16_t PayloadLength;
+    };
+    
+    // Calculate offset: CustomVector object size + alignment
+    size_t vector_obj_size = sizeof(CustomVector<Payload_t>);
+    size_t alignment = alignof(Payload_t);
+    size_t data_offset = ((vector_obj_size + alignment - 1) / alignment) * alignment;
+    
+    cout << "CustomVector object size: " << vector_obj_size << " bytes" << endl;
+    cout << "Data storage offset: " << data_offset << " bytes" << endl;
+    
+    // Place CustomVector object at start of shared memory
+    // But tell it to use memory starting AFTER the object for data storage
+    char* data_region = static_cast<char*>(shmpointer) + data_offset;
+    size_t data_region_size = 640000 - data_offset;
+    
+    CustomVector<Payload_t>* shmvector = new(shmpointer) CustomVector<Payload_t>(
+        sizeof(Payload_t), data_region, data_region_size);
+    
+    Payload_t payload1;
+    strcpy(payload1.Payload, "Payload char array");
+    payload1.PayloadLength = 18;
+    
+    Payload_t payload2;
+    strcpy(payload2.Payload, "Second payload test");
+    payload2.PayloadLength = 19;
+    
+    Payload_t payload3;
+    strcpy(payload3.Payload, "Third payload");
+    payload3.PayloadLength = 13;
+    
+    // This should not segfault
+    shmvector->push_back(payload1);
+    shmvector->push_back(payload2);
+    shmvector->push_back(payload3);
+    
+    // Verify
+    BOOST_CHECK_EQUAL(shmvector->size(), 3);
+    BOOST_CHECK_EQUAL(shmvector->at(0).PayloadLength, 18);
+    BOOST_CHECK_EQUAL(strcmp(shmvector->at(0).Payload, "Payload char array"), 0);
+    BOOST_CHECK_EQUAL(shmvector->at(1).PayloadLength, 19);
+    BOOST_CHECK_EQUAL(strcmp(shmvector->at(1).Payload, "Second payload test"), 0);
+    BOOST_CHECK_EQUAL(shmvector->at(2).PayloadLength, 13);
+    BOOST_CHECK_EQUAL(strcmp(shmvector->at(2).Payload, "Third payload"), 0);
+    
+    cout << "Placement new test passed with " << shmvector->size() << " elements" << endl;
+    cout << "Element[0]: '" << shmvector->at(0).Payload << "' (length: " << shmvector->at(0).PayloadLength << ")" << endl;
+    cout << "Element[1]: '" << shmvector->at(1).Payload << "' (length: " << shmvector->at(1).PayloadLength << ")" << endl;
+    
+    // Manually call destructor since we used placement new
+    shmvector->~CustomVector();
+    
+    munmap(shmpointer, 640000);
+}

@@ -88,6 +88,59 @@ std::cout << "Length: " << vec.at(0).PayloadLength << std::endl;
 munmap(shmem, 640000);
 ```
 
+## Placing CustomVector Object in Shared Memory
+
+When using placement new to place the CustomVector object itself inside shared memory, you must ensure the data storage region does not overlap with the CustomVector object's memory:
+
+```cpp
+#include <cstring>
+
+struct Payload_t {
+    char Payload[1024];
+    uint16_t PayloadLength;
+};
+
+// Allocate shared memory
+void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
+                        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+
+// Calculate where data storage should start (after the CustomVector object)
+size_t vector_obj_size = sizeof(CustomVector<Payload_t>);
+size_t alignment = alignof(Payload_t);
+size_t data_offset = ((vector_obj_size + alignment - 1) / alignment) * alignment;
+
+// Data region starts after the CustomVector object
+char* data_region = static_cast<char*>(shmpointer) + data_offset;
+size_t data_region_size = 640000 - data_offset;
+
+// Use placement new to construct CustomVector at start of shared memory
+// But point it to use the data region for storage (not the same address)
+CustomVector<Payload_t>* shmvector = new(shmpointer) CustomVector<Payload_t>(
+    sizeof(Payload_t), data_region, data_region_size);
+
+// Now use it normally
+Payload_t payload1;
+strcpy(payload1.Payload, "Payload char array");
+payload1.PayloadLength = 18;
+shmvector->push_back(payload1);
+
+Payload_t payload2;
+strcpy(payload2.Payload, "Second payload test");
+payload2.PayloadLength = 19;
+shmvector->push_back(payload2);
+
+// Access elements
+std::cout << "Payload: " << shmvector->at(0).Payload << std::endl;
+
+// Manually call destructor since we used placement new
+shmvector->~CustomVector();
+
+// Clean up shared memory
+munmap(shmpointer, 640000);
+```
+
+**Important**: When using placement new, the CustomVector object occupies the first bytes of the shared memory region. You must pass a different pointer (offset past the object) as the `shared_memory_ptr` parameter to avoid memory overlap.
+
 ## Custom Segment Sizes
 
 You can use segment sizes larger than the type size for alignment or spacing:
