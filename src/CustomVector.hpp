@@ -202,7 +202,10 @@ public:
      * This function is thread-safe and can be called from multiple threads or processes.
      */
     void eraseAt(size_t index) {
-        pthread_mutex_lock(&mutex_);
+        int ret = pthread_mutex_lock(&mutex_);
+        if (ret != 0) {
+            throw std::runtime_error("Failed to lock mutex in eraseAt: error code " + std::to_string(ret));
+        }
         
         try {
             eraseAt_unlocked(index);
@@ -222,7 +225,10 @@ public:
      * It uses a mutex to ensure atomic get-and-remove operation.
      */
     T getNextElement() {
-        pthread_mutex_lock(&mutex_);
+        int ret = pthread_mutex_lock(&mutex_);
+        if (ret != 0) {
+            throw std::runtime_error("Failed to lock mutex in getNextElement: error code " + std::to_string(ret));
+        }
         
         try {
             if (size_ == 0) {
