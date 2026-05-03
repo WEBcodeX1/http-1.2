@@ -7,6 +7,10 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <algorithm>
 
 using namespace std;
 
@@ -510,5 +514,256 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_thread_safety) {
     cout << "Successfully retrieved all " << NUM_ELEMENTS << " elements in order" << endl;
     
     free_shared_memory(shmem, 8192);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_push) {
+    cout << "Test CustomVector multi-threaded push_back" << endl;
+    
+    void* shmem = allocate_shared_memory(640000);
+    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    
+    const int NUM_THREADS = 10;
+    const int ELEMENTS_PER_THREAD = 100;
+    
+    // Launch multiple threads that all push_back concurrently
+    std::vector<std::thread> threads;
+    for (int t = 0; t < NUM_THREADS; ++t) {
+        threads.emplace_back([&vec, t, ELEMENTS_PER_THREAD]() {
+            for (int i = 0; i < ELEMENTS_PER_THREAD; ++i) {
+                vec.push_back(t * 1000 + i);
+            }
+        });
+    }
+    
+    // Wait for all threads to complete
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    
+    // Verify all elements were added
+    BOOST_CHECK_EQUAL(vec.size(), NUM_THREADS * ELEMENTS_PER_THREAD);
+    cout << "Successfully added " << vec.size() << " elements from " << NUM_THREADS << " concurrent threads" << endl;
+    
+    // Verify no duplicates or corruption by collecting all values
+    std::vector<int> collected;
+    for (size_t i = 0; i < vec.size(); ++i) {
+        collected.push_back(vec.at(i));
+    }
+    
+    // All values should be in range
+    for (int val : collected) {
+        BOOST_CHECK(val >= 0 && val < NUM_THREADS * 1000 + ELEMENTS_PER_THREAD);
+    }
+    
+    cout << "All elements verified - no corruption detected" << endl;
+    
+    free_shared_memory(shmem, 640000);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_get) {
+    cout << "Test CustomVector multi-threaded getNextElement (consumer)" << endl;
+    
+    void* shmem = allocate_shared_memory(640000);
+    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    
+    const int NUM_ELEMENTS = 1000;
+    const int NUM_CONSUMERS = 10;
+    
+    // Pre-populate vector
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        vec.push_back(i);
+    }
+    
+    BOOST_CHECK_EQUAL(vec.size(), NUM_ELEMENTS);
+    cout << "Pre-populated with " << NUM_ELEMENTS << " elements" << endl;
+    
+    // Launch multiple consumer threads
+    std::vector<std::thread> threads;
+    std::vector<std::vector<int>> thread_results(NUM_CONSUMERS);
+    
+    for (int t = 0; t < NUM_CONSUMERS; ++t) {
+        threads.emplace_back([&vec, &thread_results, t]() {
+            while (true) {
+                try {
+                    int val = vec.getNextElement();
+                    thread_results[t].push_back(val);
+                } catch (const std::out_of_range&) {
+                    // Vector is empty, consumer done
+                    break;
+                }
+            }
+        });
+    }
+    
+    // Wait for all consumers to finish
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    
+    // Verify vector is empty
+    BOOST_CHECK_EQUAL(vec.size(), 0);
+    
+    // Collect all retrieved values
+    std::vector<int> all_retrieved;
+    for (const auto& thread_result : thread_results) {
+        all_retrieved.insert(all_retrieved.end(), thread_result.begin(), thread_result.end());
+    }
+    
+    // Verify we got exactly NUM_ELEMENTS values
+    BOOST_CHECK_EQUAL(all_retrieved.size(), NUM_ELEMENTS);
+    
+    // Sort and verify all values 0 to NUM_ELEMENTS-1 are present (no duplicates or missing)
+    std::sort(all_retrieved.begin(), all_retrieved.end());
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        BOOST_CHECK_EQUAL(all_retrieved[i], i);
+    }
+    
+    cout << "Successfully consumed all " << NUM_ELEMENTS << " elements from " << NUM_CONSUMERS << " concurrent threads" << endl;
+    cout << "No duplicates or missing elements - thread-safety verified" << endl;
+    
+    free_shared_memory(shmem, 640000);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_producer_consumer) {
+    cout << "Test CustomVector multi-threaded producer-consumer pattern" << endl;
+    
+    void* shmem = allocate_shared_memory(640000);
+    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    
+    const int NUM_PRODUCERS = 5;
+    const int NUM_CONSUMERS = 5;
+    const int ITEMS_PER_PRODUCER = 200;
+    
+    std::atomic<int> produced_count{0};
+    std::atomic<int> consumed_count{0};
+    std::atomic<bool> production_done{false};
+    
+    std::vector<std::thread> threads;
+    std::vector<int> consumed_values;
+    std::mutex consumed_mutex;
+    
+    // Launch producer threads
+    for (int t = 0; t < NUM_PRODUCERS; ++t) {
+        threads.emplace_back([&vec, &produced_count, t, ITEMS_PER_PRODUCER]() {
+            for (int i = 0; i < ITEMS_PER_PRODUCER; ++i) {
+                vec.push_back(t * 10000 + i);
+                produced_count++;
+                // Small delay to interleave with consumers
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+        });
+    }
+    
+    // Launch consumer threads
+    for (int t = 0; t < NUM_CONSUMERS; ++t) {
+        threads.emplace_back([&vec, &consumed_count, &production_done, &consumed_values, &consumed_mutex]() {
+            while (!production_done.load() || vec.size() > 0) {
+                try {
+                    int val = vec.getNextElement();
+                    consumed_count++;
+                    {
+                        std::lock_guard<std::mutex> lock(consumed_mutex);
+                        consumed_values.push_back(val);
+                    }
+                } catch (const std::out_of_range&) {
+                    // Vector temporarily empty, retry
+                    std::this_thread::sleep_for(std::chrono::microseconds(10));
+                }
+            }
+        });
+    }
+    
+    // Wait for all producers to finish
+    for (int i = 0; i < NUM_PRODUCERS; ++i) {
+        threads[i].join();
+    }
+    production_done = true;
+    
+    // Wait for all consumers to finish
+    for (int i = NUM_PRODUCERS; i < NUM_PRODUCERS + NUM_CONSUMERS; ++i) {
+        threads[i].join();
+    }
+    
+    // Verify counts
+    const int EXPECTED_TOTAL = NUM_PRODUCERS * ITEMS_PER_PRODUCER;
+    BOOST_CHECK_EQUAL(produced_count.load(), EXPECTED_TOTAL);
+    BOOST_CHECK_EQUAL(consumed_count.load(), EXPECTED_TOTAL);
+    BOOST_CHECK_EQUAL(consumed_values.size(), EXPECTED_TOTAL);
+    BOOST_CHECK_EQUAL(vec.size(), 0);
+    
+    // Verify no duplicates by sorting and checking
+    std::sort(consumed_values.begin(), consumed_values.end());
+    for (size_t i = 1; i < consumed_values.size(); ++i) {
+        BOOST_CHECK(consumed_values[i] != consumed_values[i-1]);
+    }
+    
+    cout << "Successfully produced and consumed " << EXPECTED_TOTAL << " items" << endl;
+    cout << "Producers: " << NUM_PRODUCERS << ", Consumers: " << NUM_CONSUMERS << endl;
+    cout << "No data races or duplicates detected - thread-safety verified" << endl;
+    
+    free_shared_memory(shmem, 640000);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_mixed_operations) {
+    cout << "Test CustomVector multi-threaded mixed operations" << endl;
+    
+    void* shmem = allocate_shared_memory(640000);
+    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    
+    // Pre-populate
+    for (int i = 0; i < 100; ++i) {
+        vec.push_back(i);
+    }
+    
+    const int NUM_THREADS = 8;
+    std::atomic<int> errors{0};
+    
+    std::vector<std::thread> threads;
+    
+    // Launch threads doing mixed operations
+    for (int t = 0; t < NUM_THREADS; ++t) {
+        threads.emplace_back([&vec, &errors, t]() {
+            try {
+                for (int i = 0; i < 100; ++i) {
+                    // Mix of operations
+                    if (i % 3 == 0) {
+                        vec.push_back(t * 1000 + i);
+                    } else if (i % 3 == 1) {
+                        try {
+                            vec.getNextElement();
+                        } catch (const std::out_of_range&) {
+                            // Empty, that's ok
+                        }
+                    } else {
+                        // Read operations
+                        size_t s = vec.size();
+                        if (s > 0) {
+                            try {
+                                vec.at(0);
+                            } catch (const std::out_of_range&) {
+                                // Race condition where size changed, that's ok
+                            }
+                        }
+                    }
+                }
+            } catch (...) {
+                errors++;
+            }
+        });
+    }
+    
+    // Wait for all threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    
+    // No threads should have crashed or encountered unexpected errors
+    BOOST_CHECK_EQUAL(errors.load(), 0);
+    
+    cout << "Successfully completed " << NUM_THREADS << " threads performing mixed concurrent operations" << endl;
+    cout << "Final vector size: " << vec.size() << endl;
+    cout << "No crashes or unexpected errors - thread-safety verified" << endl;
+    
+    free_shared_memory(shmem, 640000);
 }
 

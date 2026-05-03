@@ -349,6 +349,29 @@ The spinlock provides lock-free, high-performance synchronization that is more e
 Testing
 -------
 
+The test suite includes **19 comprehensive tests** covering:
+
+**Single-threaded tests:**
+- Basic functionality (constructor, reserve, push_back, at, size)
+- Different data types (int, double, struct types, strings)
+- Memory layout verification
+- Exception handling (out of bounds access)
+- Shared memory usage with mmap
+- Placement new in shared memory
+- eraseAt and getNextElement operations
+
+**Multi-threaded tests:**
+- Concurrent push_back from multiple threads (10 threads, 100 elements each)
+- Concurrent getNextElement consumption (10 consumer threads, 1000 elements)
+- Producer-consumer pattern (5 producers, 5 consumers, 1000 items)
+- Mixed concurrent operations (8 threads performing random push/get/read operations)
+
+The multi-threaded tests verify:
+- No data races or corruption during concurrent writes
+- No duplicate or missing elements during concurrent reads
+- Proper synchronization using atomic_flag spinlock
+- Safe producer-consumer patterns in shared memory
+
 Run the test suite:
 
 .. code-block:: bash
