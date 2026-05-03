@@ -10,10 +10,15 @@
  * Memory is allocated in segments where each segment is a configurable number of bytes.
  * The next segment's memory address is always: previous_segment_address + segment_size_bytes
  * 
- * This implementation is designed to be 100% compatible with shared memory:
- * - Uses offset-based addressing instead of absolute pointers
- * - No iterators or types that rely on other memory regions
- * - The entire data structure can be placed in shared memory
+ * Design for shared memory compatibility:
+ * - No iterators or complex types that rely on separate memory regions
+ * - Uses simple POD-style data members only
+ * - The data memory uses contiguous segment-based addressing
+ * - Template parameter T should be trivially copyable for optimal shared memory usage
+ * 
+ * Note: This implementation uses absolute pointers. For cross-process shared memory,
+ * the entire CustomVector structure would need to be allocated within the shared memory
+ * region and adjusted for process address spaces.
  * 
  * Template parameter T can be any type.
  */
@@ -23,7 +28,7 @@ private:
     size_t segment_size_bytes_;  // Size of each segment in bytes
     size_t capacity_;            // Total number of elements that can be stored
     size_t size_;                // Current number of elements
-    size_t memory_offset_;       // Offset from this object to the data memory (0 means no allocation)
+    char* memory_base_;          // Base address of allocated memory
 
 public:
     /**
@@ -34,7 +39,7 @@ public:
         : segment_size_bytes_(segment_size_bytes),
           capacity_(0),
           size_(0),
-          memory_offset_(0) {
+          memory_base_(nullptr) {
         if (segment_size_bytes == 0) {
             throw std::invalid_argument("Segment size must be greater than 0");
         }
@@ -49,8 +54,8 @@ public:
             get_element_ptr(i)->~T();
         }
         // Free raw memory
-        if (memory_offset_ != 0) {
-            free(get_memory_base());
+        if (memory_base_ != nullptr) {
+            free(memory_base_);
         }
     }
 
@@ -77,10 +82,9 @@ public:
         }
 
         // Move existing elements to new memory if we have any
-        if (memory_offset_ != 0 && size_ > 0) {
-            char* old_memory = get_memory_base();
+        if (memory_base_ != nullptr && size_ > 0) {
             for (size_t i = 0; i < size_; ++i) {
-                T* old_element = reinterpret_cast<T*>(old_memory + i * segment_size_bytes_);
+                T* old_element = reinterpret_cast<T*>(memory_base_ + i * segment_size_bytes_);
                 T* new_element = reinterpret_cast<T*>(new_memory + i * segment_size_bytes_);
                 
                 // Move construct into new location
@@ -91,12 +95,10 @@ public:
             }
             
             // Free old memory
-            free(old_memory);
+            free(memory_base_);
         }
 
-        // Calculate offset from this object to the new memory
-        char* this_addr = reinterpret_cast<char*>(this);
-        memory_offset_ = new_memory - this_addr;
+        memory_base_ = new_memory;
         capacity_ = element_count;
     }
 
@@ -169,35 +171,14 @@ public:
 
 private:
     /**
-     * Gets the base address of the data memory using offset-based addressing
-     */
-    char* get_memory_base() {
-        if (memory_offset_ == 0) {
-            return nullptr;
-        }
-        char* this_addr = reinterpret_cast<char*>(this);
-        return this_addr + memory_offset_;
-    }
-
-    const char* get_memory_base() const {
-        if (memory_offset_ == 0) {
-            return nullptr;
-        }
-        const char* this_addr = reinterpret_cast<const char*>(this);
-        return this_addr + memory_offset_;
-    }
-
-    /**
      * Gets pointer to element at specified index
      * Memory address calculation: base_address + (index * segment_size_bytes)
      */
     T* get_element_ptr(size_t index) {
-        char* base = get_memory_base();
-        return reinterpret_cast<T*>(base + index * segment_size_bytes_);
+        return reinterpret_cast<T*>(memory_base_ + index * segment_size_bytes_);
     }
 
     const T* get_element_ptr(size_t index) const {
-        const char* base = get_memory_base();
-        return reinterpret_cast<const T*>(base + index * segment_size_bytes_);
+        return reinterpret_cast<const T*>(memory_base_ + index * segment_size_bytes_);
     }
 };
