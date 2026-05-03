@@ -60,7 +60,7 @@ Usage Example
     munmap(shmpointer, 640000);
 
 Working with Struct Types
---------------------------
+-------------------------
 
 CustomVector works perfectly with struct types, making it ideal for storing structured data in shared memory:
 
@@ -95,7 +95,7 @@ CustomVector works perfectly with struct types, making it ideal for storing stru
     munmap(shmem, 640000);
 
 Placing CustomVector Object in Shared Memory
----------------------------------------------
+--------------------------------------------
 
 When using placement new to place the CustomVector object itself inside shared memory, you must ensure the data storage region does not overlap with the CustomVector object's memory:
 
@@ -150,7 +150,7 @@ When using placement new to place the CustomVector object itself inside shared m
    When using placement new, the CustomVector object occupies the first bytes of the shared memory region. You must pass a different pointer (offset past the object) as the ``shared_memory_ptr`` parameter to avoid memory overlap.
 
 Custom Segment Sizes
----------------------
+--------------------
 
 You can use segment sizes larger than the type size for alignment or spacing:
 
@@ -195,7 +195,7 @@ CustomVector does NOT own the memory. The caller must:
 - Call ``munmap()`` to free the shared memory after the vector is destroyed
 
 Shared Memory Compatible
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The design uses:
 
