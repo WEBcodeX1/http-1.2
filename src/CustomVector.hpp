@@ -19,7 +19,7 @@
  * - Template parameter T should be trivially copyable for optimal shared memory usage
  * 
  * Usage:
- *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE | PROT_EXEC, 
+ *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
  *                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
  *   CustomVector<int> vec(sizeof(int), shmem, 640000);
  * 

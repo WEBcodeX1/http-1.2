@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_size) {
 BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
     cout << "Test CustomVector with different types" << endl;
     
-    // Test 6: Test with double
+    // Test 6: Test with double (trivially copyable type - ideal for shared memory)
     void* shmem1 = allocate_shared_memory(4096);
     {
         CustomVector<double> vec_double(sizeof(double), shmem1, 4096);
@@ -140,7 +140,9 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
     } // vec_double destroyed here before munmap
     free_shared_memory(shmem1, 4096);
     
-    // Test 7: Test with string
+    // Test 7: Test with string (Note: std::string is not ideal for shared memory
+    // across processes as its internal buffer is heap-allocated. This works for
+    // single-process testing but won't share properly across process boundaries.)
     void* shmem2 = allocate_shared_memory(4096);
     {
         CustomVector<string> vec_string(sizeof(string), shmem2, 4096);
@@ -151,6 +153,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
         BOOST_CHECK_EQUAL(vec_string.at(1), "World");
         
         cout << "String vector: " << vec_string.at(0) << ", " << vec_string.at(1) << endl;
+        cout << "WARNING: std::string not recommended for cross-process shared memory" << endl;
     } // vec_string destroyed here before munmap
     free_shared_memory(shmem2, 4096);
 }

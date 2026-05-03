@@ -100,7 +100,10 @@ Element N:    memory_base_ + (N * segment_size_bytes)
    - Only POD-style data members (size_t and char*)
    - Simple pointer arithmetic for element access
 
-3. **Type Compatibility**: Works best with trivially copyable types for optimal shared memory usage, but supports any type with proper constructors/destructors.
+3. **Type Compatibility**: 
+   - **Best for cross-process shared memory**: Trivially copyable types (int, double, structs with POD members)
+   - **Not recommended for cross-process**: Types with dynamic allocation (std::string, std::vector, etc.) as their internal data is heap-allocated outside the shared memory region
+   - Works with any type for single-process usage, but for true cross-process shared memory, use only trivially copyable types
 
 ## API Reference
 
