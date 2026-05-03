@@ -6,6 +6,7 @@
 #include <new>
 #include <pthread.h>
 #include <cstring>
+#include <string>
 
 /**
  * Minimalistic vector implementation with custom memory management.
@@ -63,9 +64,23 @@ public:
         
         // Initialize mutex with process-shared attribute for cross-process synchronization
         pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-        pthread_mutex_init(&mutex_, &attr);
+        int ret = pthread_mutexattr_init(&attr);
+        if (ret != 0) {
+            throw std::runtime_error("Failed to initialize mutex attributes: error code " + std::to_string(ret));
+        }
+        
+        ret = pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+        if (ret != 0) {
+            pthread_mutexattr_destroy(&attr);
+            throw std::runtime_error("Failed to set mutex process-shared attribute: error code " + std::to_string(ret));
+        }
+        
+        ret = pthread_mutex_init(&mutex_, &attr);
+        if (ret != 0) {
+            pthread_mutexattr_destroy(&attr);
+            throw std::runtime_error("Failed to initialize mutex: error code " + std::to_string(ret));
+        }
+        
         pthread_mutexattr_destroy(&attr);
     }
 
@@ -178,34 +193,24 @@ public:
     }
 
     /**
-     * Removes element at specified index
+     * Removes element at specified index (thread-safe)
      * @param index Index of the element to remove
      * @throws std::out_of_range if index is out of bounds
      * 
      * This operation shifts all elements after the removed element forward by one position.
      * Time complexity: O(n) where n is the number of elements after the removed element.
+     * This function is thread-safe and can be called from multiple threads or processes.
      */
     void eraseAt(size_t index) {
-        if (index >= size_) {
-            throw std::out_of_range("Index out of bounds");
+        pthread_mutex_lock(&mutex_);
+        
+        try {
+            eraseAt_unlocked(index);
+            pthread_mutex_unlock(&mutex_);
+        } catch (...) {
+            pthread_mutex_unlock(&mutex_);
+            throw;
         }
-
-        // Destroy the element at the index
-        get_element_ptr(index)->~T();
-
-        // Shift all elements after the erased element forward
-        for (size_t i = index; i < size_ - 1; ++i) {
-            T* current = get_element_ptr(i);
-            T* next = get_element_ptr(i + 1);
-            
-            // Use placement new to copy-construct in place
-            new (current) T(*next);
-            
-            // Destroy the old element
-            next->~T();
-        }
-
-        --size_;
     }
 
     /**
@@ -228,8 +233,8 @@ public:
             // Get a copy of the first element
             T result = *get_element_ptr(0);
 
-            // Remove the first element
-            eraseAt(0);
+            // Remove the first element (unlocked version since we already hold the lock)
+            eraseAt_unlocked(0);
 
             pthread_mutex_unlock(&mutex_);
             return result;
@@ -240,6 +245,36 @@ public:
     }
 
 private:
+    /**
+     * Removes element at specified index (internal unlocked version)
+     * @param index Index of the element to remove
+     * @throws std::out_of_range if index is out of bounds
+     * 
+     * This is an internal helper that does not acquire locks.
+     * Use the public eraseAt() for thread-safe access.
+     */
+    void eraseAt_unlocked(size_t index) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of bounds");
+        }
+
+        // Destroy the element at the index
+        get_element_ptr(index)->~T();
+
+        // Shift all elements after the erased element forward
+        for (size_t i = index; i < size_ - 1; ++i) {
+            T* current = get_element_ptr(i);
+            T* next = get_element_ptr(i + 1);
+            
+            // Use placement new to copy-construct in place
+            new (current) T(*next);
+            
+            // Destroy the old element
+            next->~T();
+        }
+
+        --size_;
+    }
     /**
      * Gets pointer to element at specified index
      * Memory address calculation: base_address + (index * segment_size_bytes)

@@ -288,9 +288,11 @@ eraseAt()
 
     void eraseAt(size_t index)
 
-Removes element at specified index. Throws ``std::out_of_range`` if index is out of bounds.
+**Thread-safe** operation that removes element at specified index. Throws ``std::out_of_range`` if index is out of bounds.
 
 This operation shifts all elements after the removed element forward by one position. Time complexity is O(n) where n is the number of elements after the removed element.
+
+This function is thread-safe and can be called from multiple threads or processes.
 
 **Example:**
 
