@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../../../lib/http/httpparser.hpp"
+#include "../../../lib/http/httpconstants.hpp"
 
 using namespace std;
 
