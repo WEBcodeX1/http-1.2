@@ -1,10 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-
 #include <string>
 #include <vector>
 #include <memory>
+#include <cstdint>
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
