@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE( test_single_valid_get_request_full_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 1);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_GET);
     BOOST_TEST(ru == "/test/test.png");
     BOOST_TEST(rh == "one");
 
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE( test_single_post_request_full_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << " Payload: " << rp << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 2);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_POST);
     BOOST_TEST(ru == "/backend/test1");
     BOOST_TEST(rh == "test.loalnet");
     BOOST_TEST(rp == "{}");
@@ -213,8 +213,8 @@ BOOST_AUTO_TEST_CASE( test_single_valid_post_request_partial_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 2);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_POST);
     BOOST_TEST(ru == "/other/path");
     BOOST_TEST(rh == "application/json");
 
@@ -244,8 +244,8 @@ BOOST_AUTO_TEST_CASE( test_single_valid_get_request_1byte_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 1);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_GET);
     BOOST_TEST(ru == "/test/test.png");
     BOOST_TEST(rh == "one");
 }
@@ -275,8 +275,8 @@ BOOST_AUTO_TEST_CASE( test_single_post_request_1byte_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << " Payload: " << rp << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 2);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_POST);
     BOOST_TEST(ru == "/backend/test1");
     BOOST_TEST(rh == "test.loalnet");
     BOOST_TEST(rp == "{}");
@@ -427,8 +427,8 @@ BOOST_AUTO_TEST_CASE( test_single_valid_post_request_partial_1byte_transmit )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 2);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_POST);
     BOOST_TEST(ru == "/other/path");
     BOOST_TEST(rh == "application/json");
 }
@@ -455,8 +455,8 @@ BOOST_AUTO_TEST_CASE( test_valid_get_parameters_1 )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 1);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_GET);
     BOOST_TEST(ru == "/test/test.html?a=1&b=2");
     BOOST_TEST(rh == "three");
     BOOST_TEST(rg1 == "1");
@@ -487,8 +487,8 @@ BOOST_AUTO_TEST_CASE( test_valid_get_parameters_2 )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 1);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_GET);
     BOOST_TEST(ru == "/test2.html?hello=hello1&test=test2&here=there");
     BOOST_TEST(rh == "two");
     BOOST_TEST(rg1 == "hello1");
@@ -520,8 +520,8 @@ BOOST_AUTO_TEST_CASE( test_urlparamsmap2_json )
     cout << "Request size: " << rs << " version: " << rv << " method: " << rm << " URL: " << ru << " Header: " << rh << endl;
 
     BOOST_TEST(rs == 1);
-    BOOST_TEST(rv == 1);
-    BOOST_TEST(rm == 1);
+    BOOST_TEST(rv == HTTP_VERSION_1_1);
+    BOOST_TEST(rm == HTTP_METHOD_GET);
     BOOST_TEST(ru == "/test2.html?hello=hello1&test=test2&here=there");
     BOOST_TEST(rh == "two");
     BOOST_TEST(rg1 == "hello1");
