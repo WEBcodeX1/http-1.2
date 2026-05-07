@@ -1,4 +1,5 @@
 #include "httpparser.hpp"
+#include "httpconstants.hpp"
 
 using namespace std;
 
