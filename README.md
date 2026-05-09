@@ -26,7 +26,7 @@
 ## :pushpin: Overview
 
 > [!NOTE]
-> We would like to slightly apologize that the project's original goal has not been fully reached in the intended form.
+> We would like to apologize that the project's original goal has not been fully reached in the intended form.
 >
 > At the same time, **version 0.2 already includes a rock-solid HTTP/1.1 parser** that is highly suitable for **Arduino microcontroller usage** and other resource-constrained environments.
 >
