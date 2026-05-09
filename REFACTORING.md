@@ -101,6 +101,7 @@ Version `v0.3` will:
 7. Replace result ordering with request UUID handling
 8. Add a client request library including tests
 9. Integrate parsing and encryption in a fixed-size threaded model with protected request and result queues
+10. Implement shared memory data exchange between AS processes via SHMVector.cpp (currently named CustomVector.hpp)
 
 > [!NOTE]
 > The planned `v0.3` work is based on the current source layout in `/src`, especially `Server`, `ClientHandler`, `ASRequestHandler`, `ASProcessHandler`, `ResultProcessor`, `ResultOrder`, and `ThreadHandler`.
@@ -140,6 +141,10 @@ In addition to the protocol parsing library, a client request library with tests
 #### 1.9. Add a Fixed-Size Threaded Processing Model
 
 Version `v0.3` will introduce a controlled threaded model with a fixed number of worker threads, explicit request and result queues, atomic synchronization, and integrated parsing and encryption stages.
+
+#### 1.10. Improve Shared Memory Data Exchange
+
+A well-tested header-only `src/CustomVector.hpp` utility has been introduced to exchange data directly with an in-SHM placed C++ object instance. The container supports passing structs and uses atomic / spinlock-based synchronization for thread-safe / process-safe access, including `getNextElement()` for producer / consumer-style access patterns.
 
 ## Future
 
