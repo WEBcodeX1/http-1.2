@@ -3,12 +3,10 @@
 #include "Debug.cpp"
 
 #include <sys/socket.h>
-#include <sys/time.h>
 #include <sys/epoll.h>
 
-#include <ctime>
-#include <atomic>
 #include <unordered_map>
+#include <memory>
 
 #include "Helper.hpp"
 #include "Global.hpp"
