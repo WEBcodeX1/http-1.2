@@ -7,11 +7,15 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
+#include <string>
+#include <utility>
 
 #include "Debug.cpp"
 #include "Helper.hpp"
 #include "Global.hpp"
 
+//- typedefs
 typedef struct {
     Filedescriptor_t Filedescriptor;
     unsigned int FileSize;

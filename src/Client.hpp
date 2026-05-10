@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <string>
 #include <ctime>
+#include <cerrno>
 
 #include <unistd.h>
 
