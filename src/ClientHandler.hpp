@@ -30,7 +30,7 @@ public:
     ClientHandler();
     ~ClientHandler();
 
-    void addClient(const uint16_t);
+    void addClient(const Filedescriptor_t);
     void processClients();
     void readClientData(const uint16_t);
 

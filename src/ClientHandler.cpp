@@ -23,7 +23,7 @@ ClientHandler::~ClientHandler()
     DBG(120, "Destructor");
 }
 
-void ClientHandler::addClient(const uint16_t ClientFD)
+void ClientHandler::addClient(const Filedescriptor_t ClientFD)
 {
     DBG(70, "Add client with FD:" << ClientFD);
 
