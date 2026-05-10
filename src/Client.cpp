@@ -22,6 +22,8 @@ Client::~Client()
 
 ssize_t Client::receiveData()
 {
+    ssize_t TotalRcvBytes = 0;
+
     for (;;) {
         const ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
         const int ReadErrno = errno;
@@ -30,6 +32,7 @@ ssize_t Client::receiveData()
 
         if (RcvBytes > 0) {
             appendBuffer(_ReceiveBuffer, RcvBytes);
+            TotalRcvBytes += RcvBytes;
             continue;
         }
 
@@ -39,6 +42,13 @@ ssize_t Client::receiveData()
 
         if (ReadErrno == EINTR) {
             continue;
+        }
+
+        if (
+            (ReadErrno == EAGAIN || ReadErrno == EWOULDBLOCK) &&
+            TotalRcvBytes > 0
+        ) {
+            return TotalRcvBytes;
         }
 
         errno = ReadErrno;

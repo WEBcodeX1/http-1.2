@@ -84,18 +84,19 @@ void ClientHandler::readClientData(const uint16_t FDCount)
 
         if (Clients.contains(ReadFD)) {
             const auto RecvStatus = Clients[ReadFD]->receiveData();
-            const int RecvErrno = errno;
             if (RecvStatus == 0) {
                 Clients.erase(ReadFD);
                 close(ReadFD);
-            } else if (
-                RecvStatus < 0 &&
-                RecvErrno != EAGAIN &&
-                RecvErrno != EWOULDBLOCK &&
-                RecvErrno != EINTR
-            ) {
-                Clients.erase(ReadFD);
-                close(ReadFD);
+            } else if (RecvStatus < 0) {
+                const int RecvErrno = errno;
+                if (
+                    RecvErrno != EAGAIN &&
+                    RecvErrno != EWOULDBLOCK &&
+                    RecvErrno != EINTR
+                ) {
+                    Clients.erase(ReadFD);
+                    close(ReadFD);
+                }
             }
         }
     }
