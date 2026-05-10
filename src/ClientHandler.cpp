@@ -1,6 +1,5 @@
 #include "ClientHandler.hpp"
 
-#include <cerrno>
 #include <memory>
 
 using namespace std;
@@ -87,16 +86,6 @@ void ClientHandler::readClientData(const uint16_t FDCount)
             if (RecvStatus == 0) {
                 Clients.erase(ReadFD);
                 close(ReadFD);
-            } else if (RecvStatus < 0) {
-                const int RecvErrno = errno;
-                if (
-                    RecvErrno != EAGAIN &&
-                    RecvErrno != EWOULDBLOCK &&
-                    RecvErrno != EINTR
-                ) {
-                    Clients.erase(ReadFD);
-                    close(ReadFD);
-                }
             }
         }
     }
