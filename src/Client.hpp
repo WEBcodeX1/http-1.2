@@ -1,33 +1,37 @@
 #pragma once
 
 #include "Debug.cpp"
+#include "Constant.hpp"
+#include "Global.hpp"
+
 #include "../lib/http/httpparser.hpp"
 
 #include <cstdint>
 #include <string>
 #include <ctime>
+#include <cerrno>
 
-typedef uint16_t ClientFD_t;
-typedef uint16_t ClientRequestNr_t;
+#include <unistd.h>
+
 
 class Client : public HTTPParser
 {
 
 public:
 
-    Client(ClientFD_t);
+    Client(Filedescriptor_t, char*);
     ~Client();
 
-    void incrementReqNr();
-    ClientRequestNr_t getCurrentReqNr();
+    bool receiveData();
 
 protected:
 
-    ClientFD_t _ClientFD;
+    Filedescriptor_t _ClientFD;
 
 private:
 
-    ClientRequestNr_t _RequestNr;
-    time_t _SocketConnectTime;
-    time_t _SocketDisconnectTime;
+    char* _ReceiveBuffer;
+    time_t _ConnectTime;
+    char _SendBuffer[SOCKET_SEND_BUFFER_SIZE];
+
 };

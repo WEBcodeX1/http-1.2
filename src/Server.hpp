@@ -54,13 +54,6 @@ private:
 
     struct pollfd ServerConnFD[1];
 
-    void* _SHMStaticFS;
-    void* _SHMPythonASMeta;
-    void* _SHMPythonASRequests;
-    void* _SHMPythonASResults;
-
-    int _FDPassingServerFD;
-
     static std::vector<pid_t> ChildPIDs;
 
 };

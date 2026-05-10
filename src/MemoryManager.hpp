@@ -40,19 +40,20 @@ public:
     }
 
     T* getNextMemPointer() {
-        SegmentOffset >= SegmentCount ? 0 : SegmentOffset++;
-        return getMemPointer(SegmentOffset);
+        T* ReturnPointer = getMemPointer(SegmentOffset);
+        SegmentOffset+1 >= SegmentCount ? SegmentOffset = 0 : SegmentOffset++;
+        return ReturnPointer;
     }
 
     T* getMemBaseAddress() {
         return MemoryBaseAddress;
     }
-    
+
     // get compile-time alignment requirement
     static constexpr size_t getAlignment() {
         return Alignment;
     }
-    
+
     // check if a pointer is properly aligned for type T
     static bool isAligned(const void* ptr) {
         return reinterpret_cast<uintptr_t>(ptr) % Alignment == 0;
