@@ -22,16 +22,26 @@ Client::~Client()
 
 ssize_t Client::receiveData()
 {
-    ssize_t RcvBytes;
-    do {
-        RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
-    } while (RcvBytes == -1 && errno == EINTR);
+    for (;;) {
+        const ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+        const int ReadErrno = errno;
 
-    DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
+        DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
 
-    if (RcvBytes > 0) {
-        appendBuffer(_ReceiveBuffer, RcvBytes);
+        if (RcvBytes > 0) {
+            appendBuffer(_ReceiveBuffer, RcvBytes);
+            continue;
+        }
+
+        if (RcvBytes == 0) {
+            return 0;
+        }
+
+        if (ReadErrno == EINTR) {
+            continue;
+        }
+
+        errno = ReadErrno;
+        return -1;
     }
-
-    return RcvBytes;
 }
