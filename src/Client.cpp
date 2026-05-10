@@ -37,7 +37,7 @@ ssize_t Client::receiveData()
         }
 
         if (RcvBytes == 0) {
-            return TotalRcvBytes > 0 ? TotalRcvBytes : 0;
+            return 0;
         }
 
         if (ReadErrno == EINTR) {
