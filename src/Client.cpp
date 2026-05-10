@@ -24,8 +24,6 @@ bool Client::receiveData()
 
     while (DataInKernelBuffer == true) {
 
-        const int RecvErrno = errno;
-
         ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
         DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
 
@@ -36,6 +34,7 @@ bool Client::receiveData()
             DataInKernelBuffer = false;
         }
         else if (RcvBytes < 0) {
+            const int RecvErrno = errno;
             DataInKernelBuffer = false;
             if (RecvErrno == EAGAIN || RecvErrno == EWOULDBLOCK || RecvErrno == EINTR) {
                 return false;
