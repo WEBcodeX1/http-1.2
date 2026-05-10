@@ -70,3 +70,15 @@ BOOST_AUTO_TEST_CASE( test_basic_memory_manager_int64_type_oob )
     BOOST_CHECK_EQUAL(MemPointer, static_cast<void*>(BaseAddr));
     MemPointer = BufferMemory.getNextMemPointer();
 }
+
+BOOST_AUTO_TEST_CASE( test_memory_manager_segment_offset_resets )
+{
+    MemoryManager<char> BufferMemory(3, 4);
+    char* BaseAddr = BufferMemory.getMemBaseAddress();
+
+    BOOST_CHECK_EQUAL(BufferMemory.getNextMemPointer(), static_cast<void*>(BaseAddr));
+    BOOST_CHECK_EQUAL(BufferMemory.getNextMemPointer(), static_cast<void*>(BaseAddr + 4));
+    BOOST_CHECK_EQUAL(BufferMemory.getNextMemPointer(), static_cast<void*>(BaseAddr + 8));
+    BOOST_CHECK_EQUAL(BufferMemory.getNextMemPointer(), static_cast<void*>(BaseAddr));
+    BOOST_CHECK_EQUAL(BufferMemory.getNextMemPointer(), static_cast<void*>(BaseAddr + 4));
+}
