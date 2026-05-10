@@ -37,10 +37,10 @@ bool Client::receiveData()
         }
         else if (RcvBytes < 0) {
             DataInKernelBuffer = false;
-            if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+            if (RecvErrno == EAGAIN || RecvErrno == EWOULDBLOCK || RecvErrno == EINTR) {
                 return false;
             }
         }
-
+    }
     return true;
 }
