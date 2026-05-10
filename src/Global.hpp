@@ -23,34 +23,7 @@
 using namespace std;
 
 
-typedef unsigned int Filedescriptor_t;
-
-typedef uint16_t HTTPVersionType_t;
-typedef uint16_t HTTPMethodType_t;
-typedef uint16_t HTTPReqNrType_t;
-typedef uint32_t HTTPPayloadLength_t;
-typedef int16_t ASIndex_t;
-typedef uint16_t RequestNr_t;
-typedef uint32_t RequestType_t;
-
-enum HTTPType_t {
-    HTTP1_1 = 1,
-    HTTP1_2 = 2
-};
-
-//- Requests
-typedef struct {
-    RequestType_t RequestType;
-    HTTPVersionType_t HTTPVersion;
-    HTTPMethodType_t HTTPMethod;
-    ClientFD_t ClientFD;
-    ClientFD_t ClientFDShared;
-    string HTTPPayload;
-    HTTPPayloadLength_t PayloadLength;
-    ASIndex_t ASIndex;
-} RequestProps_t;
-
-typedef vector<RequestProps_t> RequestPropsList_t;
+typedef int Filedescriptor_t;
 
 
 class Signal {
