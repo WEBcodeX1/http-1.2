@@ -40,8 +40,9 @@ public:
     }
 
     T* getNextMemPointer() {
-        SegmentOffset >= SegmentCount ? 0 : SegmentOffset++;
-        return getMemPointer(SegmentOffset);
+        T* ReturnPointer = getMemPointer(SegmentOffset);
+        SegmentOffset >= SegmentCount ? SegmentOffset = 0 : SegmentOffset++;
+        return ReturnPointer;
     }
 
     T* getMemBaseAddress() {
