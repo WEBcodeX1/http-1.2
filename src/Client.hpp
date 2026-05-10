@@ -21,7 +21,7 @@ public:
     Client(Filedescriptor_t, char*);
     ~Client();
 
-    ssize_t receiveData();
+    bool receiveData();
 
 protected:
 

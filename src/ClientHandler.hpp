@@ -14,6 +14,7 @@
 #include "Configuration.hpp"
 #include "MemoryManager.hpp"
 
+
 //- typedefs
 typedef Client Client_t;
 typedef std::shared_ptr<Client> ClientRef_t;

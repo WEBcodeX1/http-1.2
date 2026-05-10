@@ -82,8 +82,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         Filedescriptor_t ReadFD = EpollEvents[i].data.fd;
 
         if (Clients.contains(ReadFD)) {
-            const auto RecvStatus = Clients[ReadFD]->receiveData();
-            if (RecvStatus == 0) {
+            if (Clients[ReadFD]->receiveData() == true) {
                 Clients.erase(ReadFD);
                 close(ReadFD);
             }

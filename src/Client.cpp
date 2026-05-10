@@ -18,14 +18,29 @@ Client::~Client()
     DBG(120, "Destructor");
 }
 
-ssize_t Client::receiveData()
+bool Client::receiveData()
 {
-    ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
-    DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
+    bool DataInKernelBuffer = true;
 
-    if (RcvBytes > 0) {
-        appendBuffer(_ReceiveBuffer, RcvBytes);
-    }
+    while (DataInKernelBuffer == true) {
 
-    return RcvBytes;
+        const int RecvErrno = errno;
+
+        ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+        DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
+
+        if (RcvBytes > 0) {
+            appendBuffer(_ReceiveBuffer, RcvBytes);
+        }
+        else if (RcvBytes == 0) {
+            DataInKernelBuffer = false;
+        }
+        else if (RcvBytes < 0) {
+            DataInKernelBuffer = false;
+            if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+                return false;
+            }
+        }
+
+    return true;
 }
