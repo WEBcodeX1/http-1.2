@@ -3,7 +3,6 @@
 using namespace std;
 
 static bool RunServer = true;
-static std::thread _FDPassingThread;
 
 Configuration ConfigRef = Configuration();
 
@@ -30,7 +29,6 @@ void Server::init()
 {
     //- setup shared memory
     setupSharedMemory();
-    //setSharedMemPointer( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
 
     //- init static filesystem
     ConfigRef.mapStaticFSData();
@@ -52,39 +50,14 @@ void Server::init()
     //- apply cpu bound processing
     //setCPUConfig();
 
-    //- setup FD passing server
-    setupFDPassingServer();
-
     //- setup termination handler
     setTerminationHandler();
-
-    /*
-    //- get ASRequestHandler reference
-    ASRequestHandler& ASRequestHandlerRef = getClientHandlerASRequestHandlerRef();
-
-    //- fork result processor process
-    ResultProcessor::setVHostOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
-    const pid_t resultProcessorPID = ResultProcessor::forkProcessResultProcessor( { _SHMStaticFS, _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
-    if (resultProcessorPID > 0) {
-        addChildPID(resultProcessorPID);
-    }
-
-    //- fork application server processes
-    setASProcessHandlerOffsets(ASRequestHandlerRef.getOffsetsPrecalc());
-    forkProcessASHandler( { _SHMPythonASMeta, _SHMPythonASRequests, _SHMPythonASResults } );
-    */
 
     //- setup server socket
     setupSocket();
 
     //- setup server socket monitoring
     setupPoll();
-
-    /*
-    //- check interpreter count
-    const uint ASInterpreterCount = getASInterpreterCount();
-    DBG(50, "Sum AS Interpreters:" << ASInterpreterCount);
-    */
 
     //- drop privileges
     Permission::dropPrivileges(ConfigRef.RunAsUnixGroupID, ConfigRef.RunAsUnixUserID);
@@ -121,21 +94,6 @@ void Server::terminate(int _ignored)
     DBG(-1, "SIGTERM Main Server received, shutting down");
     RunServer = false;
     terminateChildren();
-
-    if (_FDPassingThread.joinable()) {
-        _FDPassingThread.join();
-    }
-
-    std::this_thread::sleep_for(chrono::milliseconds(100));
-
-    if (_FDPassingThread.joinable()) {
-        _FDPassingThread.join();
-    }
-
-    std::this_thread::sleep_for(chrono::milliseconds(100));
-    if (_FDPassingThread.joinable()) {
-        _FDPassingThread.join();
-    }
 }
 
 void Server::setupSocket()
@@ -254,117 +212,4 @@ void Server::acceptClient()
 
 void Server::setupSharedMemory()
 {
-    DBG(120, "Setup Shared Memory.");
-
-    _SHMStaticFS = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(_SHMStaticFS, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
-
-    _SHMPythonASMeta = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(_SHMPythonASMeta, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
-
-    _SHMPythonASRequests = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(_SHMPythonASRequests, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
-
-    _SHMPythonASResults = mmap(NULL, SHMEM_STATICFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    madvise(_SHMPythonASResults, SHMEM_STATICFS_SIZE, MADV_HUGEPAGE);
-
-    DBG(120, "SharedMemAddress:" << _SHMStaticFS);
-}
-
-void Server::setupFDPassingServer()
-{
-    DBG(120, "Setup FD Passing Server.");
-
-    _FDPassingServerFD = SysCom::createFDPassingServer(CTRL_SOCKET);
-
-    if (_FDPassingServerFD < 0) {
-        ERR("Failed to create FD passing server socket");
-        exit(EXIT_FAILURE);
-    }
-
-    DBG(120, "FD Passing Server socket created at:" << CTRL_SOCKET);
-
-    // start thread to handle FD passing requests
-    _FDPassingThread = std::thread(&Server::handleFDPassingRequests, this);
-}
-
-void Server::handleFDPassingRequests()
-{
-    DBG(120, "FD Passing handler thread started");
-
-    // set socket non-blocking
-    int flags = fcntl(_FDPassingServerFD, F_GETFL, 0);
-    fcntl(_FDPassingServerFD, F_SETFL, flags | O_NONBLOCK);
-
-    std::vector<int> ClientFDs;
-
-    while(RunServer) {
-
-        struct sockaddr_un client_addr;
-        socklen_t client_len = sizeof(client_addr);
-        int NewClientFD = accept(_FDPassingServerFD, (struct sockaddr*)&client_addr, &client_len);
-
-        if (NewClientFD >= 0) {
-            DBG(120, "FD passing new client connected, fd:" << NewClientFD);
-
-            // set client_fd non-blocking
-            int flags = fcntl(NewClientFD, F_GETFL, 0);
-            fcntl(NewClientFD, F_SETFL, flags | O_NONBLOCK);
-
-            ClientFDs.push_back(NewClientFD);
-        }
-
-        auto it = ClientFDs.begin();
-        while (it != ClientFDs.end()) {
-            int client_fd = *it;
-            uint16_t requested_fd;
-            ssize_t n = read(client_fd, &requested_fd, sizeof(requested_fd));
-            if (n == sizeof(requested_fd)) {
-                DBG(240, "FD passing request for FD:" << requested_fd);
-                // send the requested FD to the client
-                if (SysCom::sendFD(client_fd, requested_fd) < 0) {
-                    ERR("Failed to send FD:" << requested_fd);
-                    close(client_fd);
-                    it = ClientFDs.erase(it);
-                } else {
-                    DBG(240, "Successfully sent FD:" << requested_fd);
-                    ++it;
-                }
-            } else if (n == 0) {
-                // connection closed
-                DBG(120, "FD passing client disconnected, fd:" << client_fd);
-                close(client_fd);
-                it = ClientFDs.erase(it);
-            } else if (n < 0) {
-                if (errno != EAGAIN && errno != EWOULDBLOCK) {
-                    ERR("Failed to read requested FD number:" << strerror(errno));
-                    close(client_fd);
-                    it = ClientFDs.erase(it);
-                } else {
-                    ++it;
-                }
-            }
-        }
-        std::this_thread::sleep_for(chrono::microseconds(IDLE_SLEEP_MICROSECONDS));
-    }
-
-    DBG(120, "FD Passing handler thread exiting");
-
-    std::this_thread::sleep_for(chrono::milliseconds(50));
-
-    DBG(120, "FD Passing handler thread closing client connections");
-
-    // clean up
-    for (const int& fd : ClientFDs) {
-        close(fd);
-    }
-
-    std::this_thread::sleep_for(chrono::milliseconds(50));
-
-    DBG(120, "FD Passing handler thread closing serve unix domain socket");
-
-    close(_FDPassingServerFD);
-    unlink("/tmp/falcon-fd-passing.sock");
-
-    DBG(120, "FD Passing handler thread finally exiting");
 }

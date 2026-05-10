@@ -2,17 +2,15 @@
 
 using namespace std;
 
-Client::Client(ClientFD_t ClientFD) :
+Client::Client(ClientFD_t ClientFD, char* BufferAddress) :
     HTTPParser(4096),
     _ClientFD(ClientFD),
-    _RequestNr(0),
-    _SocketConnectTime(0),
-    _SocketDisconnectTime(0)
+    _ReceiveBuffer(BufferAddress),
+    _ConnectTime(0)
 {
     DBG(120, "Constructor");
 
-    _SocketConnectTime = time(nullptr);
-    _SocketDisconnectTime = time(nullptr);
+    _ConnectTime = time(nullptr);
 }
 
 Client::~Client()
@@ -20,12 +18,14 @@ Client::~Client()
     DBG(120, "Destructor");
 }
 
-ClientRequestNr_t Client::getCurrentReqNr()
+uint16_t Client::receiveData()
 {
-    return _RequestNr;
-}
+    uint16_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+    DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
 
-void Client::incrementReqNr()
-{
-    _RequestNr += 1;
+    if (RcvBytes > 0) {
+        appendBuffer(_ReceiveBuffer, RcvBytes);
+    }
+
+    return RcvBytes;
 }
