@@ -34,7 +34,7 @@ class Permission {
 
 public:
 
-    static void dropPrivileges(uint GroupID, uint UserID)
+    static void dropPrivileges(unsigned int GroupID, unsigned int UserID)
     {
         // in case of being root, drop privileges
         if (getuid() == 0) {
