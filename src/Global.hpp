@@ -6,6 +6,7 @@
 
 #include <sys/syscall.h>
 #include <sys/un.h>
+#include <execinfo.h>
 
 #include "Debug.cpp"
 
@@ -62,8 +63,6 @@ class SigHandler {
 public:
 
     #if defined(DEBUG_BUILD)
-    #include <execinfo.h>
-
     static void myterminate()
     {
         try {
