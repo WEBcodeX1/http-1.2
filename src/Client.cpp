@@ -1,5 +1,7 @@
 #include "Client.hpp"
 
+#include <cerrno>
+
 using namespace std;
 
 Client::Client(Filedescriptor_t ClientFD, char* BufferAddress) :
@@ -20,7 +22,11 @@ Client::~Client()
 
 ssize_t Client::receiveData()
 {
-    ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+    ssize_t RcvBytes;
+    do {
+        RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+    } while (RcvBytes == -1 && errno == EINTR);
+
     DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
 
     if (RcvBytes > 0) {
