@@ -2,27 +2,30 @@
 
 #include "Debug.cpp"
 #include "Constant.hpp"
+#include "Global.hpp"
+
 #include "../lib/http/httpparser.hpp"
 
 #include <cstdint>
 #include <string>
 #include <ctime>
 
-typedef uint16_t ClientFD_t;
+#include <unistd.h>
+
 
 class Client : public HTTPParser
 {
 
 public:
 
-    Client(ClientFD_t, char*);
+    Client(Filedescriptor_t, char*);
     ~Client();
 
     ssize_t receiveData();
 
 protected:
 
-    ClientFD_t _ClientFD;
+    Filedescriptor_t _ClientFD;
 
 private:
 

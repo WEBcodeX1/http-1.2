@@ -1,9 +1,8 @@
 #include "Client.hpp"
-#include <unistd.h>
 
 using namespace std;
 
-Client::Client(ClientFD_t ClientFD, char* BufferAddress) :
+Client::Client(Filedescriptor_t ClientFD, char* BufferAddress) :
     HTTPParser(4096),
     _ClientFD(ClientFD),
     _ReceiveBuffer(BufferAddress),

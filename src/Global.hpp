@@ -1,23 +1,12 @@
 #pragma once
 
 #include <csignal>
-#include <string>
-#include <cstring>
-#include <unordered_map>
-#include <vector>
 #include <exception>
 #include <cstdlib>
-#include <thread>
-#include <chrono>
-#include <errno.h>
 
 #include <sys/syscall.h>
-#include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
-#include <execinfo.h>
 
-#include "Client.hpp"
 #include "Debug.cpp"
 
 using namespace std;
@@ -73,6 +62,8 @@ class SigHandler {
 public:
 
     #if defined(DEBUG_BUILD)
+    #include <execinfo.h>
+
     static void myterminate()
     {
         try {
