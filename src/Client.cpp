@@ -18,9 +18,9 @@ Client::~Client()
     DBG(120, "Destructor");
 }
 
-uint16_t Client::receiveData()
+ssize_t Client::receiveData()
 {
-    uint16_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
+    ssize_t RcvBytes = read(_ClientFD, _ReceiveBuffer, SOCKET_RECEIVE_BUFFER_SIZE);
     DBG(220, "RcvBytes:" << RcvBytes << " ClientFD:" << _ClientFD);
 
     if (RcvBytes > 0) {

@@ -18,7 +18,7 @@ public:
     Client(ClientFD_t, char*);
     ~Client();
 
-    uint16_t receiveData();
+    ssize_t receiveData();
 
 protected:
 
