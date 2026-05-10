@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( test_basic_memory_manager_int64_type_oob )
     MemPointer = BufferMemory.getNextMemPointer();
 }
 
-BOOST_AUTO_TEST_CASE( test_memory_manager_segment_offset_resets )
+BOOST_AUTO_TEST_CASE( test_memory_manager_wraps_after_segment_count )
 {
     MemoryManager<char> BufferMemory(3, 4);
     char* BaseAddr = BufferMemory.getMemBaseAddress();
