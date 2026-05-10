@@ -79,7 +79,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
     //- process all filedescriptors with data
     for (uint16_t i=0; i<FDCount; ++i) {
 
-        uint16_t ReadFD = EpollEvents[i].data.fd;
+        Filedescriptor_t ReadFD = EpollEvents[i].data.fd;
 
         if (Clients.contains(ReadFD)) {
             const auto RecvStatus = Clients[ReadFD]->receiveData();
