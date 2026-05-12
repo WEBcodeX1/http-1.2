@@ -5,69 +5,69 @@
 ### 1.1.1. Application Request (JSON)
 
 ```xml
-<nlap>
-    <request>
+<NLAP>
+    <Request>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
-        <protocol>NLAP</protocol>
-        <version>0.1</version>
-        <subtype>NLAMP</subtype>
-        <header>
-            <host>testapp2.local</host>
+        <Protocol>NLAP</Protocol>
+        <Version>0.1</Version>
+        <Subtype>NLAMP</Subtype>
+        <Header>
+            <Host>testapp2.local</Host>
             <URL>/python/service1</URL>
-            <UserAgent>Falcon-Python-Client</UserAgent>
-        </header>
-        <payload>
+            <User-Agent>Falcon-Python-Client</User-Agent>
+        </Header>
+        <Payload>
             {
                 "param1": "string1",
                 "param2": "string2",
                 "param3": 100
             }
-        </payload>
-    </request>
-</nlap>
+        </Payload>
+    </Request>
+</NLAP>
 ```
 
 ### 1.1.2. Data Response (JSON)
 
 ```xml
-<nlap>
-    <response>
+<NLAP>
+    <Response>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
-        <protocol>NLAP</protocol>
-        <version>0.1</version>
-        <subtype>NLAMP</subtype>
-        <header>
-            <mime-type>application/json</mime-type>
-            <encoding>UTF-8</encoding>
-        </header>
-        <payload>
+        <Protocol>NLAP</Protocol>
+        <Version>0.1</Version>
+        <Subtype>NLAMP</Subtype>
+        <Header>
+            <Mime-Type>application/json</Mime-Type>
+            <Encoding>UTF-8</Encoding>
+        </Header>
+        <Payload>
             { "Result": 100 }
-        </payload>
-        <status>
-            <code>0</code>
-        </status>
-    </response>
-</nlap>
+        </Payload>
+        <Status>
+            <Code>0</Code>
+        </Status>
+    </Response>
+</NLAP>
 ```
 
 ### 1.1.3. Failure Response
 
 ```xml
-<nlap>
-    <response>
+<NLAP>
+    <Response>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
-        <protocol>NLAP</protocol>
-        <version>0.1</version>
-        <subtype>NLAMP</subtype>
-        <header>
-            <mime-type>application/xml</mime-type>
-            <encoding>UTF-8</encoding>
-        </header>
-        <status>
-            <code>10</code>
-            <description>Application Exception</description>
-            <exception>NameError: name 'test' is not defined</exception>
-        </status>
-    </response>
-</nlap>
+        <Protocol>NLAP</Protocol>
+        <Version>0.1</Version>
+        <Subtype>NLAMP</Subtype>
+        <Header>
+            <Mime-Type>application/xml</Mime-Type>
+            <Encoding>UTF-8</Encoding>
+        </Header>
+        <Status>
+            <Code>10</Code>
+            <Description>Application Exception</Description>
+            <Exception>NameError: name 'test' is not defined</Exception>
+        </Status>
+    </Response>
+</NLAP>
 ```

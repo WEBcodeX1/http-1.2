@@ -1,0 +1,351 @@
+module nlap {
+
+  yang-version 1.1;
+  namespace "urn:nlap:protocol:0.1";
+  prefix "nlap";
+
+  organization "NLAP Protocol Working Group";
+  contact "https://github.com/WEBcodeX1/http-1.2";
+
+  description
+    "YANG data model for the Next Level Application Protocol (NLAP).
+
+     Converted from nlap.dtd.
+
+     Sub-protocols covered:
+       NLAMP  - Next Level Application Metadata Protocol
+       NLAFP  - Next Level Application File Protocol
+       NLASP  - Next Level Application Session Protocol
+       NLAPP  - Next Level Application Proxy Protocol
+       NLAPS  - Next Level Application Protocol Secure Extension
+
+     NOTE: result codes / enum definitions for 'Code', 'Subtype',
+     'Compression', 'Mime-Type' etc. are work in progress and will
+     be refined manually.";
+
+  revision 2026-05-12 {
+    description "Initial version derived from nlap.dtd.";
+    reference "specs/xml/nlap.dtd";
+  }
+
+  // ============================================================
+  // Typedef definitions
+  // ============================================================
+
+  typedef uuid-type {
+    type string {
+      pattern '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}'
+            + '-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
+    }
+    description "RFC 4122 UUID string representation.";
+  }
+
+  typedef subtype-type {
+    type enumeration {
+      enum NLAMP {
+        description "Next Level Application Metadata Protocol.";
+      }
+      enum NLAFP {
+        description "Next Level Application File Protocol.";
+      }
+      enum NLASP {
+        description "Next Level Application Session Protocol.";
+      }
+      enum NLAPP {
+        description "Next Level Application Proxy Protocol.";
+      }
+      enum NLAPS {
+        description "Next Level Application Protocol Secure Extension.";
+      }
+    }
+    description "NLAP sub-protocol selector (maps to DTD element <Subtype>).";
+  }
+
+  typedef Compression-Type {
+    type enumeration {
+      enum none  { description "No compression."; }
+      enum gzip  { description "GZIP compression."; }
+      enum bzip2 { description "BZIP2 compression."; }
+    }
+    description
+      "Compression algorithm applied to the payload
+       (maps to DTD element <Compression>).
+       NOTE: enum values are WIP and may be extended.";
+  }
+
+  typedef flag-type {
+    type uint8 {
+      range "0..1";
+    }
+    description "Binary flag: 0 = disabled / false, 1 = enabled / true.";
+  }
+
+  // ============================================================
+  // Groupings
+  // ============================================================
+
+  grouping common-message-fields {
+    description "Fields common to both request and response messages.";
+
+    leaf UUID {
+      type uuid-type;
+      mandatory true;
+      description
+        "Universally unique identifier (RFC 4122) used for
+         request/response correlation.";
+    }
+
+    leaf Protocol {
+      type string;
+      default "NLAP";
+      description "Protocol name; always 'NLAP'.";
+    }
+
+    leaf Version {
+      type string;
+      description "Protocol version string, e.g. '0.1'.";
+    }
+
+    leaf Subtype {
+      type subtype-type;
+      mandatory true;
+      description "NLAP sub-protocol selector.";
+    }
+  }
+
+  grouping header-fields {
+    description
+      "Unified header containing all optional fields used across
+       request and response messages for all NLAP sub-protocols.";
+
+    container Header {
+      description "Message header (maps to DTD element <Header>).";
+
+      // --- Request header fields ---
+
+      leaf Host {
+        type string;
+        description
+          "Virtual host name, e.g. 'testapp1.local'
+           (maps to DTD element <Host>).";
+      }
+
+      leaf URL {
+        type string;
+        description
+          "Request path / resource URL, e.g. '/testpath/index.html'
+           (maps to DTD element <URL>).";
+      }
+
+      leaf User-Agent {
+        type string;
+        description
+          "Client identifier string, e.g. 'Falcon-Browser'
+           (maps to DTD element <User-Agent>).";
+      }
+
+      leaf user {
+        type string;
+        description
+          "Authenticated user identity used by NLAPS,
+           e.g. 'user1@domain.com'
+           (maps to DTD element <user>).";
+      }
+
+      // --- Response header fields ---
+
+      leaf Connection-Close {
+        type flag-type;
+        description
+          "Signal connection teardown after response:
+           0 = keep connection, 1 = close connection
+           (maps to DTD element <Connection-Close>).";
+      }
+
+      leaf Mime-Type {
+        type string;
+        description
+          "MIME type of the payload, e.g. 'text/html',
+           'application/json', 'image/png'
+           (maps to DTD element <Mime-Type>).
+           NOTE: enum definitions are WIP.";
+      }
+
+      leaf Encoding {
+        type string;
+        description
+          "Character or transfer encoding, e.g. 'UTF-8', 'binary'
+           (maps to DTD element <Encoding>).";
+      }
+
+      leaf Byte-Size {
+        type uint64;
+        description
+          "Total byte size of a single-part file payload
+           (maps to DTD element <Byte-Size>).";
+      }
+
+      // --- NLAFP multi-part transfer fields ---
+
+      leaf Byte-Size-Full {
+        type uint64;
+        description
+          "Total byte size of the complete file in a multi-part transfer
+           (maps to DTD element <Byte-Size-Full>).";
+      }
+
+      leaf Byte-Size-Part {
+        type uint64;
+        description
+          "Byte size of this individual part in a multi-part transfer
+           (maps to DTD element <Byte-Size-Part>).";
+      }
+
+      leaf Compression {
+        type Compression-Type;
+        description
+          "Compression algorithm applied to the payload
+           (maps to DTD element <Compression>).";
+      }
+
+      leaf file-UUID {
+        type uuid-type;
+        description
+          "UUID identifying the file across all parts of a multi-part
+           transfer (maps to DTD element <File-UUID>).";
+      }
+
+      leaf file-part-sum {
+        type uint32;
+        description
+          "Total number of parts in a multi-part transfer
+           (maps to DTD element <File-Part-Sum>).";
+      }
+
+      leaf file-part {
+        type uint32;
+        description
+          "Index of this part within the multi-part transfer (1-based)
+           (maps to DTD element <File-Part>).";
+      }
+    }
+  }
+
+  grouping security-fields {
+    description
+      "Security block used by the NLAPS sub-protocol
+       (maps to DTD element <Security>).";
+
+    container Security {
+      presence
+        "Security block is present when encryption or signing is used.";
+      description "NLAPS security extension fields.";
+
+      leaf Encryption {
+        type flag-type;
+        description
+          "Encryption flag: 0 = disabled, 1 = enabled
+           (maps to DTD element <Encryption>).";
+      }
+
+      leaf Signature {
+        type binary;
+        description
+          "Base64-encoded cryptographic signature of the payload
+           (maps to DTD element <Signature>).";
+      }
+    }
+  }
+
+  grouping status-fields {
+    description
+      "Result status block present in response messages
+       (maps to DTD element <Status>).";
+
+    container Status {
+      presence "Status block is included in the response.";
+      description "Result status of a response message.";
+
+      leaf Code {
+        type int32;
+        mandatory true;
+        description
+          "Numeric result code: 0 = success, non-zero = error
+           (maps to DTD element <Code>).
+           NOTE: full enum definitions are WIP.";
+      }
+
+      leaf Description {
+        type string;
+        description
+          "Human-readable description of the result or error condition
+           (maps to DTD element <Description>).";
+      }
+
+      leaf Exception {
+        type string;
+        description
+          "Exception detail string, e.g. a Python traceback line
+           (maps to DTD element <Exception>).";
+      }
+    }
+  }
+
+  // ============================================================
+  // Root container
+  // ============================================================
+
+  container NLAP {
+    description
+      "Root element of an NLAP protocol message
+       (maps to DTD element <NLAP>).";
+
+    choice message-type {
+      mandatory true;
+      description "A message is either a request or a response.";
+
+      case Request {
+        container Request {
+          description
+            "NLAP client request message
+             (maps to DTD element <Request>).";
+
+          uses common-message-fields;
+          uses header-fields;
+
+          uses security-fields;
+
+          anydata Payload {
+            description
+              "Request payload. May contain plain text (JSON, XML) or
+               base64-encoded binary data depending on the sub-protocol
+               (maps to DTD element <Payload>).";
+          }
+        }
+      }
+
+      case Response {
+        container Response {
+          description
+            "NLAP server response message
+             (maps to DTD element <Response>).";
+
+          uses common-message-fields;
+          uses header-fields;
+
+          uses security-fields;
+
+          anydata Payload {
+            description
+              "Response payload. May contain plain text (JSON,
+               inline HTML/XML) or base64-encoded binary data
+               depending on the sub-protocol
+               (maps to DTD element <Payload>).";
+          }
+
+          uses status-fields;
+        }
+      }
+    }
+  }
+}
