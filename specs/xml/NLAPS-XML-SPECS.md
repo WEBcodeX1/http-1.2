@@ -17,7 +17,7 @@
         <UserAgent>Falcon-Python-Client</UserAgent>
     </header>
     <security>
-        <encrpytion>1</encrpytion>
+        <encryption>1</encryption>
         <signature>
             #BASE64-ENCODED-SIGNATURE
         </signature>
@@ -41,7 +41,7 @@
         <encoding>UTF-8</encoding>
     </header>
     <security>
-        <encrpytion>1</encrpytion>
+        <encryption>1</encryption>
         <signature>
             #BASE64-ENCODED-SIGNATURE
         </signature>
