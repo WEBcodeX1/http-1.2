@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    NLAP (Next Level Application Protocol) DTD
+    Version: 0.1
+
+    Sub-protocols covered:
+      - NLAMP  (Next Level Application Metadata Protocol)
+      - NLAFP  (Next Level Application File Protocol)
+      - NLASP  (Next Level Application Session Protocol)
+      - NLAPP  (Next Level Application Proxy Protocol)
+      - NLAPS  (Next Level Application Protocol Secure Extension)
+
+    NOTE: result codes / enum definitions for <code>, <subtype>,
+    <compression>, <mime-type>, etc. are work in progress and will
+    be refined manually.
+-->
+
+<!-- ============================================================
+     Root element
+     ============================================================ -->
+
+<!ELEMENT nlap (request | response)>
+
+<!-- ============================================================
+     Request
+     ============================================================ -->
+
+<!ELEMENT request (UUID, protocol, version, subtype, header, security?, payload?)>
+
+<!-- ============================================================
+     Response
+     ============================================================ -->
+
+<!ELEMENT response (UUID, protocol, version, subtype, header, security?, payload?, status?)>
+
+<!-- ============================================================
+     Common fields shared by request and response
+     ============================================================ -->
+
+<!-- Universally unique identifier (RFC 4122) for request/response correlation -->
+<!ELEMENT UUID (#PCDATA)>
+
+<!-- Always "NLAP" -->
+<!ELEMENT protocol (#PCDATA)>
+
+<!-- Protocol version, e.g. "0.1" -->
+<!ELEMENT version (#PCDATA)>
+
+<!-- Sub-protocol selector: NLAMP | NLAFP | NLASP | NLAPP | NLAPS -->
+<!ELEMENT subtype (#PCDATA)>
+
+<!-- ============================================================
+     Header
+     All child elements are optional to support both request and
+     response headers across all sub-protocols.
+     ============================================================ -->
+
+<!ELEMENT header (
+    host?,
+    URL?,
+    UserAgent?,
+    user?,
+    connection-close?,
+    mime-type?,
+    encoding?,
+    byte-size?,
+    byte-size-full?,
+    byte-size-part?,
+    compression?,
+    File-UUID?,
+    File-Part-Sum?,
+    File-Part?
+)>
+
+<!-- Request header fields -->
+
+<!-- Virtual host name, e.g. "testapp1.local" -->
+<!ELEMENT host (#PCDATA)>
+
+<!-- Request path / resource URL, e.g. "/testpath/index.html" -->
+<!ELEMENT URL (#PCDATA)>
+
+<!-- Client identifier, e.g. "Falcon-Browser" -->
+<!ELEMENT UserAgent (#PCDATA)>
+
+<!-- Authenticated user identity (NLAPS), e.g. "user1@domain.com" -->
+<!ELEMENT user (#PCDATA)>
+
+<!-- Response header fields -->
+
+<!-- Signal connection teardown after response: 0 | 1 -->
+<!ELEMENT connection-close (#PCDATA)>
+
+<!-- MIME type of the payload, e.g. "text/html", "application/json", "image/png" -->
+<!ELEMENT mime-type (#PCDATA)>
+
+<!-- Character / transfer encoding, e.g. "UTF-8", "binary" -->
+<!ELEMENT encoding (#PCDATA)>
+
+<!-- Total byte size of a single-part file payload -->
+<!ELEMENT byte-size (#PCDATA)>
+
+<!-- Total byte size of the complete file (multi-part transfer) -->
+<!ELEMENT byte-size-full (#PCDATA)>
+
+<!-- Byte size of this individual part (multi-part transfer) -->
+<!ELEMENT byte-size-part (#PCDATA)>
+
+<!-- Compression algorithm applied to the payload: none | gzip | bzip2 | ... -->
+<!ELEMENT compression (#PCDATA)>
+
+<!-- UUID identifying the file across all parts of a multi-part transfer -->
+<!ELEMENT File-UUID (#PCDATA)>
+
+<!-- Total number of parts in a multi-part transfer -->
+<!ELEMENT File-Part-Sum (#PCDATA)>
+
+<!-- Index of this part within the multi-part transfer (1-based) -->
+<!ELEMENT File-Part (#PCDATA)>
+
+<!-- ============================================================
+     Security block (NLAPS)
+     ============================================================ -->
+
+<!ELEMENT security (encryption, signature)>
+
+<!-- Encryption flag: 0 = disabled, 1 = enabled -->
+<!ELEMENT encryption (#PCDATA)>
+
+<!-- Base64-encoded cryptographic signature of the payload -->
+<!ELEMENT signature (#PCDATA)>
+
+<!-- ============================================================
+     Payload
+     ANY is used to accommodate plain text, JSON, inline HTML/XML,
+     and binary (base64-encoded) content depending on sub-protocol.
+     ============================================================ -->
+
+<!ELEMENT payload ANY>
+
+<!-- ============================================================
+     Status block (response only)
+     ============================================================ -->
+
+<!ELEMENT status (code, description?, exception?)>
+
+<!-- Numeric result code; 0 = success; non-zero = error (WIP: enum TBD) -->
+<!ELEMENT code (#PCDATA)>
+
+<!-- Human-readable description of the result or error condition -->
+<!ELEMENT description (#PCDATA)>
+
+<!-- Exception detail string, e.g. a Python traceback line -->
+<!ELEMENT exception (#PCDATA)>
