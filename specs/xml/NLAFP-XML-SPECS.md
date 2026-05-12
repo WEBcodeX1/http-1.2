@@ -14,7 +14,7 @@
         <Header>
             <Host>testapp1.local</Host>
             <URL>/testpath/index.html</URL>
-            <UserAgent>Falcon-Browser</UserAgent>
+            <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
 </NLAP>
@@ -60,7 +60,7 @@
         <Header>
             <Host>testapp1.local</Host>
             <URL>/testpath/nice-image.png</URL>
-            <UserAgent>Falcon-Browser</UserAgent>
+            <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
 </NLAP>
@@ -77,7 +77,7 @@
         <Subtype>NLAFP</Subtype>
         <Header>
             <Mime-Type>image/png</Mime-Type>
-            <byte-size>7342</byte-size>
+            <Byte-Size>7342</Byte-Size>
             <Compression>none</Compression>
             <Encoding>binary</Encoding>
         </Header>
@@ -119,7 +119,7 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
         <Header>
             <Host>testapp1.local</Host>
             <URL>/testpath/package.bz2</URL>
-            <UserAgent>Falcon-Browser</UserAgent>
+            <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
 </NLAP>
@@ -136,8 +136,8 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
         <Subtype>NLAFP</Subtype>
         <Header>
             <Mime-Type>application/bzip2</Mime-Type>
-            <byte-size-full>3432132</byte-size-full>
-            <byte-size-part>100000</byte-size-part>
+            <Byte-Size-Full>3432132</Byte-Size-Full>
+            <Byte-Size-Part>100000</Byte-Size-Part>
             <Compression>none</Compression>
             <Encoding>binary</Encoding>
             <File-UUID>f3477af2-1212-76af-3377-bc7721afbc7a</File-UUID>

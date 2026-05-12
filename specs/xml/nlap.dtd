@@ -59,14 +59,14 @@
 <!ELEMENT Header (
     Host?,
     URL?,
-    UserAgent?,
+    User-Agent?,
     user?,
     connection-close?,
     Mime-Type?,
     Encoding?,
-    byte-size?,
-    byte-size-full?,
-    byte-size-part?,
+    Byte-Size?,
+    Byte-Size-Full?,
+    Byte-Size-Part?,
     Compression?,
     File-UUID?,
     File-Part-Sum?,
@@ -82,7 +82,7 @@
 <!ELEMENT URL (#PCDATA)>
 
 <!-- Client identifier, e.g. "Falcon-Browser" -->
-<!ELEMENT UserAgent (#PCDATA)>
+<!ELEMENT User-Agent (#PCDATA)>
 
 <!-- Authenticated user identity (NLAPS), e.g. "user1@domain.com" -->
 <!ELEMENT user (#PCDATA)>
@@ -99,13 +99,13 @@
 <!ELEMENT Encoding (#PCDATA)>
 
 <!-- Total byte size of a single-part file payload -->
-<!ELEMENT byte-size (#PCDATA)>
+<!ELEMENT Byte-Size (#PCDATA)>
 
 <!-- Total byte size of the complete file (multi-part transfer) -->
-<!ELEMENT byte-size-full (#PCDATA)>
+<!ELEMENT Byte-Size-Full (#PCDATA)>
 
 <!-- Byte size of this individual part (multi-part transfer) -->
-<!ELEMENT byte-size-part (#PCDATA)>
+<!ELEMENT Byte-Size-Part (#PCDATA)>
 
 <!-- Compression algorithm applied to the payload: none | gzip | bzip2 | ... -->
 <!ELEMENT Compression (#PCDATA)>

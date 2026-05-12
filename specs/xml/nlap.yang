@@ -137,11 +137,11 @@ module nlap {
            (maps to DTD element <URL>).";
       }
 
-      leaf UserAgent {
+      leaf User-Agent {
         type string;
         description
           "Client identifier string, e.g. 'Falcon-Browser'
-           (maps to DTD element <UserAgent>).";
+           (maps to DTD element <User-Agent>).";
       }
 
       leaf user {
@@ -178,27 +178,27 @@ module nlap {
            (maps to DTD element <Encoding>).";
       }
 
-      leaf byte-size {
+      leaf Byte-Size {
         type uint64;
         description
           "Total byte size of a single-part file payload
-           (maps to DTD element <byte-size>).";
+           (maps to DTD element <Byte-Size>).";
       }
 
       // --- NLAFP multi-part transfer fields ---
 
-      leaf byte-size-full {
+      leaf Byte-Size-Full {
         type uint64;
         description
           "Total byte size of the complete file in a multi-part transfer
-           (maps to DTD element <byte-size-full>).";
+           (maps to DTD element <Byte-Size-Full>).";
       }
 
-      leaf byte-size-part {
+      leaf Byte-Size-Part {
         type uint64;
         description
           "Byte size of this individual part in a multi-part transfer
-           (maps to DTD element <byte-size-part>).";
+           (maps to DTD element <Byte-Size-Part>).";
       }
 
       leaf Compression {

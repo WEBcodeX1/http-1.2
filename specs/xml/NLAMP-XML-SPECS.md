@@ -14,7 +14,7 @@
         <Header>
             <Host>testapp2.local</Host>
             <URL>/python/service1</URL>
-            <UserAgent>Falcon-Python-Client</UserAgent>
+            <User-Agent>Falcon-Python-Client</User-Agent>
         </Header>
         <Payload>
             {
