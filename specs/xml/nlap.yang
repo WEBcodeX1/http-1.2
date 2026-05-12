@@ -20,7 +20,7 @@ module nlap {
        NLAPS  - Next Level Application Protocol Secure Extension
 
      NOTE: result codes / enum definitions for 'Code', 'Subtype',
-     'compression', 'Mime-Type' etc. are work in progress and will
+     'Compression', 'Mime-Type' etc. are work in progress and will
      be refined manually.";
 
   revision 2026-05-12 {
@@ -69,7 +69,7 @@ module nlap {
     }
     description
       "Compression algorithm applied to the payload
-       (maps to DTD element <compression>).
+       (maps to DTD element <Compression>).
        NOTE: enum values are WIP and may be extended.";
   }
 
@@ -201,11 +201,11 @@ module nlap {
            (maps to DTD element <byte-size-part>).";
       }
 
-      leaf compression {
+      leaf Compression {
         type compression-type;
         description
           "Compression algorithm applied to the payload
-           (maps to DTD element <compression>).";
+           (maps to DTD element <Compression>).";
       }
 
       leaf file-UUID {

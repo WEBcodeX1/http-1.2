@@ -78,7 +78,7 @@
         <Header>
             <Mime-Type>image/png</Mime-Type>
             <byte-size>7342</byte-size>
-            <compression>none</compression>
+            <Compression>none</Compression>
             <Encoding>binary</Encoding>
         </Header>
         <Payload>
@@ -138,7 +138,7 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
             <Mime-Type>application/bzip2</Mime-Type>
             <byte-size-full>3432132</byte-size-full>
             <byte-size-part>100000</byte-size-part>
-            <compression>none</compression>
+            <Compression>none</Compression>
             <Encoding>binary</Encoding>
             <File-UUID>f3477af2-1212-76af-3377-bc7721afbc7a</File-UUID>
             <File-Part-Sum>35</File-Part-Sum>

@@ -12,7 +12,7 @@
       - NLAPS  (Next Level Application Protocol Secure Extension)
 
     NOTE: result codes / enum definitions for <Code>, <Subtype>,
-    <compression>, <Mime-Type>, etc. are work in progress and will
+    <Compression>, <Mime-Type>, etc. are work in progress and will
     be refined manually.
 -->
 
@@ -67,7 +67,7 @@
     byte-size?,
     byte-size-full?,
     byte-size-part?,
-    compression?,
+    Compression?,
     File-UUID?,
     File-Part-Sum?,
     File-Part?
@@ -108,7 +108,7 @@
 <!ELEMENT byte-size-part (#PCDATA)>
 
 <!-- Compression algorithm applied to the payload: none | gzip | bzip2 | ... -->
-<!ELEMENT compression (#PCDATA)>
+<!ELEMENT Compression (#PCDATA)>
 
 <!-- UUID identifying the file across all parts of a multi-part transfer -->
 <!ELEMENT File-UUID (#PCDATA)>
