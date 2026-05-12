@@ -8,6 +8,7 @@ This directory contains XML service metadata specifications for the Next Level A
 2. [Next Level Application File Protocol (NLAFP)](./NLAFP-XML-SPECS.md)
 3. [Next Level Application Session Protocol (NLASP)](./NLASP-XML-SPECS.md)
 4. [Next Level Application Proxy Protocol (NLAPP)](./NLAPP-XML-SPECS.md)
+5. [Next Level Application Protocol Secure Extension (NLAPS)](./NLAPS-XML-SPECS.md)
 
 ## 1.2. Development Status
 
