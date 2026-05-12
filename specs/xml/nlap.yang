@@ -61,7 +61,7 @@ module nlap {
     description "NLAP sub-protocol selector (maps to DTD element <Subtype>).";
   }
 
-  typedef compression-type {
+  typedef Compression-Type {
     type enumeration {
       enum none  { description "No compression."; }
       enum gzip  { description "GZIP compression."; }
@@ -202,7 +202,7 @@ module nlap {
       }
 
       leaf Compression {
-        type compression-type;
+        type Compression-Type;
         description
           "Compression algorithm applied to the payload
            (maps to DTD element <Compression>).";
