@@ -61,7 +61,7 @@
     URL?,
     User-Agent?,
     user?,
-    connection-close?,
+    Connection-Close?,
     Mime-Type?,
     Encoding?,
     Byte-Size?,
@@ -90,7 +90,7 @@
 <!-- Response header fields -->
 
 <!-- Signal connection teardown after response: 0 | 1 -->
-<!ELEMENT connection-close (#PCDATA)>
+<!ELEMENT Connection-Close (#PCDATA)>
 
 <!-- MIME type of the payload, e.g. "text/html", "application/json", "image/png" -->
 <!ELEMENT Mime-Type (#PCDATA)>

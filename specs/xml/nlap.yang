@@ -154,12 +154,12 @@ module nlap {
 
       // --- Response header fields ---
 
-      leaf connection-close {
+      leaf Connection-Close {
         type flag-type;
         description
           "Signal connection teardown after response:
            0 = keep connection, 1 = close connection
-           (maps to DTD element <connection-close>).";
+           (maps to DTD element <Connection-Close>).";
       }
 
       leaf Mime-Type {

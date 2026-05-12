@@ -30,7 +30,7 @@
         <Version>0.1</Version>
         <Subtype>NLAFP</Subtype>
         <Header>
-            <connection-close>1</connection-close>
+            <Connection-Close>1</Connection-Close>
             <Mime-Type>text/html</Mime-Type>
             <Encoding>UTF-8</Encoding>
         </Header>
