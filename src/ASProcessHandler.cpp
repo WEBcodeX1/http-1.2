@@ -26,10 +26,12 @@ ASProcessHandler::~ASProcessHandler()
     DBG(120, "Destructor");
 }
 
+/*
 void ASProcessHandler::setASProcessHandlerOffsets(VHostOffsetsPrecalc_t Offsets)
 {
     _VHostOffsetsPrecalc = Offsets;
 }
+*/
 
 uint ASProcessHandler::getASInterpreterCount()
 {
@@ -65,10 +67,11 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
     Signal::disableSignals();
 
     //- set shared mem address pointer
-    setBaseAddresses( { SHMAdresses.PostASMetaPtr, SHMAdresses.PostASRequestsPtr, SHMAdresses.PostASResultsPtr } );
+    //setBaseAddresses( { SHMAdresses.PostASMetaPtr, SHMAdresses.PostASRequestsPtr, SHMAdresses.PostASResultsPtr } );
 
     for (const auto& Namespace: ConfigRef.Namespaces) {
 
+        /*
         auto offsetIter = _VHostOffsetsPrecalc.find(Namespace.first);
         if (offsetIter == _VHostOffsetsPrecalc.end()) {
             ERR("_VHostOffsetsPrecalc does not contain Namespace:" << Namespace.first);
@@ -169,5 +172,7 @@ void ASProcessHandler::forkProcessASHandler(ASProcessHandlerSHMPointer_t SHMAdre
 
             }
         }
+        */
+
     }
 }

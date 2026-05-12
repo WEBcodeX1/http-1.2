@@ -1,5 +1,4 @@
-#ifndef ASProcessHandler_hpp
-#define ASProcessHandler_hpp
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,9 +16,7 @@
 
 #include "CPU.hpp"
 #include "Global.hpp"
-#include "IPCHandlerAS.hpp"
 #include "Configuration.hpp"
-#include "ASRequestHandler.hpp"
 
 #define PY_SSIZE_T_CLEAN
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
@@ -39,7 +36,7 @@ typedef struct {
 } ASProcessHandlerSHMPointer_t;
 
 
-class ASProcessHandler : public SHMPythonAS, private CPU
+class ASProcessHandler : private CPU
 {
 
 public:
@@ -49,7 +46,7 @@ public:
 
     void forkProcessASHandler(ASProcessHandlerSHMPointer_t);
     void setTerminationHandler();
-    void setASProcessHandlerOffsets(VHostOffsetsPrecalc_t);
+    //void setASProcessHandlerOffsets(VHostOffsetsPrecalc_t);
     uint getASInterpreterCount();
 
     static void terminate(int);
@@ -66,7 +63,5 @@ public:
 
     private:
 
-    VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
+    //VHostOffsetsPrecalc_t _VHostOffsetsPrecalc;
 };
-
-#endif

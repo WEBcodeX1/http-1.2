@@ -1,5 +1,4 @@
-#ifndef Filesystem_hpp
-#define Filesystem_hpp
+#pragma once
 
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -8,12 +7,15 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
+#include <string>
+#include <utility>
 
 #include "Debug.cpp"
 #include "Helper.hpp"
 #include "Global.hpp"
 
-
+//- typedefs
 typedef struct {
     Filedescriptor_t Filedescriptor;
     unsigned int FileSize;
@@ -27,7 +29,6 @@ typedef struct {
 
 typedef unordered_map<string, const string> MimetypeRelations_t;
 
-typedef unsigned int Filedescriptor_t;
 typedef vector<string> FilelistPlain_t;
 typedef pair<string, FileProperties_t> FileListExtendedPair_t;
 typedef unordered_map<string, const FileProperties_t> FileListExtended_t;
@@ -73,5 +74,3 @@ private:
     FileListExtended_t _FilesExtended;
     string _CompletePath;
 };
-
-#endif

@@ -38,9 +38,9 @@ endif()
 # set g++ compiler flags
 if ( DEFINED DEBUG_BUILD )
     add_compile_definitions(DEBUG_BUILD)
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic -fno-elide-constructors")
 else()
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv -fno-elide-constructors")
 endif()
 
 # set boost specs
@@ -78,7 +78,7 @@ target_link_libraries(
     ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
     nlohmann_json::nlohmann_json
-    libhttp
+    httpparser
 )
 
 # add custom targets
@@ -86,22 +86,17 @@ add_custom_target(
     ProjectHeaderFiles
     SOURCES
     ./src/Helper.hpp
-    ./src//Global.hpp
-    ./src//Server.hpp
-    ./src//Client.hpp
-    ./src//Filesystem.hpp
-    ./src//Configuration.hpp
-    ./src//MemoryManager.hpp
-    ./src//ThreadHandler.hpp
-    ./src//IPCHandler.hpp
-    ./src//IPCHandlerAS.hpp
-    ./src//ClientHandler.hpp
-    ./src//ASProcessHandler.hpp
-    ./src//ASRequestHandler.hpp
-    ./src//ResultProcessor.hpp
-    ./src//ResultOrder.hpp
-    ./src//Constant.hpp
-    ./src//Vector.hpp
+    ./src/Global.hpp
+    ./src/Server.hpp
+    ./src/Client.hpp
+    ./src/Filesystem.hpp
+    ./src/Configuration.hpp
+    ./src/MemoryManager.hpp
+    ./src/ClientHandler.hpp
+    ./src/ASProcessHandler.hpp
+    ./src/Constant.hpp
+    ./src/Vector.hpp
+    ./src/CustomVector.hpp
 )
 
 # add subdirs

@@ -5,21 +5,21 @@ message(STATUS "========================================")
 message(STATUS "Installing startup script...")
 message(STATUS "========================================")
 
-# Detect systemd
+# detect systemd
 if(EXISTS "/run/systemd/system")
     set(INIT_SYSTEM "systemd")
     set(INIT_SCRIPT_SRC "${CMAKE_CURRENT_LIST_DIR}/startup/systemd/falcon-as.service")
     set(INIT_SCRIPT_DEST "/etc/systemd/system/falcon-as.service")
     message(STATUS "Detected init system: systemd")
     
-# Detect OpenRC
+# detect OpenRC
 elseif((EXISTS "/etc/init.d" AND EXISTS "/etc/runlevels") OR EXISTS "/sbin/openrc-run" OR EXISTS "/usr/sbin/openrc-run")
     set(INIT_SYSTEM "openrc")
     set(INIT_SCRIPT_SRC "${CMAKE_CURRENT_LIST_DIR}/startup/openrc/falcon-as")
     set(INIT_SCRIPT_DEST "/etc/init.d/falcon-as")
     message(STATUS "Detected init system: OpenRC")
     
-# Fallback to SysVinit
+# fallback to SysVinit
 elseif(EXISTS "/etc/init.d")
     set(INIT_SYSTEM "sysvinit")
     set(INIT_SCRIPT_SRC "${CMAKE_CURRENT_LIST_DIR}/startup/init.d/falcon-as")
@@ -33,12 +33,12 @@ else()
     set(INIT_SCRIPT_DEST "/etc/init.d/falcon-as")
 endif()
 
-# Check if source script exists
+# check if source script exists
 if(NOT EXISTS "${INIT_SCRIPT_SRC}")
     message(FATAL_ERROR "Startup script not found: ${INIT_SCRIPT_SRC}")
 endif()
 
-# Install the startup script
+# install the startup script
 message(STATUS "Installing ${INIT_SYSTEM} startup script...")
 message(STATUS "  Source: ${INIT_SCRIPT_SRC}")
 message(STATUS "  Destination: ${INIT_SCRIPT_DEST}")
@@ -52,7 +52,7 @@ execute_process(
 if(INSTALL_RESULT EQUAL 0)
     message(STATUS "✓ Startup script installed successfully")
     
-    # Make executable for init.d scripts
+    # make executable for init.d scripts
     if(INIT_SYSTEM STREQUAL "openrc" OR INIT_SYSTEM STREQUAL "sysvinit")
         execute_process(
             COMMAND chmod +x ${INIT_SCRIPT_DEST}
@@ -63,7 +63,7 @@ if(INSTALL_RESULT EQUAL 0)
         endif()
     endif()
     
-    # Print instructions for the user
+    # print instructions for the user
     message(STATUS "")
     message(STATUS "========================================")
     if(INIT_SYSTEM STREQUAL "systemd")

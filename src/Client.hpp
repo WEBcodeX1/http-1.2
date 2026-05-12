@@ -1,45 +1,37 @@
-#ifndef Client_hpp
-#define Client_hpp
+#pragma once
 
 #include "Debug.cpp"
+#include "Constant.hpp"
+#include "Global.hpp"
+
+#include "../lib/http/httpparser.hpp"
 
 #include <cstdint>
 #include <string>
 #include <ctime>
+#include <cerrno>
+
+#include <unistd.h>
 
 
-typedef uint16_t ClientFD_t;
-typedef uint16_t ClientRequestNr_t;
-
-
-class Client
+class Client : public HTTPParser
 {
 
 public:
 
-    Client(ClientFD_t);
+    Client(Filedescriptor_t, char*);
     ~Client();
 
-    ClientRequestNr_t getNextReqNr();
+    bool receiveData();
 
 protected:
 
-    ClientFD_t _ClientFD;
+    Filedescriptor_t _ClientFD;
 
 private:
 
-    ClientRequestNr_t _RequestNr;
-
-    bool _Error;
-    uint16_t _ErrorID;
-
-    time_t _RequestStartTime;
-    time_t _RequestEndTime;
-    time_t _ResponseStartTime;
-    time_t _ResponseEndTime;
-
-    bool _TimeoutReached;
+    char* _ReceiveBuffer;
+    time_t _ConnectTime;
+    char _SendBuffer[SOCKET_SEND_BUFFER_SIZE];
 
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef Configuration_hpp
-#define Configuration_hpp
+#pragma once
 
 #include <fstream>
 #include <string>
@@ -9,7 +8,6 @@
 
 #include "Debug.cpp"
 
-#include "IPCHandler.hpp"
 #include "Filesystem.hpp"
 
 
@@ -50,5 +48,3 @@ public:
     Namespaces_t Namespaces;
 
 };
-
-#endif

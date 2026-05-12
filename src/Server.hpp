@@ -1,5 +1,4 @@
-#ifndef Server_hpp
-#define Server_hpp
+#pragma once
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -18,10 +17,9 @@
 #include "Configuration.hpp"
 #include "ClientHandler.hpp"
 #include "ASProcessHandler.hpp"
-#include "ResultProcessor.hpp"
 
 
-class Server : private ResultProcessor, private ASProcessHandler, private ClientHandler {
+class Server : private ASProcessHandler, private ClientHandler {
 
 public:
 
@@ -56,15 +54,6 @@ private:
 
     struct pollfd ServerConnFD[1];
 
-    void* _SHMStaticFS;
-    void* _SHMPythonASMeta;
-    void* _SHMPythonASRequests;
-    void* _SHMPythonASResults;
-
-    int _FDPassingServerFD;
-
     static std::vector<pid_t> ChildPIDs;
 
 };
-
-#endif

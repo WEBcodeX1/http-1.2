@@ -23,6 +23,15 @@
 
 ---
 
+> [!NOTE]
+> We would like to apologize that the project's original goal has not been fully reached in the intended form.
+>
+> At the same time, **version 0.2 already includes a rock-solid HTTP/1.1 parser** that is highly suitable for **Arduino microcontroller usage** and other resource-constrained environments.
+>
+> Please also note that **HTTP/1.2 will not be implemented**, and there are currently no plans to further implement **HTTP/1.1** beyond the existing stable parser/generator foundation in this library.
+>
+> The design of [`/lib/http/`](./lib/http/) should instead be understood as a **template and architectural foundation** for the **XML (Xerces)-based NLAP protocol parser**.
+
 ## :pushpin: Overview
 
 **NLAP (Next Level Application Protocol)** is a revolutionary XML-based protocol designed to replace HTTP
@@ -37,8 +46,8 @@ in place of modern web-application requirements.
 
 **FalconAS Server Features**:
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
-- ✅ **Lightning-Fast Performance**: Optimized for modern hardware with epoll-based architecture
-- ✅ **Threaded Static File Delivery**: Threading and in-kernel sendfile() increase scheduling latency
+- ✅ **Lightning-Fast Performance**: Epoll-based / multi-socket optimized architecture
+- ✅ **Sendfile Static File Delivery**: In-kernel sendfile() decrease scheduling latency
 - ✅ **Rock-Solid App-Server Security**: Runs with tight backend process-separation model (non-threaded)
 - ✅ **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
 - ✅ **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
