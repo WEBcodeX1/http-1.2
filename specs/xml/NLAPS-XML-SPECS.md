@@ -5,56 +5,56 @@
 ### 5.1.1. Encrypted / Signed Request
 
 ```xml
-<nlap>
-    <request>
+<NLAP>
+    <Request>
         <UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>
-        <protocol>NLAP</protocol>
-        <version>0.1</version>
-        <subtype>NLAMP</subtype>
-        <header>
-            <host>testapp2.local</host>
+        <Protocol>NLAP</Protocol>
+        <Version>0.1</Version>
+        <Subtype>NLAMP</Subtype>
+        <Header>
+            <Host>testapp2.local</Host>
             <user>user1@domain.com</user>
             <URL>/python/service1</URL>
             <UserAgent>Falcon-Python-Client</UserAgent>
-        </header>
-        <security>
-            <encryption>1</encryption>
-            <signature>
+        </Header>
+        <Security>
+            <Encryption>1</Encryption>
+            <Signature>
                 #BASE64-ENCODED-SIGNATURE
-            </signature>
-        </security>
-        <payload>
+            </Signature>
+        </Security>
+        <Payload>
             #BASE64-ENCODED-ENCRYPTED-PAYLOAD
-        </payload>
-    </request>
-</nlap>
+        </Payload>
+    </Request>
+</NLAP>
 ```
 
 ### 5.1.2. Encrypted / Signed Response
 
 ```xml
-<nlap>
-    <response>
+<NLAP>
+    <Response>
         <UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>
-        <protocol>NLAP</protocol>
-        <version>0.1</version>
-        <subtype>NLAMP</subtype>
-        <header>
-            <mime-type>application/json</mime-type>
-            <encoding>UTF-8</encoding>
-        </header>
-        <security>
-            <encryption>1</encryption>
-            <signature>
+        <Protocol>NLAP</Protocol>
+        <Version>0.1</Version>
+        <Subtype>NLAMP</Subtype>
+        <Header>
+            <Mime-Type>application/json</Mime-Type>
+            <Encoding>UTF-8</Encoding>
+        </Header>
+        <Security>
+            <Encryption>1</Encryption>
+            <Signature>
                 #BASE64-ENCODED-SIGNATURE
-            </signature>
-        </security>
-        <payload>
+            </Signature>
+        </Security>
+        <Payload>
             #BASE64-ENCODED-ENCRYPTED-PAYLOAD
-        </payload>
-        <status>
-            <code>0</code>
-        </status>
-    </response>
-</nlap>
+        </Payload>
+        <Status>
+            <Code>0</Code>
+        </Status>
+    </Response>
+</NLAP>
 ```

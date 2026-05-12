@@ -11,8 +11,8 @@
       - NLAPP  (Next Level Application Proxy Protocol)
       - NLAPS  (Next Level Application Protocol Secure Extension)
 
-    NOTE: result codes / enum definitions for <code>, <subtype>,
-    <compression>, <mime-type>, etc. are work in progress and will
+    NOTE: result codes / enum definitions for <Code>, <Subtype>,
+    <compression>, <Mime-Type>, etc. are work in progress and will
     be refined manually.
 -->
 
@@ -20,19 +20,19 @@
      Root element
      ============================================================ -->
 
-<!ELEMENT nlap (request | response)>
+<!ELEMENT NLAP (Request | Response)>
 
 <!-- ============================================================
      Request
      ============================================================ -->
 
-<!ELEMENT request (UUID, protocol, version, subtype, header, security?, payload?)>
+<!ELEMENT Request (UUID, Protocol, Version, Subtype, Header, Security?, Payload?)>
 
 <!-- ============================================================
      Response
      ============================================================ -->
 
-<!ELEMENT response (UUID, protocol, version, subtype, header, security?, payload?, status?)>
+<!ELEMENT Response (UUID, Protocol, Version, Subtype, Header, Security?, Payload?, Status?)>
 
 <!-- ============================================================
      Common fields shared by request and response
@@ -42,13 +42,13 @@
 <!ELEMENT UUID (#PCDATA)>
 
 <!-- Always "NLAP" -->
-<!ELEMENT protocol (#PCDATA)>
+<!ELEMENT Protocol (#PCDATA)>
 
 <!-- Protocol version, e.g. "0.1" -->
-<!ELEMENT version (#PCDATA)>
+<!ELEMENT Version (#PCDATA)>
 
 <!-- Sub-protocol selector: NLAMP | NLAFP | NLASP | NLAPP | NLAPS -->
-<!ELEMENT subtype (#PCDATA)>
+<!ELEMENT Subtype (#PCDATA)>
 
 <!-- ============================================================
      Header
@@ -56,14 +56,14 @@
      response headers across all sub-protocols.
      ============================================================ -->
 
-<!ELEMENT header (
-    host?,
+<!ELEMENT Header (
+    Host?,
     URL?,
     UserAgent?,
     user?,
     connection-close?,
-    mime-type?,
-    encoding?,
+    Mime-Type?,
+    Encoding?,
     byte-size?,
     byte-size-full?,
     byte-size-part?,
@@ -76,7 +76,7 @@
 <!-- Request header fields -->
 
 <!-- Virtual host name, e.g. "testapp1.local" -->
-<!ELEMENT host (#PCDATA)>
+<!ELEMENT Host (#PCDATA)>
 
 <!-- Request path / resource URL, e.g. "/testpath/index.html" -->
 <!ELEMENT URL (#PCDATA)>
@@ -93,10 +93,10 @@
 <!ELEMENT connection-close (#PCDATA)>
 
 <!-- MIME type of the payload, e.g. "text/html", "application/json", "image/png" -->
-<!ELEMENT mime-type (#PCDATA)>
+<!ELEMENT Mime-Type (#PCDATA)>
 
 <!-- Character / transfer encoding, e.g. "UTF-8", "binary" -->
-<!ELEMENT encoding (#PCDATA)>
+<!ELEMENT Encoding (#PCDATA)>
 
 <!-- Total byte size of a single-part file payload -->
 <!ELEMENT byte-size (#PCDATA)>
@@ -123,13 +123,13 @@
      Security block (NLAPS)
      ============================================================ -->
 
-<!ELEMENT security (encryption, signature)>
+<!ELEMENT Security (Encryption, Signature)>
 
 <!-- Encryption flag: 0 = disabled, 1 = enabled -->
-<!ELEMENT encryption (#PCDATA)>
+<!ELEMENT Encryption (#PCDATA)>
 
 <!-- Base64-encoded cryptographic signature of the payload -->
-<!ELEMENT signature (#PCDATA)>
+<!ELEMENT Signature (#PCDATA)>
 
 <!-- ============================================================
      Payload
@@ -137,19 +137,19 @@
      and binary (base64-encoded) content depending on sub-protocol.
      ============================================================ -->
 
-<!ELEMENT payload ANY>
+<!ELEMENT Payload ANY>
 
 <!-- ============================================================
      Status block (response only)
      ============================================================ -->
 
-<!ELEMENT status (code, description?, exception?)>
+<!ELEMENT Status (Code, Description?, Exception?)>
 
 <!-- Numeric result code; 0 = success; non-zero = error (WIP: enum TBD) -->
-<!ELEMENT code (#PCDATA)>
+<!ELEMENT Code (#PCDATA)>
 
 <!-- Human-readable description of the result or error condition -->
-<!ELEMENT description (#PCDATA)>
+<!ELEMENT Description (#PCDATA)>
 
 <!-- Exception detail string, e.g. a Python traceback line -->
-<!ELEMENT exception (#PCDATA)>
+<!ELEMENT Exception (#PCDATA)>

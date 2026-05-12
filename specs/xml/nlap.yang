@@ -19,8 +19,8 @@ module nlap {
        NLAPP  - Next Level Application Proxy Protocol
        NLAPS  - Next Level Application Protocol Secure Extension
 
-     NOTE: result codes / enum definitions for 'code', 'subtype',
-     'compression', 'mime-type' etc. are work in progress and will
+     NOTE: result codes / enum definitions for 'Code', 'Subtype',
+     'compression', 'Mime-Type' etc. are work in progress and will
      be refined manually.";
 
   revision 2026-05-12 {
@@ -58,7 +58,7 @@ module nlap {
         description "Next Level Application Protocol Secure Extension.";
       }
     }
-    description "NLAP sub-protocol selector (maps to DTD element <subtype>).";
+    description "NLAP sub-protocol selector (maps to DTD element <Subtype>).";
   }
 
   typedef compression-type {
@@ -95,18 +95,18 @@ module nlap {
          request/response correlation.";
     }
 
-    leaf protocol {
+    leaf Protocol {
       type string;
       default "NLAP";
       description "Protocol name; always 'NLAP'.";
     }
 
-    leaf version {
+    leaf Version {
       type string;
       description "Protocol version string, e.g. '0.1'.";
     }
 
-    leaf subtype {
+    leaf Subtype {
       type subtype-type;
       mandatory true;
       description "NLAP sub-protocol selector.";
@@ -118,16 +118,16 @@ module nlap {
       "Unified header containing all optional fields used across
        request and response messages for all NLAP sub-protocols.";
 
-    container header {
-      description "Message header (maps to DTD element <header>).";
+    container Header {
+      description "Message header (maps to DTD element <Header>).";
 
       // --- Request header fields ---
 
-      leaf host {
+      leaf Host {
         type string;
         description
           "Virtual host name, e.g. 'testapp1.local'
-           (maps to DTD element <host>).";
+           (maps to DTD element <Host>).";
       }
 
       leaf URL {
@@ -162,20 +162,20 @@ module nlap {
            (maps to DTD element <connection-close>).";
       }
 
-      leaf mime-type {
+      leaf Mime-Type {
         type string;
         description
           "MIME type of the payload, e.g. 'text/html',
            'application/json', 'image/png'
-           (maps to DTD element <mime-type>).
+           (maps to DTD element <Mime-Type>).
            NOTE: enum definitions are WIP.";
       }
 
-      leaf encoding {
+      leaf Encoding {
         type string;
         description
           "Character or transfer encoding, e.g. 'UTF-8', 'binary'
-           (maps to DTD element <encoding>).";
+           (maps to DTD element <Encoding>).";
       }
 
       leaf byte-size {
@@ -234,25 +234,25 @@ module nlap {
   grouping security-fields {
     description
       "Security block used by the NLAPS sub-protocol
-       (maps to DTD element <security>).";
+       (maps to DTD element <Security>).";
 
-    container security {
+    container Security {
       presence
         "Security block is present when encryption or signing is used.";
       description "NLAPS security extension fields.";
 
-      leaf encryption {
+      leaf Encryption {
         type flag-type;
         description
           "Encryption flag: 0 = disabled, 1 = enabled
-           (maps to DTD element <encryption>).";
+           (maps to DTD element <Encryption>).";
       }
 
-      leaf signature {
+      leaf Signature {
         type binary;
         description
           "Base64-encoded cryptographic signature of the payload
-           (maps to DTD element <signature>).";
+           (maps to DTD element <Signature>).";
       }
     }
   }
@@ -260,33 +260,33 @@ module nlap {
   grouping status-fields {
     description
       "Result status block present in response messages
-       (maps to DTD element <status>).";
+       (maps to DTD element <Status>).";
 
-    container status {
+    container Status {
       presence "Status block is included in the response.";
       description "Result status of a response message.";
 
-      leaf code {
+      leaf Code {
         type int32;
         mandatory true;
         description
           "Numeric result code: 0 = success, non-zero = error
-           (maps to DTD element <code>).
+           (maps to DTD element <Code>).
            NOTE: full enum definitions are WIP.";
       }
 
-      leaf description {
+      leaf Description {
         type string;
         description
           "Human-readable description of the result or error condition
-           (maps to DTD element <description>).";
+           (maps to DTD element <Description>).";
       }
 
-      leaf exception {
+      leaf Exception {
         type string;
         description
           "Exception detail string, e.g. a Python traceback line
-           (maps to DTD element <exception>).";
+           (maps to DTD element <Exception>).";
       }
     }
   }
@@ -295,52 +295,52 @@ module nlap {
   // Root container
   // ============================================================
 
-  container nlap {
+  container NLAP {
     description
       "Root element of an NLAP protocol message
-       (maps to DTD element <nlap>).";
+       (maps to DTD element <NLAP>).";
 
     choice message-type {
       mandatory true;
       description "A message is either a request or a response.";
 
-      case request {
-        container request {
+      case Request {
+        container Request {
           description
             "NLAP client request message
-             (maps to DTD element <request>).";
+             (maps to DTD element <Request>).";
 
           uses common-message-fields;
           uses header-fields;
 
           uses security-fields;
 
-          anydata payload {
+          anydata Payload {
             description
               "Request payload. May contain plain text (JSON, XML) or
                base64-encoded binary data depending on the sub-protocol
-               (maps to DTD element <payload>).";
+               (maps to DTD element <Payload>).";
           }
         }
       }
 
-      case response {
-        container response {
+      case Response {
+        container Response {
           description
             "NLAP server response message
-             (maps to DTD element <response>).";
+             (maps to DTD element <Response>).";
 
           uses common-message-fields;
           uses header-fields;
 
           uses security-fields;
 
-          anydata payload {
+          anydata Payload {
             description
               "Response payload. May contain plain text (JSON,
                inline HTML/XML) or base64-encoded binary data
                depending on the sub-protocol
-               (maps to DTD element <payload>).";
+               (maps to DTD element <Payload>).";
           }
 
           uses status-fields;
