@@ -1,8 +1,8 @@
-# 4. Next Level Application Protocol Secure Extension (NLAPS)
+# 5. Next Level Application Protocol Secure Extension (NLAPS)
 
-## 4.1. Request / Responses
+## 5.1. Request / Responses
 
-### 4.1.1. Encrypted / Signed Request
+### 5.1.1. Encrypted / Signed Request
 
 ```xml
 <request>
@@ -28,7 +28,7 @@
 </request>
 ```
 
-### 4.1.2. Encrypted / Signed Response
+### 5.1.2. Encrypted / Signed Response
 
 ```xml
 <response>
