@@ -68,6 +68,38 @@ private:
 
 
 // ---------------------------------------------------------------------------
+//  Entity resolver that blocks external entity loading (XXE prevention).
+//  Only the known NLAP DTD SYSTEM identifier is allowed to pass through
+//  (the pre-loaded grammar pool handles it without disk I/O).  All other
+//  external entity references — which could be injected by a malicious
+//  client — are resolved to an empty document.
+// ---------------------------------------------------------------------------
+
+class _BlockingEntityResolver : public HandlerBase
+{
+public:
+    InputSource* resolveEntity(const XMLCh* /*publicId*/, const XMLCh* systemId) override
+    {
+        if (systemId != nullptr) {
+            char* sysStr = XMLString::transcode(systemId);
+            bool isNLAPDtd = (string(sysStr).find("nlap.dtd") != string::npos);
+            XMLString::release(&sysStr);
+            if (isNLAPDtd) {
+                //- let Xerces handle it; the grammar pool will serve the
+                //- pre-loaded DTD without loading from the file system
+                return nullptr;
+            }
+        }
+        //- block all other external entities (XXE prevention)
+        static const char emptyDoc[] = "";
+        return new MemBufInputSource(
+            reinterpret_cast<const XMLByte*>(emptyDoc), 0, "blocked-entity"
+        );
+    }
+};
+
+
+// ---------------------------------------------------------------------------
 //  Xerces reference counting for Initialize / Terminate
 //  Thread-safe via std::atomic.
 // ---------------------------------------------------------------------------
@@ -373,6 +405,10 @@ inline bool XMLParser::_parseXML(const string& XMLMessage, RequestProperties_t& 
     parser.useCachedGrammarInParse(true);
     parser.setCreateEntityReferenceNodes(false);
     parser.setValidationConstraintFatal(true);
+
+    //- block all external entity resolution at the SAX layer (XXE defence)
+    _BlockingEntityResolver blockingResolver;
+    parser.setEntityResolver(&blockingResolver);
 
     try {
         MemBufInputSource xmlInput(
