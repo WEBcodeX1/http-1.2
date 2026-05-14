@@ -35,12 +35,9 @@ void HTTPGenerator::addDateHeader()
 {
     stringstream current_date;
     std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    struct std::tm * ptm = std::localtime(&tt);
-    current_date << std::put_time(ptm, "%a, %d %b %Y %T") << '\n';
-    string DateValue = current_date.str();
-    if (!DateValue.empty() && DateValue.back() == '\n')
-        DateValue.pop_back();
-    addHeader("Date", DateValue);
+    struct std::tm * ptm = std::gmtime(&tt);
+    current_date << std::put_time(ptm, "%a, %d %b %Y %T GMT");
+    addHeader("Date", current_date.str());
 }
 
 string HTTPGenerator::generate()
