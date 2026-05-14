@@ -9,6 +9,7 @@ add_custom_target(
     httpparserheader
     SOURCES
     ./httpparser.hpp
+    ./httpgenerator.hpp
 )
 
 # install static .a library
@@ -17,9 +18,10 @@ install(
     ARCHIVE DESTINATION /usr/local/lib
 )
 
-# install header file
+# install header files
 install(
     FILES
     ./httpparser.hpp
+    ./httpgenerator.hpp
     DESTINATION /usr/local/include
 )
