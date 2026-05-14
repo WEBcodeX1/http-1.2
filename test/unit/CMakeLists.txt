@@ -2,3 +2,4 @@
 add_subdirectory(http-parser)
 add_subdirectory(memory-alignment)
 add_subdirectory(memory-manager)
+add_subdirectory(xml-parser)
