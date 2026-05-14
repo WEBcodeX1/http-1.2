@@ -26,11 +26,16 @@ void HTTPGenerator::setBody(const string& Body)
     _Body = Body;
 }
 
+void HTTPGenerator::addHeader(HeaderID_t HeaderID, HeaderValue_t HeaderValue)
+{
+    Headers.emplace(HeaderID, HeaderValue);
+}
+
 string HTTPGenerator::generate()
 {
     string Message = "HTTP/1.1 " + to_string(_StatusCode) + " " + _StatusText + "\r\n";
 
-    for (const auto& Header : headers) {
+    for (const auto& Header : Headers) {
         const string& Name = Header.first;
         const string& Value = Header.second;
 
