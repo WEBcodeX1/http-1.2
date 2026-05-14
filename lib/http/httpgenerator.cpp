@@ -31,6 +31,18 @@ void HTTPGenerator::addHeader(HeaderID_t HeaderID, HeaderValue_t HeaderValue)
     Headers.emplace(HeaderID, HeaderValue);
 }
 
+void HTTPGenerator::addDateHeader()
+{
+    stringstream current_date;
+    std::time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    struct std::tm * ptm = std::localtime(&tt);
+    current_date << std::put_time(ptm, "%a, %d %b %Y %T") << '\n';
+    string DateValue = current_date.str();
+    if (!DateValue.empty() && DateValue.back() == '\n')
+        DateValue.pop_back();
+    addHeader("Date", DateValue);
+}
+
 string HTTPGenerator::generate()
 {
     string Message = "HTTP/1.1 " + to_string(_StatusCode) + " " + _StatusText + "\r\n";

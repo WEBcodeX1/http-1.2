@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <sstream>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <unordered_map>
 #include <cstdint>
 
@@ -21,6 +25,7 @@ public:
     void setStatus(const uint16_t StatusCode, const string& StatusText);
     void setBody(const string& Body);
     void addHeader(HeaderID_t HeaderID, HeaderValue_t HeaderValue);
+    void addDateHeader();
     string generate();
 
 private:
