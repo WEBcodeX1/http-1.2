@@ -1,0 +1,416 @@
+#include "xmlparser.hpp"
+#include "xmlconstants.hpp"
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLException.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/sax/HandlerBase.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+
+XERCES_CPP_NAMESPACE_USE
+
+using namespace std;
+
+
+// ---------------------------------------------------------------------------
+//  Internal helpers
+// ---------------------------------------------------------------------------
+
+//- RAII wrapper: char* transcoded from XMLCh* (auto-release on destruction)
+class _CStr
+{
+public:
+    explicit _CStr(const XMLCh* str) : _p(XMLString::transcode(str)) {}
+    ~_CStr() { if (_p) XMLString::release(&_p); }
+    string str() const { return _p ? string(_p) : string(); }
+    const char* c_str() const { return _p; }
+private:
+    char* _p;
+};
+
+//- RAII wrapper: XMLCh* transcoded from char* (auto-release on destruction)
+class _XStr
+{
+public:
+    explicit _XStr(const char* str) : _p(XMLString::transcode(str)) {}
+    ~_XStr() { if (_p) XMLString::release(&_p); }
+    operator const XMLCh*() const { return _p; }
+private:
+    XMLCh* _p;
+};
+
+
+// ---------------------------------------------------------------------------
+//  Simple SAX error handler used during DOM parsing
+// ---------------------------------------------------------------------------
+
+class _NLAPErrorHandler : public HandlerBase
+{
+public:
+    _NLAPErrorHandler() : _hasError(false) {}
+
+    bool hasError() const { return _hasError; }
+
+    void error(const SAXParseException&)      override { _hasError = true; }
+    void fatalError(const SAXParseException&) override { _hasError = true; }
+    void warning(const SAXParseException&)    override {}
+    void resetErrors()                        override { _hasError = false; }
+
+private:
+    bool _hasError;
+};
+
+
+// ---------------------------------------------------------------------------
+//  Xerces reference counting for Initialize / Terminate
+// ---------------------------------------------------------------------------
+
+static int _xercesRefCount = 0;
+
+
+// ---------------------------------------------------------------------------
+//  DOM tree helper functions
+// ---------------------------------------------------------------------------
+
+//- Return the trimmed text content of a DOM element (concatenates TEXT and
+//- CDATA child nodes; does NOT recurse into element children).
+static string _getElementText(DOMElement* elem)
+{
+    string result;
+    DOMNodeList* children = elem->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        DOMNode::NodeType t = child->getNodeType();
+        if (t == DOMNode::TEXT_NODE || t == DOMNode::CDATA_SECTION_NODE) {
+            _CStr val(child->getNodeValue());
+            result += val.str();
+        }
+    }
+    //- trim leading and trailing whitespace
+    size_t start = result.find_first_not_of(" \t\r\n");
+    if (start == string::npos) { return string(); }
+    size_t end = result.find_last_not_of(" \t\r\n");
+    return result.substr(start, end - start + 1);
+}
+
+//- Return all child text content recursively (for Payload ANY elements).
+static string _getAllText(DOMNode* node)
+{
+    string result;
+    DOMNodeList* children = node->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        DOMNode::NodeType t = child->getNodeType();
+        if (t == DOMNode::TEXT_NODE || t == DOMNode::CDATA_SECTION_NODE) {
+            _CStr val(child->getNodeValue());
+            result += val.str();
+        } else if (t == DOMNode::ELEMENT_NODE) {
+            result += _getAllText(child);
+        }
+    }
+    return result;
+}
+
+//- Parse <Header> element child nodes into the NLAPHeader_t map.
+static void _parseHeader(DOMElement* headerElem, NLAPHeader_t& headerMap)
+{
+    DOMNodeList* children = headerElem->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        if (child->getNodeType() != DOMNode::ELEMENT_NODE) { continue; }
+
+        DOMElement* field = static_cast<DOMElement*>(child);
+        _CStr name(field->getTagName());
+        string value = _getElementText(field);
+
+        if (!value.empty()) {
+            headerMap.emplace(name.str(), value);
+        }
+    }
+}
+
+//- Parse <Security> element into Encryption / Signature fields.
+static void _parseSecurity(DOMElement* secElem, RequestProperties_t& props)
+{
+    DOMNodeList* children = secElem->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        if (child->getNodeType() != DOMNode::ELEMENT_NODE) { continue; }
+
+        DOMElement* field = static_cast<DOMElement*>(child);
+        _CStr name(field->getTagName());
+        string value = _getElementText(field);
+        string nameStr = name.str();
+
+        if (nameStr == "Encryption")  { props.Encryption = value; }
+        else if (nameStr == "Signature") { props.Signature  = value; }
+    }
+}
+
+//- Parse <Status> element into StatusCode / StatusDescription / StatusException.
+static void _parseStatus(DOMElement* statusElem, RequestProperties_t& props)
+{
+    DOMNodeList* children = statusElem->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        if (child->getNodeType() != DOMNode::ELEMENT_NODE) { continue; }
+
+        DOMElement* field = static_cast<DOMElement*>(child);
+        _CStr name(field->getTagName());
+        string value = _getElementText(field);
+        string nameStr = name.str();
+
+        if      (nameStr == "Code")        { props.StatusCode        = value; }
+        else if (nameStr == "Description") { props.StatusDescription = value; }
+        else if (nameStr == "Exception")   { props.StatusException   = value; }
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+//  Build a parseable XML string: ensure <?xml declaration is present and
+//  inject a DOCTYPE declaration so Xerces can locate the DTD for validation.
+// ---------------------------------------------------------------------------
+
+static string _buildParseableXML(const string& xmlMsg)
+{
+    string result = xmlMsg;
+
+    const string declTag  = "<?xml";
+    const string declEnd  = "?>";
+    const string doctype  = "<!DOCTYPE NLAP SYSTEM \"" + NLAP_DTD_SYSTEM_PATH + "\">";
+
+    size_t declStartPos = result.find(declTag);
+
+    if (declStartPos == string::npos) {
+        //- no XML declaration at all: prepend both
+        result = NLAP_XML_DECLARATION + doctype + result;
+    } else {
+        //- XML declaration is present: inject DOCTYPE right after it
+        size_t declEndPos = result.find(declEnd, declStartPos);
+        if (declEndPos != string::npos) {
+            result.insert(declEndPos + declEnd.length(), doctype);
+        }
+    }
+
+    return result;
+}
+
+
+// ---------------------------------------------------------------------------
+//  StringHelper (shared split utility – mirrors httpparser.hpp)
+// ---------------------------------------------------------------------------
+
+class StringHelper {
+public:
+    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    {
+        string SplitElement;
+        auto pos = StringRef.find(Delimiter);
+
+        while (pos != string::npos) {
+            SplitElement = StringRef.substr(0, pos);
+            ResultRef.push_back(SplitElement);
+            StringRef.erase(0, pos + Delimiter.length());
+            pos = StringRef.find(Delimiter);
+        }
+    }
+};
+
+
+// ---------------------------------------------------------------------------
+//  XMLParser implementation
+// ---------------------------------------------------------------------------
+
+XMLParser::XMLParser(const uint16_t BufferSize) :
+    _RequestParseError(0),
+    _ReqAddIndex(0),
+    _ReqNextIndex(0),
+    _XMLRequestBuffer("")
+{
+    _XMLRequestBuffer.reserve(BufferSize);
+    _XMLRequestBufferMax = BufferSize;
+
+    if (_xercesRefCount == 0) {
+        XMLPlatformUtils::Initialize();
+    }
+    ++_xercesRefCount;
+}
+
+XMLParser::~XMLParser()
+{
+    --_xercesRefCount;
+    if (_xercesRefCount == 0) {
+        XMLPlatformUtils::Terminate();
+    }
+}
+
+void XMLParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
+{
+    if (_XMLRequestBuffer.length() + RecvBytes > _XMLRequestBufferMax) {
+        return;
+    }
+
+    _XMLRequestBuffer.append(BufferRef, RecvBytes);
+
+    //- reset split vector and process only when at least one complete message arrived
+    const size_t EndMarkerFound = _XMLRequestBuffer.find(NLAP_XML_END_MARKER);
+
+    if (EndMarkerFound != string::npos) {
+        _SplittedRequests.clear();
+        _processRequests();
+    }
+}
+
+RequestsMap_t XMLParser::getRequests()
+{
+    return _Requests;
+}
+
+RequestPropertiesPtr_t XMLParser::getNextRequest()
+{
+    if (_Requests.size() > 0) {
+        _ReqNextIndex += 1;
+        return make_shared<RequestProperties_t>(_Requests.at(_ReqNextIndex - 1));
+    }
+    return nullptr;
+}
+
+void XMLParser::removeRequest(uint16_t Index)
+{
+    if (_Requests.find(Index) != _Requests.end()) {
+        _Requests.erase(Index);
+    }
+}
+
+
+inline void XMLParser::_processRequests()
+{
+    //- split stream buffer into individual NLAP messages on the end marker
+    StringHelper::split(_XMLRequestBuffer, NLAP_XML_END_MARKER, _SplittedRequests);
+
+    //- iterate over split messages
+    for (size_t i = 0; i < _SplittedRequests.size(); ++i) {
+        if (_processRequestProperties(i) == false) {
+            _RequestParseError = XML_ERROR_BAD_REQUEST;
+        }
+    }
+}
+
+inline bool XMLParser::_processRequestProperties(const size_t Index)
+{
+    //- get the raw split piece at this index
+    auto& Request = _SplittedRequests.at(Index);
+
+    //- skip empty pieces (e.g. trailing split result)
+    if (Request.empty()) { return false; }
+
+    //- reassemble a complete, valid XML message:
+    //-   1. append </NLAP> (was consumed as the delimiter during split)
+    //-   2. prepend <?xml declaration if not already present
+    string XMLMessage = Request;
+    XMLMessage += NLAP_XML_END_MARKER;
+
+    if (XMLMessage.find("<?xml") == string::npos) {
+        XMLMessage = NLAP_XML_DECLARATION + XMLMessage;
+    }
+
+    //- reset properties
+    _RequestProperties = RequestProperties_t{};
+    _RequestProperties.XMLRawMessage = XMLMessage;
+
+    //- parse XML and populate remaining fields
+    if (_parseXML(XMLMessage, _RequestProperties) == false) { return false; }
+
+    //- add to requests map
+    _Requests.emplace(_ReqAddIndex, _RequestProperties);
+    _ReqAddIndex += 1;
+
+    return true;
+}
+
+inline bool XMLParser::_parseXML(const string& XMLMessage, RequestProperties_t& Props)
+{
+    //- build a version of the XML that includes a DOCTYPE so Xerces can
+    //- locate the DTD and validate the document structure
+    string parseableXML = _buildParseableXML(XMLMessage);
+
+    XercesDOMParser parser;
+    _NLAPErrorHandler errHandler;
+
+    parser.setErrorHandler(&errHandler);
+    parser.setValidationScheme(XercesDOMParser::Val_Always);
+    parser.setDoNamespaces(false);
+    parser.setDoSchema(false);
+    parser.setLoadExternalDTD(true);
+    parser.setValidationConstraintFatal(true);
+
+    try {
+        MemBufInputSource xmlInput(
+            reinterpret_cast<const XMLByte*>(parseableXML.c_str()),
+            static_cast<XMLSize_t>(parseableXML.size()),
+            "nlap-xml-input"
+        );
+        parser.parse(xmlInput);
+    }
+    catch (const XMLException&)      { return false; }
+    catch (const DOMException&)      { return false; }
+    catch (...)                      { return false; }
+
+    if (errHandler.hasError()) { return false; }
+
+    DOMDocument* doc = parser.getDocument();
+    if (!doc) { return false; }
+
+    //- root element: <NLAP>
+    DOMElement* root = doc->getDocumentElement();
+    if (!root) { return false; }
+
+    //- first element child of <NLAP> is either <Request> or <Response>
+    DOMNodeList* rootChildren = root->getChildNodes();
+    DOMElement*  reqresElem   = nullptr;
+
+    for (XMLSize_t i = 0; i < rootChildren->getLength(); ++i) {
+        DOMNode* node = rootChildren->item(i);
+        if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
+            reqresElem = static_cast<DOMElement*>(node);
+            break;
+        }
+    }
+
+    if (!reqresElem) { return false; }
+
+    {
+        _CStr tagName(reqresElem->getTagName());
+        Props.RequestType = tagName.str();
+    }
+
+    //- only accept <Request> or <Response>
+    if (Props.RequestType != "Request" && Props.RequestType != "Response") {
+        return false;
+    }
+
+    //- iterate over child elements of <Request> / <Response>
+    DOMNodeList* children = reqresElem->getChildNodes();
+    for (XMLSize_t i = 0; i < children->getLength(); ++i) {
+        DOMNode* child = children->item(i);
+        if (child->getNodeType() != DOMNode::ELEMENT_NODE) { continue; }
+
+        DOMElement* elem = static_cast<DOMElement*>(child);
+        _CStr nameCS(elem->getTagName());
+        string name = nameCS.str();
+
+        if      (name == "UUID")     { Props.UUID     = _getElementText(elem); }
+        else if (name == "Protocol") { Props.Protocol = _getElementText(elem); }
+        else if (name == "Version")  { Props.Version  = _getElementText(elem); }
+        else if (name == "Subtype")  { Props.Subtype  = _getElementText(elem); }
+        else if (name == "Header")   { _parseHeader(elem, Props.Header);       }
+        else if (name == "Security") { _parseSecurity(elem, Props);            }
+        else if (name == "Payload")  { Props.Payload  = _getAllText(child);    }
+        else if (name == "Status")   { _parseStatus(elem, Props);             }
+    }
+
+    return true;
+}
