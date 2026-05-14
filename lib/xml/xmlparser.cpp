@@ -1,6 +1,8 @@
 #include "xmlparser.hpp"
 #include "xmlconstants.hpp"
 
+#include <atomic>
+
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/XMLException.hpp>
@@ -8,6 +10,8 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/framework/XMLGrammarPoolImpl.hpp>
+#include <xercesc/validators/common/Grammar.hpp>
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -65,9 +69,10 @@ private:
 
 // ---------------------------------------------------------------------------
 //  Xerces reference counting for Initialize / Terminate
+//  Thread-safe via std::atomic.
 // ---------------------------------------------------------------------------
 
-static int _xercesRefCount = 0;
+static atomic<int> _xercesRefCount{0};
 
 
 // ---------------------------------------------------------------------------
@@ -205,7 +210,7 @@ static string _buildParseableXML(const string& xmlMsg)
 
 class StringHelper {
 public:
-    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    static void split(string& StringRef, const string& Delimiter, vector<string>& ResultRef)
     {
         string SplitElement;
         auto pos = StringRef.find(Delimiter);
@@ -228,21 +233,36 @@ XMLParser::XMLParser(const uint16_t BufferSize) :
     _RequestParseError(0),
     _ReqAddIndex(0),
     _ReqNextIndex(0),
-    _XMLRequestBuffer("")
+    _XMLRequestBuffer(""),
+    _grammarPool(nullptr)
 {
     _XMLRequestBuffer.reserve(BufferSize);
     _XMLRequestBufferMax = BufferSize;
 
-    if (_xercesRefCount == 0) {
+    if (_xercesRefCount.fetch_add(1) == 0) {
         XMLPlatformUtils::Initialize();
     }
-    ++_xercesRefCount;
+
+    //- pre-load the NLAP DTD into a locked grammar pool so that individual
+    //- parse calls can use the cached grammar without loading external files
+    auto* pool = new XMLGrammarPoolImpl(XMLPlatformUtils::fgMemoryManager);
+    _grammarPool = pool;
+
+    try {
+        XercesDOMParser dtdLoader(nullptr, XMLPlatformUtils::fgMemoryManager, pool);
+        dtdLoader.loadGrammar(NLAP_DTD_SYSTEM_PATH.c_str(), Grammar::DTDGrammarType, true);
+    }
+    catch (...) {}
+
+    pool->lockPool();
 }
 
 XMLParser::~XMLParser()
 {
-    --_xercesRefCount;
-    if (_xercesRefCount == 0) {
+    delete static_cast<XMLGrammarPoolImpl*>(_grammarPool);
+    _grammarPool = nullptr;
+
+    if (_xercesRefCount.fetch_sub(1) == 1) {
         XMLPlatformUtils::Terminate();
     }
 }
@@ -250,6 +270,7 @@ XMLParser::~XMLParser()
 void XMLParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
 {
     if (_XMLRequestBuffer.length() + RecvBytes > _XMLRequestBufferMax) {
+        _RequestParseError = XML_ERROR_PARSE_BUFFER_EXCEEDED;
         return;
     }
 
@@ -334,17 +355,23 @@ inline bool XMLParser::_processRequestProperties(const size_t Index)
 inline bool XMLParser::_parseXML(const string& XMLMessage, RequestProperties_t& Props)
 {
     //- build a version of the XML that includes a DOCTYPE so Xerces can
-    //- locate the DTD and validate the document structure
+    //- identify the grammar to use from the pre-loaded grammar pool
     string parseableXML = _buildParseableXML(XMLMessage);
 
-    XercesDOMParser parser;
+    auto* pool = static_cast<XMLGrammarPool*>(_grammarPool);
+    XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager, pool);
     _NLAPErrorHandler errHandler;
 
     parser.setErrorHandler(&errHandler);
     parser.setValidationScheme(XercesDOMParser::Val_Always);
     parser.setDoNamespaces(false);
     parser.setDoSchema(false);
-    parser.setLoadExternalDTD(true);
+
+    //- use the pre-loaded DTD grammar; disable loading of any external
+    //- entities from user-supplied XML to prevent XXE attacks
+    parser.setLoadExternalDTD(false);
+    parser.useCachedGrammarInParse(true);
+    parser.setCreateEntityReferenceNodes(false);
     parser.setValidationConstraintFatal(true);
 
     try {

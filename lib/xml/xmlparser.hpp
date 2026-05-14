@@ -5,7 +5,6 @@
 #include <memory>
 #include <cstdint>
 #include <unordered_map>
-
 using namespace std;
 
 //- Header fields map: key = element name (e.g. "Host", "URL", "Mime-Type"), value = text content
@@ -87,4 +86,6 @@ private:
 
     RequestProperties_t _RequestProperties;
     RequestsMap_t _Requests;
+
+    void* _grammarPool;     //- xercesc::XMLGrammarPool* (opaque to avoid Xerces in public header)
 };
