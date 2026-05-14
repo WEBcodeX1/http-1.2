@@ -31,13 +31,18 @@ string HTTPGenerator::generate()
     string Message = "HTTP/1.1 " + to_string(_StatusCode) + " " + _StatusText + "\r\n";
 
     for (const auto& Header : headers) {
-        Message += Header.first + ": " + Header.second + "\r\n";
+        const string& Name = Header.first;
+        const string& Value = Header.second;
+
+        if (Name.find('\r') != string::npos || Name.find('\n') != string::npos ||
+            Value.find('\r') != string::npos || Value.find('\n') != string::npos) {
+            continue;
+        }
+
+        Message += Name + ": " + Value + "\r\n";
     }
 
-    if (!_Body.empty()) {
-        Message += "Content-Length: " + to_string(_Body.length()) + "\r\n";
-    }
-
+    Message += "Content-Length: " + to_string(_Body.length()) + "\r\n";
     Message += "\r\n";
     Message += _Body;
 

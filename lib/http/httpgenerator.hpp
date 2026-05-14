@@ -7,7 +7,6 @@
 using namespace std;
 
 typedef unordered_map<string, string> ResponseHeader_t;
-typedef ResponseHeader_t& ResponseHeaderRef_t;
 
 class HTTPGenerator
 {
