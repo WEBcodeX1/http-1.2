@@ -284,7 +284,11 @@ XMLParser::XMLParser(const uint16_t BufferSize) :
         XercesDOMParser dtdLoader(nullptr, XMLPlatformUtils::fgMemoryManager, pool);
         dtdLoader.loadGrammar(NLAP_DTD_SYSTEM_PATH.c_str(), Grammar::DTDGrammarType, true);
     }
-    catch (...) {}
+    catch (...) {
+        //- DTD loading failed (file not found or malformed DTD).
+        //- The pool remains empty; validation will fail for every incoming message,
+        //- which is the correct safe behaviour: no DTD → no accepted messages.
+    }
 
     pool->lockPool();
 }
