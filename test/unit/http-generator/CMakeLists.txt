@@ -8,7 +8,7 @@ add_executable(
 
 # add custom targets
 add_custom_target(
-    TestGeneratorHeader
+    HttpGeneratorTestHeaders
     SOURCES
     ../../../lib/http/httpgenerator.hpp
 )
