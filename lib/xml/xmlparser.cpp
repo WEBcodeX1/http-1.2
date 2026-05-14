@@ -328,10 +328,9 @@ RequestsMap_t XMLParser::getRequests()
 
 RequestPropertiesPtr_t XMLParser::getNextRequest()
 {
-    auto it = _Requests.find(_ReqNextIndex);
-    if (it != _Requests.end()) {
+    if (_Requests.size() > 0) {
         _ReqNextIndex += 1;
-        return make_shared<RequestProperties_t>(it->second);
+        return make_shared<RequestProperties_t>(_Requests.at(_ReqNextIndex - 1));
     }
     return nullptr;
 }

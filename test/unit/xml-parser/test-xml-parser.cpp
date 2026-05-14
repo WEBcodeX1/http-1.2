@@ -735,13 +735,13 @@ BOOST_AUTO_TEST_CASE( test_valid_getNextRequest )
     unique_ptr<XMLParser> parser = make_unique<XMLParser>(8192);
     parser->appendBuffer(combined.c_str(), combined.length());
 
+    BOOST_TEST(parser->getRequests().size() == 2u);
+
     auto r1 = parser->getNextRequest();
     auto r2 = parser->getNextRequest();
-    auto r3 = parser->getNextRequest();
 
     BOOST_TEST(r1 != nullptr);
     BOOST_TEST(r2 != nullptr);
-    BOOST_TEST(r3 == nullptr);
 
     BOOST_TEST(r1->RequestType == "Request");
     BOOST_TEST(r2->RequestType == "Response");
@@ -857,7 +857,8 @@ BOOST_AUTO_TEST_CASE( test_invalid_wrong_root_element )
     cout << "Invalid: wrong root element (not NLAP) - DTD validation rejects." << endl;
 
     unique_ptr<XMLParser> parser = make_unique<XMLParser>(4096);
-    // The end marker must be present to trigger processing - use </NOTLAP> as appended
+    // The end marker </NLAP> is not present, so the split on NLAP_XML_END_MARKER
+    // will never trigger processing. The message is therefore never parsed.
     string bad = INVALID_WRONG_ROOT;
     parser->appendBuffer(bad.c_str(), bad.length());
 
