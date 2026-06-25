@@ -14,6 +14,7 @@ typedef string HeaderID_t;
 typedef string HeaderValue_t;
 typedef unordered_map<HeaderID_t, HeaderValue_t> ResponseHeader_t;
 
+
 class HTTPGenerator
 {
 
@@ -22,17 +23,24 @@ public:
     HTTPGenerator();
     ~HTTPGenerator();
 
-    void setStatus(const uint16_t StatusCode, const string& StatusText);
-    void setBody(const string& Body);
-    void addHeader(HeaderID_t HeaderID, HeaderValue_t HeaderValue);
+    void setStatus(const uint16_t, const string&);
+    void setBodyRef(char*, const unsigned int);
+    void addHeader(const HeaderID_t, const HeaderValue_t);
     void addDateHeader();
-    string generate();
+    void generate();
 
 private:
 
     uint16_t _StatusCode;
     string _StatusText;
-    string _Body;
+
+    uint16_t _HeaderLength;
+    unsigned int _BodyLength;
+
+    char _HeaderBuffer[4096];
+
+    char* _HeaderPointer;
+    char* _BodyPointer;
 
     ResponseHeader_t Headers;
 

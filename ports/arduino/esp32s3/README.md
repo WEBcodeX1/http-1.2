@@ -1,6 +1,6 @@
-# ESP32-C3
+# ESP32-S3
 
-As the first arduino port, the ESP32-C3 will be used for prototyping. This CMake configuration will cross-compile the httpparser as static `httpparser.a` library which afterwards can be used in your ESP-IDF project / component.
+This CMake configuration will cross-compile the httpparser as static `httpparser.a` library which afterwards can be used in your ESP-IDF project / component.
 
 # Prerequisites
 
@@ -10,12 +10,12 @@ Installed and **active** ESP-IDF build environment / cross-compiler installed in
 
 ```bash
 ./adjust-cross-build.sh
-cmake -DCMAKE_TOOLCHAIN_FILE=riscv32-cross.cmake .
+cmake -DCMAKE_TOOLCHAIN_FILE=xtensa-cross.cmake .
 make
 sudo make install
 ```
 
-The `make install` command will install the static library `/usr/local/lib/esp32c3/libhttpparser.a` and the c++ header files `/usr/local/include/esp32c3/`.
+The `make install` command will install the static library `/usr/local/lib/esp32s3/libhttpparser.a` and the c++ header files `/usr/local/include/esp32s3/`.
 
 # Using External Library
 
