@@ -29,6 +29,9 @@ public:
     void addDateHeader();
     void generate();
 
+    char* _HeaderPointer;
+    char* _BodyPointer;
+
 private:
 
     uint16_t _StatusCode;
@@ -37,10 +40,7 @@ private:
     uint16_t _HeaderLength;
     unsigned int _BodyLength;
 
-    char _HeaderBuffer[4096];
-
-    char* _HeaderPointer;
-    char* _BodyPointer;
+    char _HeaderBuffer[254];
 
     ResponseHeader_t Headers;
 

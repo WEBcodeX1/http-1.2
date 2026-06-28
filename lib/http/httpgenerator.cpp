@@ -49,13 +49,6 @@ void HTTPGenerator::generate()
         const string& Name = Header.first;
         const string& Value = Header.second;
 
-        /* -- check really neccessary?
-        if (Name.find('\r') != string::npos || Name.find('\n') != string::npos ||
-            Value.find('\r') != string::npos || Value.find('\n') != string::npos) {
-            continue;
-        }
-        */
-
         Message += Name + ": " + Value + "\r\n";
     }
 

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <cstdint>
 #include <utility>
 #include <algorithm>
@@ -27,9 +26,9 @@ struct RequestProperties_t
 };
 
 typedef RequestProperties_t& RequestPropertiesRef_t;
-typedef shared_ptr<RequestProperties_t> RequestPropertiesPtr_t;
 
 typedef unordered_map<uint16_t, RequestProperties_t> RequestsMap_t;
+typedef RequestsMap_t* RequestsMapPtr_t;
 
 
 class HTTPParser
@@ -42,7 +41,7 @@ public:
 
     void appendBuffer(const char*, const uint16_t);
     RequestsMap_t getRequests();
-    RequestPropertiesPtr_t getNextRequest();
+    RequestsMapPtr_t getRequestsPtr();
     void removeRequest(uint16_t);
 
 private:
@@ -62,7 +61,6 @@ private:
     uint16_t _POSTContentLength;
 
     uint16_t _ReqAddIndex;
-    uint16_t _ReqNextIndex;
 
     string _HTTPRequestBuffer;
 

@@ -11,7 +11,6 @@ HTTPParser::HTTPParser(const uint16_t BufferSize) :
     _POSTWaitContentLength(false),
     _POSTContentLength(0),
     _ReqAddIndex(0),
-    _ReqNextIndex(0),
     _HTTPRequestBuffer("")
 {
     _HTTPRequestBuffer.reserve(BufferSize);
@@ -56,13 +55,9 @@ RequestsMap_t HTTPParser::getRequests()
     return _Requests;
 }
 
-RequestPropertiesPtr_t HTTPParser::getNextRequest()
+RequestsMapPtr_t HTTPParser::getRequestsPtr()
 {
-    if (_Requests.size() > 0) {
-        _ReqNextIndex += 1;
-        return make_shared<RequestProperties_t>(_Requests.at(_ReqNextIndex-1));
-    }
-    return nullptr;
+    return &_Requests;
 }
 
 void HTTPParser::removeRequest(uint16_t Index)
@@ -71,7 +66,6 @@ void HTTPParser::removeRequest(uint16_t Index)
         _Requests.erase(Index);
     }
 }
-
 
 inline void HTTPParser::_processRequests()
 {
