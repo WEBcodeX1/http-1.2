@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE( test_headers_appear_before_body_separator )
 
 // ── CRLF injection guard ──────────────────────────────────────────────────────
 
-BOOST_AUTO_TEST_CASE( test_crlf_in_header_value_is_rejected )
+BOOST_AUTO_TEST_CASE( test_crlf_in_header_value_is_currently_included )
 {
     cout << "Check header with \\r\\n in value is present in generated headers." << endl;
 
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE( test_crlf_in_header_value_is_rejected )
     BOOST_TEST( contains(response, "X-Evil: bad\r\nvalue\r\n"));
 }
 
-BOOST_AUTO_TEST_CASE( test_cr_only_in_header_value_is_rejected )
+BOOST_AUTO_TEST_CASE( test_cr_only_in_header_value_is_currently_included )
 {
     cout << "Check header with \\r only in value is present in generated headers." << endl;
 
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE( test_cr_only_in_header_value_is_rejected )
     BOOST_TEST(contains(response, "X-Evil-CR: bad\rvalue\r\n"));
 }
 
-BOOST_AUTO_TEST_CASE( test_lf_only_in_header_value_is_rejected )
+BOOST_AUTO_TEST_CASE( test_lf_only_in_header_value_is_currently_included )
 {
     cout << "Check header with \\n only in value is present in generated headers." << endl;
 
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_lf_only_in_header_value_is_rejected )
     BOOST_TEST(contains(response, "X-Evil-LF: bad\nvalue\r\n"));
 }
 
-BOOST_AUTO_TEST_CASE( test_crlf_in_header_name_is_rejected )
+BOOST_AUTO_TEST_CASE( test_crlf_in_header_name_is_currently_included )
 {
     cout << "Check header with \\r\\n in name is present in generated headers." << endl;
 
