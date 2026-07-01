@@ -12,17 +12,18 @@ Installed and **active** ESP-IDF build environment / cross-compiler installed in
 ./adjust-cross-build.sh
 cmake -DCMAKE_TOOLCHAIN_FILE=riscv32-cross.cmake .
 make
-make install
+sudo make install
 ```
 
-The `make install` command will install the static library `/usr/local/lib/esp32c3/libhttpparser.a` and the c++ header file `/usr/local/include/esp32c3/libhttpparser.hpp`.
+The `make install` command will install the static library `/usr/local/lib/esp32c3/libhttpparser.a` and the c++ header files `/usr/local/include/esp32c3/`.
 
 # Using External Library
 
-1. The c++ header file must be included in your C++ headers
+1. The c++ header files must be included in your C++ headers
 
 ```c++
-#include "/usr/local/include/esp32c3/libhttpparser.hpp"
+#include "/usr/local/include/esp32c3/httpparser.hpp"
+#include "/usr/local/include/esp32c3/httpgenerator.hpp"
 ```
 
 **and**

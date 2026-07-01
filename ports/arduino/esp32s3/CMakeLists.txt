@@ -1,6 +1,6 @@
 # project settings
 cmake_minimum_required(VERSION 3.11)
-project(esp32c3-httplib)
+project(esp32s3-httplib)
 
 set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Os -std=c++11 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
 
@@ -21,7 +21,7 @@ add_custom_target(
 # install
 install(
     TARGETS httpparser
-    ARCHIVE DESTINATION /usr/local/lib/esp32c3
+    ARCHIVE DESTINATION /usr/local/lib/esp32s3
 )
 
 # install header file
@@ -29,5 +29,5 @@ install(
     FILES
     ../../../lib/http/httpparser.hpp
     ../../../lib/http/httpgenerator.hpp
-    DESTINATION /usr/local/include/esp32c3
+    DESTINATION /usr/local/include/esp32s3
 )
