@@ -10,7 +10,6 @@ HTTPParser::HTTPParser(const uint16_t BufferSize) :
     _RequestParseError(0),
     _POSTWaitContentLength(false),
     _POSTContentLength(0),
-    _ReqAddIndex(0),
     _HTTPRequestBuffer("")
 {
     _HTTPRequestBuffer.reserve(BufferSize);
@@ -33,8 +32,9 @@ void HTTPParser::appendBuffer(const char* BufferRef, const uint16_t RecvBytes)
     if (_POSTWaitContentLength == true && _HTTPRequestBuffer.length() >= _POSTContentLength) {
         _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
         _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
-        _Requests.emplace(_ReqAddIndex, _RequestProperties);
-        _ReqAddIndex += 1;
+
+        _Requests.push_back(_RequestProperties);
+
         _POSTWaitContentLength = false;
     }
     else {
@@ -58,13 +58,6 @@ RequestsMap_t HTTPParser::getRequests()
 RequestsMapPtr_t HTTPParser::getRequestsPtr()
 {
     return &_Requests;
-}
-
-void HTTPParser::removeRequest(uint16_t Index)
-{
-    if (_Requests.find(Index) != _Requests.end()) {
-        _Requests.erase(Index);
-    }
 }
 
 inline void HTTPParser::_processRequests()
@@ -114,8 +107,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
         _parseGETParameter(_RequestProperties.URL, _RequestProperties.URLParams);
 
         //- add request to requests map
-        _Requests.emplace(_ReqAddIndex, _RequestProperties);
-        _ReqAddIndex += 1;
+        _Requests.push_back(_RequestProperties);
     }
 
     //- POST request
@@ -144,9 +136,10 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
             if (_HTTPRequestBuffer.length() >= _POSTContentLength) {
                 _RequestProperties.Payload = _HTTPRequestBuffer.substr(0, _POSTContentLength);
                 _HTTPRequestBuffer.replace(0, _POSTContentLength, "");
+
                 //- add request to requests map
-                _Requests.emplace(_ReqAddIndex, _RequestProperties);
-                _ReqAddIndex += 1;
+                _Requests.push_back(_RequestProperties);
+
             }
             else {
                 //- set flag to wait until content-length reached
@@ -160,8 +153,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
                 _RequestProperties.Payload = NextRequest.substr(0, _POSTContentLength);
                 NextRequest.replace(0, _POSTContentLength, "");
                 //- add request to requests map
-                _Requests.emplace(_ReqAddIndex, _RequestProperties);
-                _ReqAddIndex += 1;
+                _Requests.push_back(_RequestProperties);
             }
             else {
                 return false;

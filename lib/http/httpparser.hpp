@@ -27,7 +27,7 @@ struct RequestProperties_t
 
 typedef RequestProperties_t& RequestPropertiesRef_t;
 
-typedef unordered_map<uint16_t, RequestProperties_t> RequestsMap_t;
+typedef vector<RequestProperties_t> RequestsMap_t;
 typedef RequestsMap_t* RequestsMapPtr_t;
 
 
@@ -42,7 +42,6 @@ public:
     void appendBuffer(const char*, const uint16_t);
     RequestsMap_t getRequests();
     RequestsMapPtr_t getRequestsPtr();
-    void removeRequest(uint16_t);
 
 private:
 
@@ -59,8 +58,6 @@ private:
 
     bool _POSTWaitContentLength;
     uint16_t _POSTContentLength;
-
-    uint16_t _ReqAddIndex;
 
     string _HTTPRequestBuffer;
 
