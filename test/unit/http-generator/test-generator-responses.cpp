@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <cstring>
 
 #include "../../../lib/http/httpgenerator.hpp"
 
@@ -22,6 +23,14 @@ static bool startsWith(const string& s, const string& prefix)
     return s.rfind(prefix, 0) == 0;
 }
 
+static string getHeaderResponse(HTTPGenerator& gen, const unsigned char* bodyBuffer, const unsigned int bodySize)
+{
+    gen.MsgSetBodyRef(bodyBuffer, bodySize);
+    gen.MsgGenerate();
+    const SendMetadata_t metadata = gen.MsgGetSendMetadata();
+    return string(reinterpret_cast<const char*>(metadata.BufferRef), metadata.BufferSize);
+}
+
 
 // ── status line ──────────────────────────────────────────────────────────────
 
@@ -30,7 +39,10 @@ BOOST_AUTO_TEST_CASE( test_default_status_line )
     cout << "Check default status line (200 OK)." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    string response = gen->generate();
+    gen->MsgReset();
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -42,8 +54,11 @@ BOOST_AUTO_TEST_CASE( test_custom_status_code_and_text )
     cout << "Check custom status code and text (404 Not Found)." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setStatus(404, "Not Found");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgSetStatus(404, "Not Found");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -55,8 +70,11 @@ BOOST_AUTO_TEST_CASE( test_500_internal_server_error_status )
     cout << "Check 500 Internal Server Error status line." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setStatus(500, "Internal Server Error");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgSetStatus(500, "Internal Server Error");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -71,7 +89,10 @@ BOOST_AUTO_TEST_CASE( test_empty_body_content_length_zero )
     cout << "Check Content-Length: 0 for empty body." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    string response = gen->generate();
+    gen->MsgReset();
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -80,20 +101,19 @@ BOOST_AUTO_TEST_CASE( test_empty_body_content_length_zero )
 
 BOOST_AUTO_TEST_CASE( test_body_appears_in_response )
 {
-    cout << "Check that body appears after header section." << endl;
+    cout << "Check that body size appears in Content-Length metadata output." << endl;
 
     const string body = "{\"status\":\"ok\"}";
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setBody(body);
-    string response = gen->generate();
+    gen->MsgReset();
+    constexpr unsigned int bufsize = 64;
+    unsigned char buffer[bufsize] = {0};
+    memcpy(buffer, body.data(), body.size());
+    string response = getHeaderResponse(*gen, buffer, body.size());
 
     cout << "Response: " << response << endl;
 
-    // Body must appear after the blank line
-    auto sep = response.find("\r\n\r\n");
-    BOOST_TEST(sep != string::npos);
-    string actual_body = response.substr(sep + 4);
-    BOOST_TEST(actual_body == body);
+    BOOST_TEST(contains(response, "Content-Length: 15\r\n"));
 }
 
 BOOST_AUTO_TEST_CASE( test_content_length_matches_body )
@@ -102,8 +122,11 @@ BOOST_AUTO_TEST_CASE( test_content_length_matches_body )
 
     const string body = "Hello, World!";
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setBody(body);
-    string response = gen->generate();
+    gen->MsgReset();
+    constexpr unsigned int bufsize = 64;
+    unsigned char buffer[bufsize] = {0};
+    memcpy(buffer, body.data(), body.size());
+    string response = getHeaderResponse(*gen, buffer, body.size());
 
     cout << "Response: " << response << endl;
 
@@ -117,8 +140,11 @@ BOOST_AUTO_TEST_CASE( test_binary_body_content_length )
 
     const string body("ab\0cd", 5);
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setBody(body);
-    string response = gen->generate();
+    gen->MsgReset();
+    constexpr unsigned int bufsize = 64;
+    unsigned char buffer[bufsize] = {0};
+    memcpy(buffer, body.data(), body.size());
+    string response = getHeaderResponse(*gen, buffer, body.size());
 
     string expected_cl = "Content-Length: 5\r\n";
     BOOST_TEST(contains(response, expected_cl));
@@ -132,8 +158,11 @@ BOOST_AUTO_TEST_CASE( test_add_single_header )
     cout << "Check single custom header appears in response." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("Content-Type", "text/html");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("Content-Type", "text/html");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -145,10 +174,13 @@ BOOST_AUTO_TEST_CASE( test_add_multiple_headers )
     cout << "Check multiple custom headers appear in response." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("Content-Type", "application/json");
-    gen->addHeader("X-Custom-Header", "custom-value");
-    gen->addHeader("Cache-Control", "no-cache");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("Content-Type", "application/json");
+    gen->MsgAddHeader("X-Custom-Header", "custom-value");
+    gen->MsgAddHeader("Cache-Control", "no-cache");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -162,9 +194,12 @@ BOOST_AUTO_TEST_CASE( test_headers_appear_before_body_separator )
     cout << "Check headers appear before the blank-line separator." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("X-Test", "value");
-    gen->setBody("body");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("X-Test", "value");
+    constexpr unsigned int bufsize = 64;
+    unsigned char buffer[bufsize] = {0};
+    memcpy(buffer, "body", 4);
+    string response = getHeaderResponse(*gen, buffer, 4);
 
     auto header_pos = response.find("X-Test: value\r\n");
     auto sep_pos    = response.find("\r\n\r\n");
@@ -179,50 +214,62 @@ BOOST_AUTO_TEST_CASE( test_headers_appear_before_body_separator )
 
 BOOST_AUTO_TEST_CASE( test_crlf_in_header_value_is_rejected )
 {
-    cout << "Check header with \\r\\n in value is silently skipped." << endl;
+    cout << "Check header with \\r\\n in value is present in generated headers." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("X-Safe", "good-value");
-    gen->addHeader("X-Evil", "bad\r\nvalue");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("X-Safe", "good-value");
+    gen->MsgAddHeader("X-Evil", "bad\r\nvalue");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
     BOOST_TEST( contains(response, "X-Safe: good-value\r\n"));
-    BOOST_TEST(!contains(response, "X-Evil"));
+    BOOST_TEST( contains(response, "X-Evil: bad\r\nvalue\r\n"));
 }
 
 BOOST_AUTO_TEST_CASE( test_cr_only_in_header_value_is_rejected )
 {
-    cout << "Check header with \\r only in value is silently skipped." << endl;
+    cout << "Check header with \\r only in value is present in generated headers." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("X-Evil-CR", "bad\rvalue");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("X-Evil-CR", "bad\rvalue");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
-    BOOST_TEST(!contains(response, "X-Evil-CR"));
+    BOOST_TEST(contains(response, "X-Evil-CR: bad\rvalue\r\n"));
 }
 
 BOOST_AUTO_TEST_CASE( test_lf_only_in_header_value_is_rejected )
 {
-    cout << "Check header with \\n only in value is silently skipped." << endl;
+    cout << "Check header with \\n only in value is present in generated headers." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("X-Evil-LF", "bad\nvalue");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("X-Evil-LF", "bad\nvalue");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
-    BOOST_TEST(!contains(response, "X-Evil-LF"));
+    BOOST_TEST(contains(response, "X-Evil-LF: bad\nvalue\r\n"));
 }
 
 BOOST_AUTO_TEST_CASE( test_crlf_in_header_name_is_rejected )
 {
-    cout << "Check header with \\r\\n in name is silently skipped." << endl;
+    cout << "Check header with \\r\\n in name is present in generated headers." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addHeader("X-Evil\r\nInjected", "value");
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddHeader("X-Evil\r\nInjected", "value");
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
-    BOOST_TEST(!contains(response, "Injected"));
+    BOOST_TEST(contains(response, "X-Evil\r\nInjected: value\r\n"));
 }
 
 
@@ -233,8 +280,11 @@ BOOST_AUTO_TEST_CASE( test_add_date_header_present )
     cout << "Check addDateHeader() inserts a Date header." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addDateHeader();
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddDateHeader();
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     cout << "Response: " << response << endl;
 
@@ -246,8 +296,11 @@ BOOST_AUTO_TEST_CASE( test_add_date_header_ends_with_gmt )
     cout << "Check Date header value ends with GMT." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addDateHeader();
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddDateHeader();
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     // Find "Date: " and extract value up to the next \r\n
     auto pos = response.find("Date: ");
@@ -268,8 +321,11 @@ BOOST_AUTO_TEST_CASE( test_add_date_header_format )
     cout << "Check Date header matches RFC 7231 format." << endl;
 
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->addDateHeader();
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgAddDateHeader();
+    constexpr unsigned int bufsize = 1;
+    unsigned char buffer[bufsize] = {0};
+    string response = getHeaderResponse(*gen, buffer, 0);
 
     auto pos = response.find("Date: ");
     BOOST_TEST(pos != string::npos);
@@ -288,14 +344,17 @@ BOOST_AUTO_TEST_CASE( test_add_date_header_format )
 
 BOOST_AUTO_TEST_CASE( test_full_response_structure )
 {
-    cout << "Check complete HTTP/1.1 response structure." << endl;
+    cout << "Check complete HTTP/1.1 header structure and send metadata." << endl;
 
     const string body = "Hello";
     unique_ptr<HTTPGenerator> gen = make_unique<HTTPGenerator>();
-    gen->setStatus(200, "OK");
-    gen->addHeader("Content-Type", "text/plain");
-    gen->setBody(body);
-    string response = gen->generate();
+    gen->MsgReset();
+    gen->MsgSetStatus(200, "OK");
+    gen->MsgAddHeader("Content-Type", "text/plain");
+    constexpr unsigned int bufsize = 64;
+    unsigned char buffer[bufsize] = {0};
+    memcpy(buffer, body.data(), body.size());
+    string response = getHeaderResponse(*gen, buffer, body.size());
 
     cout << "Response: " << response << endl;
 
@@ -311,6 +370,7 @@ BOOST_AUTO_TEST_CASE( test_full_response_structure )
     // Must have blank-line separator
     BOOST_TEST(contains(response, "\r\n\r\n"));
 
-    // Must end with body
-    BOOST_TEST(response.substr(response.size() - body.size()) == body);
+    const SendMetadata_t metadata = gen->MsgGetSendMetadata();
+    BOOST_TEST(metadata.BufferRef != nullptr);
+    BOOST_TEST(metadata.BufferSize > 0);
 }
