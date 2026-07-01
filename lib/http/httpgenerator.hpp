@@ -41,6 +41,9 @@ public:
     void MsgAddDateHeader();
     void MsgGenerate();
 
+    //- test wrapper
+    void generate();
+
     uint8_t MsgGetSendStatus();
     SendMetadata_t MsgGetSendMetadata();
     bool MsgUpdateSendMetadata(ssize_t);

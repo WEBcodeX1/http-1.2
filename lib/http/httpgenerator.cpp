@@ -65,6 +65,11 @@ void HTTPGenerator::MsgSetBodyRef(const unsigned char* BodyAddress, const unsign
     _BodyRemainingBytes = _BodyLength;
 }
 
+void HTTPGenerator::generate()
+{
+    MsgGenerate();
+}
+
 void HTTPGenerator::MsgGenerate()
 {
     string Message = "HTTP/1.1 " + to_string(_StatusCode) + " " + _StatusText + "\r\n";
