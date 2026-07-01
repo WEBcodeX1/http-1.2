@@ -1,6 +1,6 @@
 # project settings
 cmake_minimum_required(VERSION 3.11)
-project(esp32c3-httplib)
+project(esp32s3-httplib)
 
 set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Os -std=c++11 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
 
