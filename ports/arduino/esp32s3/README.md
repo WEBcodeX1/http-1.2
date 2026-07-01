@@ -22,8 +22,8 @@ The `make install` command will install the static library `/usr/local/lib/esp32
 1. The c++ header files must be included in your C++ headers
 
 ```c++
-#include "/usr/local/include/esp32c3/httpparser.hpp"
-#include "/usr/local/include/esp32c3/httpgenerator.hpp"
+#include "/usr/local/include/esp32s3/httpparser.hpp"
+#include "/usr/local/include/esp32s3/httpgenerator.hpp"
 ```
 
 **and**
@@ -32,7 +32,7 @@ The `make install` command will install the static library `/usr/local/lib/esp32
 
 ```cmake
 add_library(httpparser_lib STATIC IMPORTED)
-set_property(TARGET httpparser_lib PROPERTY IMPORTED_LOCATION /usr/local/lib/esp32c3/libhttpparser.a)
+set_property(TARGET httpparser_lib PROPERTY IMPORTED_LOCATION /usr/local/lib/esp32s3/libhttpparser.a)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE httpparser_lib)
 ```
