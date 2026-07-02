@@ -1,5 +1,5 @@
 <h1 align="center">🚀 NLAP - FalconAS</h1>
-<p align="center"><em><b>N</b>ext <b>L</b>evel <b>A</b>pplication <b>P</b>rotocol including a lightning-fast Python / Java Application Server</em></p>
+<p align="center"><em><b>N</b>ext <b>L</b>evel <b>A</b>pplication <b>P</b>rotocol including a lightning-fast Python / Java Application Server (FalconAS)</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
