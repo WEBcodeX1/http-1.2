@@ -25,8 +25,8 @@
 
 This project includes:
 
-- A rock solid, fast and secure HTTP/1.1 parser and generator C++ library for use in microcontroller (Arduino) projects
-- A (not-yet-finished) XML based (NLAP protocol) application server (Python or Java) for realtime or high-security requirements
+- A rock-solid, fast, and secure HTTP/1.1 parser and generator C++ library for use in microcontroller (e.g., Arduino) projects
+- A (not-yet-finished) XML-based (NLAP protocol) application server (Python or Java) for real-time or high-security requirements
 
 ## :pushpin: Overview
 
