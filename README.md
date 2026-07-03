@@ -30,8 +30,8 @@ This project includes:
 
 ## :pushpin: Overview
 
-**NLAP (Next Level Application Protocol)** is a XML-based protocol designed to replace HTTP
-in place of modern web-application requirements.
+**NLAP (Next Level Application Protocol)** is an XML-based protocol designed to replace HTTP
+for modern web application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
 - ✅ Solid parallel response transmission in a single socket
