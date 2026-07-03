@@ -38,7 +38,7 @@ in place of modern web-application requirements.
 - ✅ Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
 - ✅ Structured data with XML schemas
 - ✅ Multiple protocol subtypes (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, non-TLS and HSM / TPM based encryption
+- ✅ Simple, non-TLS, HSM/TPM-based encryption
 
 **FalconAS Server Features**:
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
