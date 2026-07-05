@@ -1,4 +1,6 @@
-# SHMVector - Minimalistic C++ Vector with Shared Memory Support
+# SHMVector
+
+A minimalistic C++ Vector with Shared Memory Support.
 
 ## Overview
 
