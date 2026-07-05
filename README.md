@@ -34,13 +34,15 @@ This project includes:
 for modern web application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
-- ✅ Solid parallel response transmission in a single socket
-- ✅ Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
-- ✅ Structured data with XML schemas
-- ✅ Multiple protocol subtypes (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, non-TLS, HSM/TPM-based encryption
+
+- ✅ **Robust** parallel **multi-response** transmission **over a single socket**
+- ✅ **Elimination** of **head-of-line blocking** (time-consuming responses do not block follow-ups)
+- ✅ Structured, **XML-encapsulated transport** data, including **validatable** XML schemas
+- ✅ Firewall-friendly, **port-separated protocol subtypes** (NLAFP for files, NLAMP for application server requests)
+- ✅ Simple, non-TLS, HSM- and TPM-based X.509 encryption
 
 **FalconAS Server Features**:
+
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
 - ✅ **Lightning-Fast Performance**: Epoll-based / multi-socket optimized architecture
 - ✅ **Sendfile Static File Delivery**: In-kernel sendfile() decrease scheduling latency
