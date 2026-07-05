@@ -14,11 +14,9 @@
   <a href="https://docs.webcodex.de/developer/falconas/v0.3/sphinx/index.html">
     <img src="https://img.shields.io/badge/docs-sphinx-blue" alt="Docs Sphinx">
   </a>
-  <!--
   <a href="https://github.com/WEBcodeX1/http-1.2/releases">
     <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
   </a>
-  -->
 </div>
 
 ---
