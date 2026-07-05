@@ -10,8 +10,8 @@ The File Data will be mmapped() into Kernel-Space for sendfile() usage when requ
 If a files size is bigger than 2 Megabytes a huge-page for mmap() will be tried to allocate.
 
 .. warning::
-   A huge amount of files / subdirs currently is a performance killer. Segmentation on subdirs
-   must be implemented in an upcoming release.
+
+   The current volume of files and subdirectories is a performance bottleneck. We must implement subdirectory segmentation in an upcoming release.
 
 6.1. Program Logic
 ------------------

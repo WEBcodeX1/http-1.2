@@ -1,8 +1,12 @@
-7. Application Server Process Handler
-=====================================
+7. AS Server Process Handler
+============================
 
 The application-server process handler currently provides the public lifecycle and configuration
 hooks for backend workers.
+
+.. note::
+
+   The current implementation only contains placeholders for the new SHMVector system. This generic approach will simplify handling and implementation within multi-virtual-domain and multi-interpreter environments..
 
 The active source code exposes:
 

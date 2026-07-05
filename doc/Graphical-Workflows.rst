@@ -21,7 +21,7 @@ and ``lib/http``.
 
 
 15.1.2. ASProcessHandler Runtime Hooks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. mermaid::
 
@@ -77,7 +77,7 @@ and ``lib/http``.
     C -->|Yes| D[Read FD from epoll event];
     D --> E{Client exists in map?};
     E -->|No| C;
-    E -->|Yes| F[Call Client.receiveData()];
+    E -->|Yes| F[Call Client.receiveData];
     F --> G{Receive finished or hard error?};
     G -->|Yes| H[Erase client from map];
     H --> I[Close FD];

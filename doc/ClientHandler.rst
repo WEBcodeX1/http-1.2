@@ -26,8 +26,7 @@ Get all Epoll FDs with waiting data.
 
 .. note::
 
-   If 5000 current Clients are connected and 2000 have waiting buffered data, we get an
-   array of these 2000 file descriptor integers.
+   If 5,000 clients are currently connected and 2,000 have pending buffered data, the system outputs an array containing the 2,000 corresponding file descriptor integers.
 
 Reset ``ProcessedClients``, call ``epoll_wait()``, and pass the ready descriptors to
 ``readClientData()`` when data is available.
