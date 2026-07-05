@@ -1,5 +1,5 @@
 <h1 align="center">🚀 NLAP - FalconAS</h1>
-<p align="center"><em>Lightning-Fast Python / Java Application Server with NLAP (Next Level Application Protocol)</em></p>
+<p align="center"><em>XML based <b>N</b>ext <b>L</b>evel <b>A</b>pplication <b>P</b>rotocol including a lightning-fast Python / Java Application Server (FalconAS)</em></p>
 
 <div align="center">
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
@@ -23,26 +23,22 @@
 
 ---
 
-> [!NOTE]
-> We would like to apologize that the project's original goal has not been fully reached in the intended form.
->
-> At the same time, **version 0.2 already includes a rock-solid HTTP/1.1 parser** that is highly suitable for **Arduino microcontroller usage** and other resource-constrained environments.
->
-> Please also note that **HTTP/1.2 will not be implemented**, and there are currently no plans to further implement **HTTP/1.1** beyond the existing stable parser/generator foundation in this library.
->
-> The design of [`/lib/http/`](./lib/http/) should instead be understood as a **template and architectural foundation** for the **XML (Xerces)-based NLAP protocol parser**.
+This project includes:
+
+- A rock-solid, fast, and secure HTTP/1.1 parser and generator C++ library for use in microcontroller (e.g., Arduino) projects
+- A (not-yet-finished) XML-based (NLAP protocol) application server (Python or Java) for real-time or high-security requirements
 
 ## :pushpin: Overview
 
-**NLAP (Next Level Application Protocol)** is a revolutionary XML-based protocol designed to replace HTTP
-in place of modern web-application requirements.
+**NLAP (Next Level Application Protocol)** is an XML-based protocol designed to replace HTTP
+for modern web application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
 - ✅ Solid parallel response transmission in a single socket
 - ✅ Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
 - ✅ Structured data with XML schemas
 - ✅ Multiple protocol subtypes (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, extensible architecture
+- ✅ Simple, non-TLS, HSM/TPM-based encryption
 
 **FalconAS Server Features**:
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks

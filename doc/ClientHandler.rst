@@ -1,43 +1,49 @@
-5. Client Handler
-=================
+Client Handler
+==============
 
-The ClientHandler Component handles Client Sockets / Epoll Setup / Data Buffering.
+The ``ClientHandler`` component owns the client socket registry, epoll state, and reusable
+receive buffers used by ``Client`` objects.
 
-5.1. Program Logic
-------------------
+Program Logic
+-------------
 
-5.1.1. Add Client
-~~~~~~~~~~~~~~~~~
+Add Client
+~~~~~~~~~~
 
 Called from Main::Server on new Client Socket.
 
-* Insert ClientObject with ClientFD as Key into internal C++ Map
-* Add ClientFD to Kernel Epoll
+* Make the accepted socket non-blocking
+* Create a ``Client`` instance with the file descriptor and a reusable buffer segment
+* Insert the client object into the internal map
+* Add the file descriptor to epoll using ``EPOLLIN | EPOLLET``
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.2.1.
+Workflow diagram see: :ref:`client-handler-add-client-workflow`.
 
-5.1.2. Process Clients
-~~~~~~~~~~~~~~~~~~~~~~
+Process Clients
+~~~~~~~~~~~~~~~
 
 Get all Epoll FDs with waiting data.
 
 .. note::
 
-   If 5000 current Clients are connected and 2000 have waiting buffered data, we get an
-   array of these 2000 file descriptor integers.
+   If 5,000 clients are currently connected and 2,000 have pending buffered data, the system outputs an array containing the 2,000 corresponding file descriptor integers.
 
-Process all file descriptors calling readClientData().
+Reset ``ProcessedClients``, call ``epoll_wait()``, and pass the ready descriptors to
+``readClientData()`` when data is available.
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.2.2.
+Workflow diagram see: :ref:`client-handler-process-clients-workflow`.
 
-5.1.3. Read Client Data
-~~~~~~~~~~~~~~~~~~~~~~~
+Read Client Data
+~~~~~~~~~~~~~~~~
 
 Process all file descriptors with waiting data.
 
-* Close connection when connection-close (0 Bytes received) on Socket Level
-* If file descriptor in Client Map found, append received data to Client Object's Buffer
-* Parse Request Basic Data, if non-fragmented add to SHM buffer
-* If Clients with data exist, release SHM StaticFS Lock to process
+* Iterate over each ready epoll entry
+* Look up the client in the active client map
+* Call ``Client::receiveData()``
+* On EOF or a hard receive error, erase the client entry and close the socket
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.2.3.
+The current source keeps request buffering and HTTP parsing on each ``Client`` instance and no
+longer routes the read path through a separate result-processing stage.
+
+Workflow diagram see: :ref:`client-handler-read-client-data-workflow`.

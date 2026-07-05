@@ -1,22 +1,22 @@
-6. Static Filesystem Handler
-============================
+Static Filesystem
+=================
 
 The StaticFSHandler Component manages Filesystem Data / Mime-Types for Static Data Requests.
 
 All Virtual Host dependent file properties will be loaded at startup into static C++ class
 member Objects / Structs.
 
-The File Data will be mmapped() into Kernel-Space for sendfile() usage when requested.
-If a files size is bigger than 2 Megabytes a huge-page for mmap() will be tried to allocate.
+The File Data will be ``mmapped()`` into Kernel-Space for ``sendfile()`` usage when requested.
+If a files size is bigger than 2 Megabytes a huge-page for ``mmap()`` will be tried to allocate.
 
 .. warning::
-   A huge amount of files / subdirs currently is a performance killer. Segmentation on subdirs
-   must be implemented in an upcoming release.
 
-6.1. Program Logic
+   The current volume of files and subdirectories is a performance bottleneck. We must implement subdirectory segmentation in an upcoming release.
+
+Program Logic
 ------------------
 
-6.1.1. Initialization
+Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
 Loop recursive over files found in Virtual Host dir (from configuration). Add properties to
@@ -24,10 +24,10 @@ internal C++ Objects / Structs.
 
 All found files will be mmapped() (read into memory) for sendfile() processing.
 
-6.1.2. Get Property
+Get Property
 ~~~~~~~~~~~~~~~~~~~
 
 When an HTTP request for a Static File arrives, the file's properties (e.g. SendfileFD) must
-be determined / returned. This happens inside multiple parallel ResultProcessors Threads.
+be determined / returned by the request-handling code that performs the filesystem lookup.
 
 Due to immutable member Objects / Structs a pointer can be used for parallel read access.

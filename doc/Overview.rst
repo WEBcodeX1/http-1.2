@@ -1,207 +1,100 @@
-1. Preface
-==========
+Preface
+=======
 
-Our intention is to build good, stable and secure software. This implies detailed documentation.
+The current ``FalconAS`` / ``NLAP`` updates (`version 0.3`) target two core areas:
 
-.. note::
+1. ``Microcontroller-Optimized HTTP/1.1``: A clean, secure library tailored for embedded environments.
+2. ``NLAP Draft & Schemas``: Next Level Application Protocol specifications implementing a 100% non-blocking, scalable client-handling approach for ``TCP`` Sockets (compared to ``HTTP/2.0`` and ``HTTP/3.0``).
 
-   Do not forget: keep the clean code paradigm in mind.
+.. important::
 
-The following document describes the Base-Layout of ``FalconAS`` / ``HTTP/1.2``, its Base Components
-and Infrastructural Layout.
+   The implementation has been simplified compared to `version 0.1` and `version 0.2`. This overview reflects the code that
+   is currently present in ``src`` and ``lib/http``.
 
-2. Logical Components
-=====================
+The current implementation status is as following:
 
-The following components are referenced throughout the documentation.
+1. ``HTTP/1.0 Library``: Developed a robust HTTP/1.0 library containing HTTPParser and HTTPMessageGenerator. This library has been successfully tested on an ESP32-S3 microcontroller.
+2. ``Client Handling / Data Processing``: Optimized receiving and result-sending functionality (see `ESP32-S3`_ code for reference). This optimized client data handling serves as the boilerplate for all upcoming XML-based NLAP sub-features.
+3. ``Upcoming Milestones``: Development of a concurrent, multi-processing, and 100% non-blocking NLAP client / server library is underway. Furthermore, the data encryption process is engineered and scheduled for implementation.
 
-.. note::
+.. _ESP32-S3: https://github.com/WEBcodeX1/micropython-as/tree/main/src/components/network_oop
 
-   Logical Component Names used in documentation and the C++ Abstraction Model sometimes do not match.
+Logical Components
+==================
 
-2.1. Configuration
-------------------
+Configuration
+-------------
 
-XML Configuration Handling. C++ Transformation.
+JSON configuration loading and transformation into C++ runtime objects.
 
-2.2. Main::Server
------------------
+:doc:`Configuration`
 
-Main Server Loop.
+Main::Server
+------------
+
+The top-level runtime that initializes the process, maps static filesystem data, sets up the
+listening socket, and drives the main poll loop.
 
 :doc:`Main-Server`
 
-2.3. Main::ClientHandler
-------------------------
+Main::ClientHandler
+-------------------
 
-Client / Connection Handler.
+The epoll-based client connection manager. It owns the active client map, reusable receive buffers,
+and delegates socket reads to ``Client`` objects.
 
 :doc:`ClientHandler`
 
-2.4. Main::StaticFSHandler
---------------------------
+Main::StaticFSHandler
+---------------------
 
-Static Files / Virtual Host Handler.
+Static filesystem indexing is provided by the ``Filesystem`` class and initialized through the
+configuration layer at server startup.
 
 :doc:`StaticFSHandler`
 
-2.5. ASProcessHandler
----------------------
+ASProcessHandler
+----------------
 
-Python Application Server Process Handler.
+Backend process lifecycle hooks and interpreter-count discovery. The public interface for backend
+child processes still exists, while the current source keeps the former worker-fork implementation
+as scaffolding during the runtime simplification.
 
 :doc:`ASProcessHandler`
 
-2.6. ResultProcessor
---------------------
+HTTPLib::HTTPParser
+-------------------
 
-Result processing process (fork).
+Incremental HTTP/1.1 request parsing for GET and POST requests, including header parsing, URL
+parameter extraction, and partial POST-body handling.
 
-:doc:`ResultProcessor`
+:doc:`HTTPLib`
 
-2.7. ResultProcessor::ThreadHandler
------------------------------------
-
-Result Thread Distributor.
-
-Due to looping on Result sendfile(), write() and Header Processing, each ClientFDs requests (plural)
-will be processed by a single POSIX Thread.
-
-This also guarantees that multiple repeated result writes (in case of congestion) always will be
-processed in serial order.
-
-Big results using multiple writes are sent in the correct order as well.
-
-2.8. ResultProcessor::ResultOrder
----------------------------------
-
-Result Ordering will be done for the following types:
-
-* Static Files, sendfile()
-* Application Server Results (JSON), write()
-
-2.8.1. HTTP/1.1
-~~~~~~~~~~~~~~~
-
-Result Ordering. Results must be sent in the exact order how they arrived.
-The Result Ordering Class keeps track of dependent ClientFD Requests / Request Nr. and related.
-
-2.8.2. HTTP/1.2
-~~~~~~~~~~~~~~~
-
-No order needed. Our implementation appends the "Request-UUID" HTTP Header to the HTTP Response.
-
-3. Shared Memory Layout
-=======================
-
-Due to the Python Global Interpreter Lock the ``Main Server``, ``ResultProcessor`` and each Application
-Server Process are implemented using Unix Processes.
-
-Data Sharing (Requests, Synchronization) is done by Shared Memory and User Space Atomic Locks
-(Kernel Mutex less).
-
-.. code-block:: text
-
-   +---------------------+---------------------+---------------------+---------------------+
-   | Server Process      | AS Process 1        | AS Process x        | Result Processor    |
-   |                     | Python Interpreter  | Python Interpreter  |                     |
-   +---------------------+---------------------+---------------------+---------------------+
-   | Shared Mem                                                                            |
-   |  - StaticFS Requests                                                                  |
-   |  - AS Metadata                                                                        |
-   |  - AS Requests                                                                        |
-   |  - AS Results                                                                         |
-   +---------------------------------------------------------------------------------------+
-
-
-.. note::
-
-   32-bit memory addresses used for simplicity.
-
-3.1. StaticFS Request SHM #1
-----------------------------
-
-.. code-block:: text
-
-   Address                 Type                Descr           Default
-
-   0x00000000              atomic_uint16_t     StaticFSLock    0
-   0x00000002              uint16_t            RequestCount    0
-
-   -- Req 1 Metadata ---------------------------------------------------
-
-   0x00000004              uint16_t            ClientFD        Nullptr
-   0x00000006              uint16_t            HTTPVersion     Nullptr
-   0x00000008              uint16_t            RequestNr       Nullptr
-   0x0000000a              uint16_t            PayloadLength   Nullptr
-   0x0000000c              char[]              char[LenReq1]   Nullptr
-
-   -- Req 2 Metadata ---------------------------------------------------
-
-   0x0000000c+LenReq1      uint16_t            ClientFD        Nullptr
-   0x0000000e+LenReq1+2    uint16_t            HTTPVersion     Nullptr
-   0x00000010+LenReq1+4    uint16_t            RequestNr       Nullptr
-   0x00000012+LenReq1+6    uint16_t            PayloadLength   Nullptr
-   0x00000014+LenReq1+8    char[]              char[LenReq2]   Nullptr
-
-
-3.2. AS Request / Result SHM #2
--------------------------------
-
-.. code-block:: text
-
-   Address                 Type                Descr           Default
-
-   -- AS 1 Metadata ---------------------------------------------------
-
-   0x00000000              atomic_uint16_t     CanRead         0
-   0x00000002              atomic_uint16_t     WriteReady      0
-
-   0x00000004              uint16_t            ClientFD        Nullptr
-   0x00000006              uint16_t            HTTPVersion     1
-   0x00000008              uint16_t            HTTPMethod      1
-   0x0000000a              uint16_t            ReqNr           1
-   0x0000000c              uint32_t            ReqPayloadLen   Nullptr
-   0x00000010              uint32_t            ResPayloadLen   Nullptr
-
-   -- AS 2 Metadata ---------------------------------------------------
-
-   0x00000014              atomic_uint16_t     CanRead         0
-   0x00000016              atomic_uint16_t     WriteReady      0
-
-   0x00000018              uint16_t            ClientFD        Nullptr
-   0x0000001a              uint16_t            HTTPVersion     1
-   0x0000001c              uint16_t            HTTPMethod      1
-   0x0000001e              uint16_t            ReqNr           1
-   0x00000020              uint32_t            ReqPayloadLen   Nullptr
-   0x00000024              uint32_t            ResPayloadLen   Nullptr
-
-
-3.3. AS Request Payload SHM #3
-------------------------------
-
-.. code-block:: text
-
-   Address                 Type                Descr           Default
-
-   -- AS 1 Payload -----------------------------------------------------
-
-   0x00000000              char[]              char[LenReq]    Nullptr
-
-   -- AS 2 Payload -----------------------------------------------------
-
-   0x00000000+SegmentSize  char[]              char[LenReq]    Nullptr
-
-
-3.4. AS Result Payload SHM #4
+HTTPLib::HTTPMessageGenerator
 -----------------------------
 
-.. code-block:: text
+HTTP response message generation implemented by the ``HTTPGenerator`` class. It builds the response
+status line, headers, body metadata, and incremental send state.
 
-   -- AS 1 Payload -----------------------------------------------------
+:doc:`HTTPLib`
 
-   0x00000000              char[]              char[LenRes]    Nullptr
+SHMVector
+---------
 
-   -- AS 2 Payload -----------------------------------------------------
+``src/SHMVector.hpp`` provides a shared-memory-friendly vector implementation with contiguous
+segment-based storage and atomic spinlock synchronization.
 
-   0x00000000+SegmentSize  char[]              char[LenRes]    Nullptr
+:doc:`SHMVector`
+
+Runtime Layout
+==============
+
+The current runtime is simpler than the older documentation variants:
+
+* ``Server::setupSharedMemory()`` is currently a placeholder hook.
+* ``Client`` inherits from ``HTTPParser``, so request parsing happens per connection.
+* Static filesystem data is mapped up front via ``Configuration::mapStaticFSData()``.
+* The older dedicated result-processing pipeline is no longer part of the active
+  documentation set.
+* ``ASProcessHandler`` still exposes shared-memory pointer types and lifecycle methods, but the
+  active source tree focuses on the server loop, client handling, HTTPLib, and ``SHMVector``.

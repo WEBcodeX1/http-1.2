@@ -1,8 +1,10 @@
-# CustomVector - Minimalistic C++ Vector with Shared Memory Support
+# SHMVector
+
+A minimalistic C++ Vector with Shared Memory Support.
 
 ## Overview
 
-`CustomVector<T>` is a minimalistic vector implementation designed specifically for shared memory usage. It provides custom memory management where memory is allocated in configurable segments, and accepts externally allocated shared memory (e.g., from `mmap`).
+`SHMVector<T>` is a minimalistic vector implementation designed specifically for shared memory usage. It provides custom memory management where memory is allocated in configurable segments, and accepts externally allocated shared memory (e.g., from `mmap`).
 
 ## Key Features
 
@@ -23,7 +25,7 @@
 ## Usage Example
 
 ```cpp
-#include "CustomVector.hpp"
+#include "SHMVector.hpp"
 #include <sys/mman.h>
 
 // Allocate shared memory using mmap
@@ -34,7 +36,7 @@ void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE,
 // - segment_size: sizeof(int) bytes per element
 // - shared_memory_ptr: pointer from mmap
 // - shared_memory_size: total size of shared memory
-CustomVector<int> vec(sizeof(int), shmpointer, 640000);
+SHMVector<int> vec(sizeof(int), shmpointer, 640000);
 
 // Reserve capacity for 100 elements
 vec.reserve(100);
@@ -56,7 +58,7 @@ munmap(shmpointer, 640000);
 
 ## Working with Struct Types
 
-CustomVector works perfectly with struct types, making it ideal for storing structured data in shared memory:
+SHMVector works perfectly with struct types, making it ideal for storing structured data in shared memory:
 
 ```cpp
 #include <cstring>
@@ -72,7 +74,7 @@ void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE,
                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
 // Create vector for struct type
-CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
+SHMVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
 
 // Create and add struct instances
 Payload_t payload1;
@@ -88,9 +90,9 @@ std::cout << "Length: " << vec.at(0).PayloadLength << std::endl;
 munmap(shmem, 640000);
 ```
 
-## Placing CustomVector Object in Shared Memory
+## Placing SHMVector Object in Shared Memory
 
-When using placement new to place the CustomVector object itself inside shared memory, you must ensure the data storage region does not overlap with the CustomVector object's memory:
+When using placement new to place the SHMVector object itself inside shared memory, you must ensure the data storage region does not overlap with the SHMVector object's memory:
 
 ```cpp
 #include <cstring>
@@ -104,18 +106,18 @@ struct Payload_t {
 void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
                         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-// Calculate where data storage should start (after the CustomVector object)
-size_t vector_obj_size = sizeof(CustomVector<Payload_t>);
+// Calculate where data storage should start (after the SHMVector object)
+size_t vector_obj_size = sizeof(SHMVector<Payload_t>);
 size_t alignment = alignof(Payload_t);
 size_t data_offset = ((vector_obj_size + alignment - 1) / alignment) * alignment;
 
-// Data region starts after the CustomVector object
+// Data region starts after the SHMVector object
 char* data_region = static_cast<char*>(shmpointer) + data_offset;
 size_t data_region_size = 640000 - data_offset;
 
-// Use placement new to construct CustomVector at start of shared memory
+// Use placement new to construct SHMVector at start of shared memory
 // But point it to use the data region for storage (not the same address)
-CustomVector<Payload_t>* shmvector = new(shmpointer) CustomVector<Payload_t>(
+SHMVector<Payload_t>* shmvector = new(shmpointer) SHMVector<Payload_t>(
     sizeof(Payload_t), data_region, data_region_size);
 
 // Now use it normally
@@ -133,13 +135,13 @@ shmvector->push_back(payload2);
 std::cout << "Payload: " << shmvector->at(0).Payload << std::endl;
 
 // Manually call destructor since we used placement new
-shmvector->~CustomVector();
+shmvector->~SHMVector();
 
 // Clean up shared memory
 munmap(shmpointer, 640000);
 ```
 
-**Important**: When using placement new, the CustomVector object occupies the first bytes of the shared memory region. You must pass a different pointer (offset past the object) as the `shared_memory_ptr` parameter to avoid memory overlap.
+**Important**: When using placement new, the SHMVector object occupies the first bytes of the shared memory region. You must pass a different pointer (offset past the object) as the `shared_memory_ptr` parameter to avoid memory overlap.
 
 ## Custom Segment Sizes
 
@@ -150,7 +152,7 @@ void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE,
                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
 // Use 16 bytes per segment even though int is only 4 bytes
-CustomVector<int> vec(16, shmem, 640000);
+SHMVector<int> vec(16, shmem, 640000);
 
 vec.push_back(100);
 vec.push_back(200);
@@ -176,7 +178,7 @@ Element N:    memory_base_ + (N * segment_size_bytes)
 
 ## Important Notes
 
-1. **Memory Ownership**: CustomVector does NOT own the memory. The caller must:
+1. **Memory Ownership**: SHMVector does NOT own the memory. The caller must:
    - Allocate shared memory before creating the vector
    - Ensure the vector is destroyed before freeing the shared memory
    - Call `munmap()` to free the shared memory after the vector is destroyed
@@ -196,7 +198,7 @@ Element N:    memory_base_ + (N * segment_size_bytes)
 
 ### Constructor
 ```cpp
-CustomVector(size_t segment_size_bytes, void* shared_memory_ptr, size_t shared_memory_size)
+SHMVector(size_t segment_size_bytes, void* shared_memory_ptr, size_t shared_memory_size)
 ```
 Creates a vector with specified segment size using external shared memory.
 
@@ -243,6 +245,6 @@ Run the test suite:
 ```bash
 cd /home/runner/work/http-1.2/http-1.2
 cmake .
-make test-CustomVector
-./test/integration/custom-vector/test-CustomVector
+make test-SHMVector
+./test/integration/custom-vector/test-SHMVector
 ```

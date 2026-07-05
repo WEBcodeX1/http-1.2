@@ -1,7 +1,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "../../../src/CustomVector.hpp"
+#include "../../../src/SHMVector.hpp"
 #include <string>
 #include <iostream>
 #include <sys/mman.h>
@@ -30,11 +30,11 @@ void free_shared_memory(void* ptr, size_t size) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_basic) {
-    cout << "Test CustomVector basic functionality" << endl;
+    cout << "Test SHMVector basic functionality" << endl;
     
     // Test 1: Create vector with segment size and shared memory
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     BOOST_CHECK_EQUAL(vec.size(), 0);
     BOOST_CHECK_EQUAL(vec.segment_size(), sizeof(int));
@@ -45,10 +45,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_basic) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_reserve) {
-    cout << "Test CustomVector reserve" << endl;
+    cout << "Test SHMVector reserve" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Test 2: Reserve capacity
     vec.reserve(10);
@@ -61,10 +61,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_reserve) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_push_back) {
-    cout << "Test CustomVector push_back" << endl;
+    cout << "Test SHMVector push_back" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Test 3: Push back elements
     vec.push_back(10);
@@ -82,10 +82,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_push_back) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_get_element) {
-    cout << "Test CustomVector element access" << endl;
+    cout << "Test SHMVector element access" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Test 4: Get element at index
     for (int i = 0; i < 5; ++i) {
@@ -107,10 +107,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_get_element) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_size) {
-    cout << "Test CustomVector size tracking" << endl;
+    cout << "Test SHMVector size tracking" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Test 5: Size tracking
     BOOST_CHECK_EQUAL(vec.size(), 0);
@@ -130,12 +130,12 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_size) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
-    cout << "Test CustomVector with different types" << endl;
+    cout << "Test SHMVector with different types" << endl;
     
     // Test 6: Test with double (trivially copyable type - ideal for shared memory)
     void* shmem1 = allocate_shared_memory(4096);
     {
-        CustomVector<double> vec_double(sizeof(double), shmem1, 4096);
+        SHMVector<double> vec_double(sizeof(double), shmem1, 4096);
         vec_double.push_back(3.14);
         vec_double.push_back(2.71);
         
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
     // single-process testing but won't share properly across process boundaries.)
     void* shmem2 = allocate_shared_memory(4096);
     {
-        CustomVector<string> vec_string(sizeof(string), shmem2, 4096);
+        SHMVector<string> vec_string(sizeof(string), shmem2, 4096);
         vec_string.push_back("Hello");
         vec_string.push_back("World");
         
@@ -165,13 +165,13 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_different_types) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_memory_layout) {
-    cout << "Test CustomVector memory layout" << endl;
+    cout << "Test SHMVector memory layout" << endl;
     
     // Test 8: Verify memory layout with custom segment size
     // Use segment size larger than sizeof(int) to test the address calculation
     size_t segment_size = 16; // 16 bytes per segment
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(segment_size, shmem, 4096);
+    SHMVector<int> vec(segment_size, shmem, 4096);
     
     vec.reserve(5);
     vec.push_back(100);
@@ -190,10 +190,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_memory_layout) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_out_of_bounds) {
-    cout << "Test CustomVector out of bounds exception" << endl;
+    cout << "Test SHMVector out of bounds exception" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     vec.push_back(42);
     
     // Test 9: Out of bounds access should throw
@@ -206,14 +206,14 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_out_of_bounds) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_shared_memory) {
-    cout << "Test CustomVector with actual mmap shared memory" << endl;
+    cout << "Test SHMVector with actual mmap shared memory" << endl;
     
     // Test 10: Use mmap as specified in requirements
     void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
                             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     BOOST_CHECK(shmpointer != MAP_FAILED);
     
-    CustomVector<int> vec(sizeof(int), shmpointer, 640000);
+    SHMVector<int> vec(sizeof(int), shmpointer, 640000);
     
     // Add many elements to test larger memory usage
     for (int i = 0; i < 100; ++i) {
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_shared_memory) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_struct_type) {
-    cout << "Test CustomVector with struct types" << endl;
+    cout << "Test SHMVector with struct types" << endl;
     
     // Test 11: Test with struct type as requested by user
     struct Payload_t {
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_struct_type) {
     };
     
     void* shmem = allocate_shared_memory(640000);
-    CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
+    SHMVector<Payload_t> vec(sizeof(Payload_t), shmem, 640000);
     
     // Create and add first payload
     Payload_t payload1;
@@ -285,9 +285,9 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_struct_type) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_placement_new_in_shared_memory) {
-    cout << "Test CustomVector with placement new in shared memory" << endl;
+    cout << "Test SHMVector with placement new in shared memory" << endl;
     
-    // Test 12: Reproduce the user's issue - placing CustomVector object itself in shared memory
+    // Test 12: Reproduce the user's issue - placing SHMVector object itself in shared memory
     void* shmpointer = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
                             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     BOOST_CHECK(shmpointer != MAP_FAILED);
@@ -299,20 +299,20 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_placement_new_in_shared_memory) {
         uint16_t PayloadLength;
     };
     
-    // Calculate offset: CustomVector object size + alignment
-    size_t vector_obj_size = sizeof(CustomVector<Payload_t>);
+    // Calculate offset: SHMVector object size + alignment
+    size_t vector_obj_size = sizeof(SHMVector<Payload_t>);
     size_t alignment = alignof(Payload_t);
     size_t data_offset = ((vector_obj_size + alignment - 1) / alignment) * alignment;
     
-    cout << "CustomVector object size: " << vector_obj_size << " bytes" << endl;
+    cout << "SHMVector object size: " << vector_obj_size << " bytes" << endl;
     cout << "Data storage offset: " << data_offset << " bytes" << endl;
     
-    // Place CustomVector object at start of shared memory
+    // Place SHMVector object at start of shared memory
     // But tell it to use memory starting AFTER the object for data storage
     char* data_region = static_cast<char*>(shmpointer) + data_offset;
     size_t data_region_size = 640000 - data_offset;
     
-    CustomVector<Payload_t>* shmvector = new(shmpointer) CustomVector<Payload_t>(
+    SHMVector<Payload_t>* shmvector = new(shmpointer) SHMVector<Payload_t>(
         sizeof(Payload_t), data_region, data_region_size);
     
     Payload_t payload1;
@@ -346,16 +346,16 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_placement_new_in_shared_memory) {
     cout << "Element[1]: '" << shmvector->at(1).Payload << "' (length: " << shmvector->at(1).PayloadLength << ")" << endl;
     
     // Manually call destructor since we used placement new
-    shmvector->~CustomVector();
+    shmvector->~SHMVector();
     
     munmap(shmpointer, 640000);
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_eraseAt) {
-    cout << "Test CustomVector eraseAt function" << endl;
+    cout << "Test SHMVector eraseAt function" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Add some elements
     vec.push_back(10);
@@ -399,10 +399,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_eraseAt) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement) {
-    cout << "Test CustomVector getNextElement function" << endl;
+    cout << "Test SHMVector getNextElement function" << endl;
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<int> vec(sizeof(int), shmem, 4096);
+    SHMVector<int> vec(sizeof(int), shmem, 4096);
     
     // Add some elements
     vec.push_back(100);
@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement_with_struct) {
-    cout << "Test CustomVector getNextElement with struct type" << endl;
+    cout << "Test SHMVector getNextElement with struct type" << endl;
     
     struct Payload_t {
         char Payload[128];
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement_with_struct) {
     };
     
     void* shmem = allocate_shared_memory(4096);
-    CustomVector<Payload_t> vec(sizeof(Payload_t), shmem, 4096);
+    SHMVector<Payload_t> vec(sizeof(Payload_t), shmem, 4096);
     
     // Add some struct elements
     Payload_t p1;
@@ -483,10 +483,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_getNextElement_with_struct) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_thread_safety) {
-    cout << "Test CustomVector getNextElement thread safety" << endl;
+    cout << "Test SHMVector getNextElement thread safety" << endl;
     
     void* shmem = allocate_shared_memory(8192);
-    CustomVector<int> vec(sizeof(int), shmem, 8192);
+    SHMVector<int> vec(sizeof(int), shmem, 8192);
     
     // Add many elements
     const int NUM_ELEMENTS = 100;
@@ -517,10 +517,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_thread_safety) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_push) {
-    cout << "Test CustomVector multi-threaded push_back" << endl;
+    cout << "Test SHMVector multi-threaded push_back" << endl;
     
     void* shmem = allocate_shared_memory(640000);
-    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    SHMVector<int> vec(sizeof(int), shmem, 640000);
     
     const int NUM_THREADS = 10;
     const int ELEMENTS_PER_THREAD = 100;
@@ -561,10 +561,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_push) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_get) {
-    cout << "Test CustomVector multi-threaded getNextElement (consumer)" << endl;
+    cout << "Test SHMVector multi-threaded getNextElement (consumer)" << endl;
     
     void* shmem = allocate_shared_memory(640000);
-    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    SHMVector<int> vec(sizeof(int), shmem, 640000);
     
     const int NUM_ELEMENTS = 1000;
     const int NUM_CONSUMERS = 10;
@@ -625,10 +625,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_get) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_producer_consumer) {
-    cout << "Test CustomVector multi-threaded producer-consumer pattern" << endl;
+    cout << "Test SHMVector multi-threaded producer-consumer pattern" << endl;
     
     void* shmem = allocate_shared_memory(640000);
-    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    SHMVector<int> vec(sizeof(int), shmem, 640000);
     
     const int NUM_PRODUCERS = 5;
     const int NUM_CONSUMERS = 5;
@@ -705,10 +705,10 @@ BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_producer_consumer) {
 }
 
 BOOST_AUTO_TEST_CASE(test_custom_vector_multithreaded_mixed_operations) {
-    cout << "Test CustomVector multi-threaded mixed operations" << endl;
+    cout << "Test SHMVector multi-threaded mixed operations" << endl;
     
     void* shmem = allocate_shared_memory(640000);
-    CustomVector<int> vec(sizeof(int), shmem, 640000);
+    SHMVector<int> vec(sizeof(int), shmem, 640000);
     
     // Pre-populate
     for (int i = 0; i < 100; ++i) {

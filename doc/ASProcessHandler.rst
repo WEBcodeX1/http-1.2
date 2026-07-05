@@ -1,36 +1,43 @@
-7. Application Server Process Handler
-=====================================
+AS Process Handler
+==================
 
-The Application Server Process Handler manages:
+The application-server process handler currently provides the public lifecycle and configuration
+hooks for backend workers.
 
-* Setup Application Server Processes / Instances (fork)
-* SHM Requests / Synchronization for all AS Instances
-* SHM Writes / Synchronization for all AS Instances
+.. note::
 
-7.1. Program Logic
-------------------
+   The current implementation only contains placeholders for the new SHMVector system. This generic approach will simplify handling and implementation within multi-virtual-domain and multi-interpreter environments..
 
-7.1.1. Initialization
-~~~~~~~~~~~~~~~~~~~~~
+The active source code exposes:
 
-.. code-block:: text
+* ``getASInterpreterCount()`` for counting configured interpreters
+* ``setTerminationHandler()`` and ``terminate()`` for lifecycle control
+* ``registerChildPID()`` to hand child PIDs back to ``Server``
+* ``forkProcessASHandler()`` as the entry point for backend worker setup
 
-   ASIndex = 0
-   * Iterate over Config::VirtualDomains
-     - Iterate over VirtualDomain::ASCount
-       - Fork AS[Index] Process / SHM Reference
-       - Index++
+Program Logic
+-------------
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.1.1.
-
-7.1.2. Main Loop
-~~~~~~~~~~~~~~~~
+Initialization
+~~~~~~~~~~~~~~
 
 .. code-block:: text
 
-   * Loop
-     - Check CanRead == 1 && WriteReady == 0
-       - If yes: Process Python Request
-       - Write CanRead == 0 && WriteReady = 1
+   * Disable SIGINT / SIGPIPE for the backend entry point
+   * Receive the SHM pointer bundle
+   * Iterate over ConfigRef.Namespaces
+   * Keep the child-worker fork block disabled while the runtime simplification is in progress
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.1.2.
+Workflow diagram see: :ref:`as-process-handler-initialization-workflow`.
+
+Main Loop
+~~~~~~~~~
+
+.. code-block:: text
+
+   * getASInterpreterCount() sums the configured "interpreters" values
+   * The SIGTERM handler flips the internal RunServer flag to false
+   * Shared-memory metadata and worker-loop code remain part of the interface surface,
+     but the current implementation keeps the old child-process execution path commented out
+
+Workflow diagram see: :ref:`as-process-handler-runtime-workflow`.
