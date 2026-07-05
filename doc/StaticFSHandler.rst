@@ -28,6 +28,6 @@ All found files will be mmapped() (read into memory) for sendfile() processing.
 ~~~~~~~~~~~~~~~~~~~
 
 When an HTTP request for a Static File arrives, the file's properties (e.g. SendfileFD) must
-be determined / returned. This happens inside multiple parallel ResultProcessors Threads.
+be determined / returned by the request-handling code that performs the filesystem lookup.
 
 Due to immutable member Objects / Structs a pointer can be used for parallel read access.

@@ -96,7 +96,7 @@ add_custom_target(
     ./src/ASProcessHandler.hpp
     ./src/Constant.hpp
     ./src/Vector.hpp
-    ./src/CustomVector.hpp
+    ./src/SHMVector.hpp
 )
 
 # add subdirs

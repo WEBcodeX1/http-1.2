@@ -1,119 +1,91 @@
-10. HTTP Library - Internal
-===========================
+10. HTTPLib
+===========
 
-The HTTP Library is divided into three parts:
+The HTTP library currently consists of two documented components:
 
-* httpnet.cpp / Network Processing (Tests)
-* httpparser.cpp / HTTP Parsing (Header, Payload)
-* httpgen.cpp / HTTP Generating (Header)
+* ``HTTPParser`` in ``lib/http/httpparser.*``
+* ``HTTPMessageGenerator`` implemented by ``HTTPGenerator`` in ``lib/http/httpgenerator.*``
 
-10.1. Compiling / Linking
--------------------------
+10.1. HTTPParser
+----------------
 
-The HTTPLib library gets linked shared because it will be used by multiple applications (e.g. test).
+``HTTPParser`` is an incremental HTTP/1.1 parser used directly by ``Client`` objects.
 
-10.2. Program Logic (httpparser.cpp)
-------------------------------------
+Current parser behavior:
 
-Features:
+* Accepts GET and POST requests
+* Requires ``Content-Length`` for POST requests
+* Supports multiple requests in a single receive buffer
+* Keeps partial POST state until the configured body length has arrived
+* Extracts request headers, URL, payload, and GET parameters into ``RequestProperties_t``
+* Rejects unsupported protocol versions and malformed request lines
 
-* GET Requests (without Content-Length header)
-* POST Requests (with Content-Length header and bytes[size] after "\\n\\r" end marker)
-* Multiple HTTP "messages" in one TCP packet
-* Fragmented (partial) messages without end marker "\\n\\r" (GET) or "Content-Length" (POST)
-
-10.2.1. appendBuffer()
+10.1.1. appendBuffer()
 ~~~~~~~~~~~~~~~~~~~~~~
 
-10.2.1.1. Params
-^^^^^^^^^^^^^^^^
+``appendBuffer(const char*, const uint16_t)`` appends new socket bytes to the internal request
+buffer until ``_HTTPRequestBufferMax`` is reached.
 
-1. const char* BufferRef
-2. const uint16_t BufferSize
+Processing flow:
 
-10.2.1.2. Processing Logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Reject the append if the configured buffer limit would be exceeded
+2. Append the received bytes to ``_HTTPRequestBuffer``
+3. If the parser is waiting for a POST body and enough bytes are now available, complete the request
+4. Otherwise, start request processing once the HTTP header end marker has been found
 
-The passed buffer data will be appended to _HTTPRequest private member. Afterwards _splitRequests()
-method will be called.
+10.1.2. Request Splitting and Parsing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-10.2.2. _splitRequests()
+``_processRequests()`` and ``_processRequestProperties()`` split buffered data by ``\\r\\n\\r\\n``
+and build ``RequestProperties_t`` entries.
+
+The parser currently records:
+
+* ``HTTPVersion``
+* ``HTTPMethod``
+* ``RequestHeaders``
+* ``URL``
+* ``Payload``
+* ``URLParams``
+
+10.1.3. Public Accessors
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. _SplitRequests Vector will be cleared
-2. All requests inside _HTTPRequest buffer are split by "\\n\\r" or "\\n\\r"+Content-Length
-3. Single requests will be put inside _SplitRequests Vector
+``getRequests()`` returns the parsed request vector by value, while ``getRequestsPtr()`` returns a
+pointer to the same internal request collection.
 
-10.2.3. parseRequestsBasic()
+10.2. HTTPMessageGenerator
+--------------------------
+
+The documented message-generator component is implemented by the ``HTTPGenerator`` class.
+
+Current generator behavior:
+
+* Stores an HTTP status code and status text
+* Adds arbitrary response headers
+* Generates an RFC-style ``Date`` header through ``MsgAddDateHeader()``
+* Tracks header/body send progress through ``SendMetadata_t``
+* Supports incremental sending by updating the active buffer pointer after each write
+
+10.2.1. Message Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-10.2.3.1. Params
-^^^^^^^^^^^^^^^^
+Typical usage:
 
-1. SharedMemAddress_t SHMGetRequests
-2. const ASRequestHandlerRef_t ASRequestHandlerRef
+1. ``MsgReset()``
+2. ``MsgSetStatus(...)``
+3. ``MsgAddHeader(...)`` and optionally ``MsgAddDateHeader()``
+4. ``MsgSetBodyRef(...)``
+5. ``MsgGenerate()``
 
-10.2.3.2. Processing Logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``MsgGenerate()`` builds an ``HTTP/1.1`` status line, serializes all headers, appends
+``Content-Length``, and prepares the header buffer for transmission.
 
-1. Set SHM Base Address (SHMGetRequests)
-2. For each _SplitRequests Vector Element: call _parseBaseProps(&Request, ASRequestHandlerRef)
+10.2.2. Incremental Send State
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+``MsgGetSendMetadata()`` exposes the active buffer pointer and remaining byte count for either the
+header or the body.
 
-10.2.4. _parseBaseProps
-~~~~~~~~~~~~~~~~~~~~~~~
-
-10.2.4.1. Params
-^^^^^^^^^^^^^^^^
-
-1. string& Request
-2. const ASRequestHandlerRef_t ASRequestHandlerRef
-
-10.2.4.2. Processing Logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* Get HTTP Version (HTTP/1.1 or HTTP/1.2)
-* Get HTTP Method (GET/POST)
-* Get HTTP Payload
-* Get HTTP Payload Size (Bytes)
-
-* Check Request Type (StaticFS / Python Script POST AS)
-
-.. code-block:: text
-
-   * On Type StaticFS (SHM Segment #1)
-
-     - Write ClientFD to SHM-StaticFS, increment Pointer Address
-     - Write HTTPVersion to SHM-StaticFS, increment Pointer Address
-     - Write MsgNr to SHM-StaticFS, increment Pointer Address
-     - Write MsgLength to SHM-StaticFS, increment Pointer Address
-     - Write MsgPayload to SHM-StaticFS, increment Pointer Address
-
-.. note::
-
-   IPCHandler.hpp and IPCHandler.cpp are used to calculate Shared Memory Address Offsets.
-
-.. code-block:: text
-
-   * On Type POST AS (SHM Segment #2/Metadata, #3/RequestPayloads)
-
-     // SHM Segment #2
-     - Get Next Free AS Index (Check CanRead == 0 && WriteReady == 0)
-       - If no Free AS:: add to RequestQueue
-
-     // SHM Segment #2
-     - Write ClientFD to SHM-PostAS @AS Index Address
-     - Write HTTPVersion to SHM-PostAS @AS Index Address
-     - Write HTTPMethod to SHM-PostAS @AS Index Address
-     - Write ReqNr to SHM-PostAS @AS Index Address
-     - Write ReqPayloadLength to SHM-PostAS @AS Index Address
-
-     //- SHM Segment #3
-     - Write ReqPayload to SHM-PostAS @AS Index Address
-
-     // SHM Segment #2
-     - Write CanRead = 1 @AS Index Address
-
-.. note::
-
-   IPCHandlerAS.hpp and IPCHandlerAS.cpp are used to calculate Shared Memory Address Offsets.
+``MsgUpdateSendMetadata(ssize_t SentBytes)`` advances the active pointer after each send operation
+and switches from header mode to body mode once the header has been transmitted completely.

@@ -25,12 +25,12 @@
  * Usage:
  *   void* shmem = mmap(NULL, 640000, PROT_READ | PROT_WRITE, 
  *                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
- *   CustomVector<int> vec(sizeof(int), shmem, 640000);
+ *   SHMVector<int> vec(sizeof(int), shmem, 640000);
  * 
  * Template parameter T can be any type.
  */
 template<typename T>
-class CustomVector {
+class SHMVector {
 private:
     size_t segment_size_bytes_;  // Size of each segment in bytes
     size_t capacity_;            // Total number of elements that can be stored
@@ -46,7 +46,7 @@ public:
      * @param shared_memory_ptr Pointer to externally allocated shared memory (e.g., from mmap)
      * @param shared_memory_size Total size of the shared memory region in bytes
      */
-    CustomVector(size_t segment_size_bytes, void* shared_memory_ptr, size_t shared_memory_size) 
+    SHMVector(size_t segment_size_bytes, void* shared_memory_ptr, size_t shared_memory_size)
         : segment_size_bytes_(segment_size_bytes),
           capacity_(0),
           size_(0),
@@ -68,7 +68,7 @@ public:
      * Destructor: destroys constructed elements but does NOT free memory
      * (memory is owned externally and must be freed by the caller)
      */
-    ~CustomVector() {
+    ~SHMVector() {
         // Destroy all constructed elements
         for (size_t i = 0; i < size_; ++i) {
             get_element_ptr(i)->~T();
@@ -77,8 +77,8 @@ public:
     }
 
     // Disable copy constructor and copy assignment
-    CustomVector(const CustomVector&) = delete;
-    CustomVector& operator=(const CustomVector&) = delete;
+    SHMVector(const SHMVector&) = delete;
+    SHMVector& operator=(const SHMVector&) = delete;
 
     /**
      * Reserves memory for the specified number of elements (thread-safe)

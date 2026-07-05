@@ -1,6 +1,6 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "../../src/CustomVector.hpp"
+#include "../../src/SHMVector.hpp"
 
 #include <signal.h>
 #include <stdint.h>
@@ -31,14 +31,14 @@ BOOST_AUTO_TEST_CASE( test_custom_vector_placed_in_shared_memory )
         uint16_t PayloadLength;
     };
 
-    size_t vector_obj_size = sizeof(CustomVector<Payload_t>);
+    size_t vector_obj_size = sizeof(SHMVector<Payload_t>);
     size_t alignment = alignof(Payload_t);
     size_t data_offset = ((vector_obj_size + alignment - 1) / alignment) * alignment;
 
     char* data_region = static_cast<char*>(shmpointer) + data_offset;
     size_t data_region_size = 640000 - data_offset;
 
-    CustomVector<Payload_t>* shmvector = new(shmpointer) CustomVector<Payload_t>(
+    SHMVector<Payload_t>* shmvector = new(shmpointer) SHMVector<Payload_t>(
         sizeof(Payload_t),
         data_region,
         data_region_size

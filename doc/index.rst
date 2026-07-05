@@ -15,19 +15,15 @@ FalconAS - HTTP/1.2 Documentation
    ClientHandler
    StaticFSHandler
    ASProcessHandler
-   ResultProcessor
-   ResultScheduler
    HTTPLib
-   HTTPLibNet
-   IPCHandler
+   SHMVector
    MemoryAlignment
-   CustomVector
    TerminationHandling
    Graphical-Workflows
 
 .. toctree::
    :maxdepth: 2
-   :caption: Class-Reference:
+   :caption: Class Reference:
 
    CPPClasses
 

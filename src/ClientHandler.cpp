@@ -89,7 +89,7 @@ void ClientHandler::readClientData(const uint16_t FDCount)
         }
     }
 
-    //- trigger data processing in ResultProcessor
+    //- debug processed client count
     if (ProcessedClients > 0) {
         DBG(100, "Processed Clients:" << ProcessedClients);
     }

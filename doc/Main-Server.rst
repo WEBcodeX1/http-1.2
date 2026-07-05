@@ -1,8 +1,8 @@
 4. Main Server
 ==============
 
-The Main Server Process initializes all components on startup using configuration from
-XML Configuration file.
+The main server process initializes all runtime components from the JSON configuration and then
+enters a non-blocking poll loop.
 
 4.1. Program Logic
 ------------------
@@ -10,26 +10,24 @@ XML Configuration file.
 4.1.1. Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
-* Setup Shared Memory Segments
+* Call ``setupSharedMemory()`` (currently a placeholder hook)
+* Load and map static filesystem data via ``Configuration::mapStaticFSData()``
 * Disable Signals / Setup Termination Handling
 * Setup Server Listening Socket / Poll for Server Socket File Descriptor
-* Load / Init StaticFS recursive Filesystem Snapshot for each Virtual Host
-* Init AS Handler Process (Fork all Application Server Processes)
-* Init Result Processor (Fork Result Processor Process)
-* Setup Connection Handler Instance
 * Drop System Privileges
 * Enter Server Loop
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.3.1.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.3.1.
 
 4.1.2. Main Loop
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: text
 
-   - While Static::RunServer is True
-     - Check for Socket Accept Client (New Connection)
-       - Add Client FD to Connection Handler
-     - Process Clients with waiting data (Connection Handler Method)
+   - While RunServer is true
+     - Poll the server socket for new connections
+     - On POLLIN: accept the client and register it in ClientHandler
+     - On idle and no processed clients: sleep for IDLE_SLEEP_MICROSECONDS
+     - Call processClients() every loop iteration
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 1.3.2.
+Workflow diagram see: :doc:`Graphical-Workflows` Section 15.3.2.
