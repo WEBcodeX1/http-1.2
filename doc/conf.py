@@ -19,14 +19,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "FalconAS - HTTP/1.2"
-copyright = "WEB/codeX / clickIT 2011 - 2025"
+project = "FalconAS - NLAP"
+copyright = "WEB/codeX / clickIT 2011 - 2026"
 author = "Claus Prüfer"
 
 # The short X.Y version
-version = '0.1'
+version = '0.3'
 # The full version, including alpha/beta/rc tags
-release = '0.1rc'
+release = '0.3'
 
 
 # -- General configuration ---------------------------------------------------
