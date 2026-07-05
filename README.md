@@ -5,20 +5,15 @@
   <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
     <img src="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg" alt="CodeQL">
   </a>
-  <a href="https://github.com/WEBcodeX1/http-1.2/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat" alt="License">
-  </a>
-  <a href="https://docs.webcodex.de/developer/falconas/doxygen/index.html">
+  <a href="https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html">
     <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Oxygen">
   </a>
-  <a href="https://docs.webcodex.de/developer/falconas/sphinx/index.html">
+  <a href="https://docs.webcodex.de/developer/falconas/v0.3/sphinx/index.html">
     <img src="https://img.shields.io/badge/docs-sphinx-blue" alt="Docs Sphinx">
   </a>
-  <!--
   <a href="https://github.com/WEBcodeX1/http-1.2/releases">
     <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
   </a>
-  -->
 </div>
 
 ---
@@ -34,13 +29,15 @@ This project includes:
 for modern web application requirements.
 
 **NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
-- ✅ Solid parallel response transmission in a single socket
-- ✅ Eliminates head-of-line blocking: time-consuming responses do not block follow-ups
-- ✅ Structured data with XML schemas
-- ✅ Multiple protocol subtypes (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, non-TLS, HSM/TPM-based encryption
+
+- ✅ **Robust** parallel **multi-response** transmission **over a single socket**
+- ✅ **Elimination** of **head-of-line blocking** (time-consuming responses do not block follow-ups)
+- ✅ Structured, **XML-encapsulated transport** data, including **validatable** XML schemas
+- ✅ Firewall-friendly, **port-separated protocol subtypes** (NLAFP for files, NLAMP for application server requests)
+- ✅ Simple, non-TLS, HSM- and TPM-based X.509 authentication, signing and encryption
 
 **FalconAS Server Features**:
+
 - ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
 - ✅ **Lightning-Fast Performance**: Epoll-based / multi-socket optimized architecture
 - ✅ **Sendfile Static File Delivery**: In-kernel sendfile() decrease scheduling latency

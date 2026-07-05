@@ -1,6 +1,6 @@
-# Contributing to HTTP/1.2
+# Contributing to FalconAS / NLAP
 
-Welcome to the HTTP/1.2 project! We appreciate your interest in improving our codebase. Whether you’re fixing a typo, reporting a bug, or proposing a new feature, your contribution is highly valued.
+Welcome to the FalconAS / NLAPproject! We appreciate your interest in improving our codebase. Whether you’re fixing a typo, reporting a bug, or proposing a new feature, your contribution is highly valued.
 
 ---
 
