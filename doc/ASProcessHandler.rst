@@ -1,4 +1,4 @@
-7. AS Server Process Handler
+AS Server Process Handler
 ============================
 
 The application-server process handler currently provides the public lifecycle and configuration
@@ -15,10 +15,10 @@ The active source code exposes:
 * ``registerChildPID()`` to hand child PIDs back to ``Server``
 * ``forkProcessASHandler()`` as the entry point for backend worker setup
 
-7.1. Program Logic
+Program Logic
 ------------------
 
-7.1.1. Initialization
+Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: text
@@ -28,9 +28,9 @@ The active source code exposes:
    * Iterate over ConfigRef.Namespaces
    * Keep the child-worker fork block disabled while the runtime simplification is in progress
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 15.1.1.
+Workflow diagram see: :ref:`as-process-handler-initialization-workflow`.
 
-7.1.2. Main Loop
+Main Loop
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: text
@@ -40,4 +40,4 @@ Workflow diagram see: :doc:`Graphical-Workflows` Section 15.1.1.
    * Shared-memory metadata and worker-loop code remain part of the interface surface,
      but the current implementation keeps the old child-process execution path commented out
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 15.1.2.
+Workflow diagram see: :ref:`as-process-handler-runtime-workflow`.

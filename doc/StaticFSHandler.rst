@@ -1,4 +1,4 @@
-6. Static Filesystem Handler
+Static Filesystem Handler
 ============================
 
 The StaticFSHandler Component manages Filesystem Data / Mime-Types for Static Data Requests.
@@ -13,10 +13,10 @@ If a files size is bigger than 2 Megabytes a huge-page for mmap() will be tried 
 
    The current volume of files and subdirectories is a performance bottleneck. We must implement subdirectory segmentation in an upcoming release.
 
-6.1. Program Logic
+Program Logic
 ------------------
 
-6.1.1. Initialization
+Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
 Loop recursive over files found in Virtual Host dir (from configuration). Add properties to
@@ -24,7 +24,7 @@ internal C++ Objects / Structs.
 
 All found files will be mmapped() (read into memory) for sendfile() processing.
 
-6.1.2. Get Property
+Get Property
 ~~~~~~~~~~~~~~~~~~~
 
 When an HTTP request for a Static File arrives, the file's properties (e.g. SendfileFD) must

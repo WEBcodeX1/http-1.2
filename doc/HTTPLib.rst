@@ -1,4 +1,4 @@
-10. HTTPLib
+HTTPLib
 ===========
 
 The HTTP library currently consists of two documented components:
@@ -6,7 +6,7 @@ The HTTP library currently consists of two documented components:
 * ``HTTPParser`` in ``lib/http/httpparser.*``
 * ``HTTPMessageGenerator`` implemented by ``HTTPGenerator`` in ``lib/http/httpgenerator.*``
 
-10.1. HTTPParser
+HTTPParser
 ----------------
 
 ``HTTPParser`` is an incremental HTTP/1.1 parser used directly by ``Client`` objects.
@@ -20,7 +20,7 @@ Current parser behavior:
 * Extracts request headers, URL, payload, and GET parameters into ``RequestProperties_t``
 * Rejects unsupported protocol versions and malformed request lines
 
-10.1.1. appendBuffer()
+appendBuffer()
 ~~~~~~~~~~~~~~~~~~~~~~
 
 ``appendBuffer(const char*, const uint16_t)`` appends new socket bytes to the internal request
@@ -33,7 +33,7 @@ Processing flow:
 3. If the parser is waiting for a POST body and enough bytes are now available, complete the request
 4. Otherwise, start request processing once the HTTP header end marker has been found
 
-10.1.2. Request Splitting and Parsing
+Request Splitting and Parsing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``_processRequests()`` and ``_processRequestProperties()`` split buffered data by ``\\r\\n\\r\\n``
@@ -48,13 +48,13 @@ The parser currently records:
 * ``Payload``
 * ``URLParams``
 
-10.1.3. Public Accessors
+Public Accessors
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``getRequests()`` returns the parsed request vector by value, while ``getRequestsPtr()`` returns a
 pointer to the same internal request collection.
 
-10.2. HTTPMessageGenerator
+HTTPMessageGenerator
 --------------------------
 
 The documented message-generator component is implemented by the ``HTTPGenerator`` class.
@@ -67,7 +67,7 @@ Current generator behavior:
 * Tracks header/body send progress through ``SendMetadata_t``
 * Supports incremental sending by updating the active buffer pointer after each write
 
-10.2.1. Message Construction
+Message Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Typical usage:
@@ -81,7 +81,7 @@ Typical usage:
 ``MsgGenerate()`` builds an ``HTTP/1.1`` status line, serializes all headers, appends
 ``Content-Length``, and prepares the header buffer for transmission.
 
-10.2.2. Incremental Send State
+Incremental Send State
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``MsgGetSendMetadata()`` exposes the active buffer pointer and remaining byte count for either the

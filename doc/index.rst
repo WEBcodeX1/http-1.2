@@ -19,7 +19,16 @@ FalconAS - HTTP/1.2 Documentation
    SHMVector
    MemoryAlignment
    TerminationHandling
-   Graphical-Workflows
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Graphical Workflows:
+
+   ASProcessHandler-Workflows
+   ClientHandler-Workflows
+   Main-Server-Workflows
+   HTTPParser-Workflows
+   HTTPMessageGenerator-Workflows
 
 .. toctree::
    :maxdepth: 2

@@ -1,13 +1,13 @@
-4. Main Server
+Main Server
 ==============
 
 The main server process initializes all runtime components from the JSON configuration and then
 enters a non-blocking poll loop.
 
-4.1. Program Logic
+Program Logic
 ------------------
 
-4.1.1. Initialization
+Initialization
 ~~~~~~~~~~~~~~~~~~~~~
 
 * Call ``setupSharedMemory()`` (currently a placeholder hook)
@@ -17,9 +17,9 @@ enters a non-blocking poll loop.
 * Drop System Privileges
 * Enter Server Loop
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 15.3.1.
+Workflow diagram see: :ref:`main-server-initialization-workflow`.
 
-4.1.2. Main Loop
+Main Loop
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: text
@@ -30,4 +30,4 @@ Workflow diagram see: :doc:`Graphical-Workflows` Section 15.3.1.
      - On idle and no processed clients: sleep for IDLE_SLEEP_MICROSECONDS
      - Call processClients() every loop iteration
 
-Workflow diagram see: :doc:`Graphical-Workflows` Section 15.3.2.
+Workflow diagram see: :ref:`main-server-loop-workflow`.
