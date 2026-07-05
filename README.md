@@ -39,7 +39,7 @@ for modern web application requirements.
 - ✅ **Elimination** of **head-of-line blocking** (time-consuming responses do not block follow-ups)
 - ✅ Structured, **XML-encapsulated transport** data, including **validatable** XML schemas
 - ✅ Firewall-friendly, **port-separated protocol subtypes** (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, non-TLS, HSM- and TPM-based X.509 encryption
+- ✅ Simple, non-TLS, HSM- and TPM-based X.509 authentication, signing and encryption
 
 **FalconAS Server Features**:
 
