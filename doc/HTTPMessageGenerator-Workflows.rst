@@ -1,5 +1,5 @@
-HTTPMessageGenerator Workflows
-================================
+HTTPMessageGenerator
+====================
 
 This document contains Mermaid diagrams for the current ``HTTPGenerator`` / message-generator implementation.
 

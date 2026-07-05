@@ -1,19 +1,21 @@
 Preface
 =======
 
-The current ``FalconAS`` / ``HTTP/1.2`` tree is centered around a small HTTP/1.1 runtime, a reusable
-HTTP helper library, and supporting utilities for filesystem access and shared-memory-safe containers.
+The current ``FalconAS`` / ``NLAP`` updates (`version 0.3`) target two core areas:
 
-.. note::
+1. ``Microcontroller-Optimized HTTP/1.1``: A clean, secure library tailored for embedded environments.
+2. ``NLAP Draft & Schemas``: Next Level Application Protocol specifications implementing a 100% non-blocking, scalable client-handling approach for ``TCP`` Sockets (compared to ``HTTP/2.0`` and ``HTTP/3.0``).
 
-   The implementation has been simplified compared to earlier multi-process drafts. This overview
-   reflects the code that is currently present in ``src`` and ``lib/http``.
+.. important::
+
+   The implementation has been simplified compared to `version 0.1` and `version 0.2`. This overview reflects the code that
+   is currently present in ``src`` and ``lib/http``.
 
 The current implementation status is as following:
 
 1. ``HTTP/1.0 Library``: Developed a robust HTTP/1.0 library containing HTTPParser and HTTPMessageGenerator. This library has been successfully tested on an ESP32-S3 microcontroller.
 2. ``Client Handling / Data Processing``: Optimized receiving and result-sending functionality (see `ESP32-S3`_ code for reference). This optimized client data handling serves as the boilerplate for all upcoming XML-based NLAP sub-features.
-3. ``Upcoming Milestones``: Development of a concurrent, multi-processing, and 100% non-blocking NLAP client/server library is underway. Furthermore, the data encryption process is engineered and scheduled for implementation.
+3. ``Upcoming Milestones``: Development of a concurrent, multi-processing, and 100% non-blocking NLAP client / server library is underway. Furthermore, the data encryption process is engineered and scheduled for implementation.
 
 .. _ESP32-S3: https://github.com/WEBcodeX1/micropython-as/tree/main/src/components/network_oop
 

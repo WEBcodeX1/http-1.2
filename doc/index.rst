@@ -1,5 +1,5 @@
-FalconAS - HTTP/1.2 Documentation
-=================================
+FalconAS - NLAP Documentation
+=============================
 
 .. toctree::
    :maxdepth: 2

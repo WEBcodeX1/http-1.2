@@ -1,5 +1,5 @@
-Main Server Workflows
-=====================
+Main Server
+===========
 
 This document contains Mermaid diagrams for the current main server implementation.
 

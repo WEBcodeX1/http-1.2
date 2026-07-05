@@ -1,16 +1,16 @@
 Memory Alignment
-====================
+================
 
 Overview
---------------
+--------
 
-This document describes the memory alignment guarantees and implementation in the HTTP/1.2 codebase.
+This document describes the memory alignment guarantees and implementation in the ``NLAP`` codebase.
 
 Memory Allocation and Alignment
--------------------------------------
+-------------------------------
 
 Default Alignment with `malloc`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``MemoryManager`` class uses ``malloc`` for memory allocation, which provides the following alignment guarantees:
 
@@ -32,7 +32,7 @@ The ``MemoryManager`` class uses ``malloc`` for memory allocation, which provide
    - Atomic operations work correctly with malloc-allocated memory
 
 Compile-Time Alignment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 The ``MemoryManager`` template class provides compile-time alignment information:
 
@@ -57,7 +57,7 @@ The ``MemoryManager`` template class provides compile-time alignment information
 * Type-safe alignment checking
 
 Runtime Alignment Verification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In debug builds, alignment is verified at allocation time:
 
@@ -71,7 +71,7 @@ In debug builds, alignment is verified at allocation time:
 This helps catch alignment issues during development without impacting production performance.
 
 Alignment Checking Utilities
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``MemoryManager`` provides static methods for alignment checking:
 
@@ -83,7 +83,7 @@ The ``MemoryManager`` provides static methods for alignment checking:
    }
 
 When std::align is NOT Needed
------------------------------------
+-----------------------------
 
 ``std::align`` is primarily useful for:
 
@@ -91,48 +91,15 @@ When std::align is NOT Needed
 * Manual memory management with over-aligned types
 * Implementing custom allocators
 
-In the HTTP/1.2 codebase:
+In the ``NLAP`` codebase:
 
 * `malloc` already provides sufficient alignment
 * Each `MemoryManager` instance manages a single type `T`
 * No over-aligned types are used
 * Therefore, `std::align` is not necessary
 
-Shared Memory Layout and Alignment
-----------------------------------------
-
-The shared memory segments use the following types:
-
-StaticFS Request SHM #1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: text
-
-   0x00000000  atomic_uint16_t  StaticFSLock    (2 bytes, 2-byte aligned)
-   0x00000002  uint16_t         RequestCount    (2 bytes, 2-byte aligned)
-
-AS Request and Result Metadata SHM #2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: text
-
-   0x00000000  atomic_uint16_t  CanRead         (2 bytes, 2-byte aligned)
-   0x00000002  atomic_uint16_t  WriteReady      (2 bytes, 2-byte aligned)
-   0x00000004  uint16_t         ClientFD        (2 bytes, 2-byte aligned)
-   0x00000006  uint16_t         HTTPVersion     (2 bytes, 2-byte aligned)
-   0x00000008  uint16_t         HTTPMethod      (2 bytes, 2-byte aligned)
-   0x0000000a  uint16_t         ReqNr           (2 bytes, 2-byte aligned)
-   0x0000000c  uint32_t         ReqPayloadLen   (4 bytes, 4-byte aligned)
-   0x00000010  uint32_t         ResPayloadLen   (4 bytes, 4-byte aligned)
-
-**Alignment Notes**:
-
-* All fields are naturally aligned (offset is a multiple of the type's size)
-* `mmap` with `MAP_ANONYMOUS` returns page-aligned memory (typically 4096 bytes)
-* This provides more than sufficient alignment for all types
-
 Hugepage Support
-----------------------
+----------------
 
 The code uses ``madvise(ptr, size, MADV_HUGEPAGE)`` to request transparent hugepage support:
 
@@ -147,7 +114,7 @@ The code uses ``madvise(ptr, size, MADV_HUGEPAGE)`` to request transparent hugep
 * Does not affect alignment (hugepages are more strictly aligned)
 
 Testing
--------------
+-------
 
 Memory alignment is verified through unit tests in ``test/unit/memory-alignment/``:
 

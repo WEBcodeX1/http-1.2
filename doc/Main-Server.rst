@@ -1,14 +1,14 @@
 Main Server
-==============
+===========
 
 The main server process initializes all runtime components from the JSON configuration and then
 enters a non-blocking poll loop.
 
 Program Logic
-------------------
+-------------
 
 Initialization
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 * Call ``setupSharedMemory()`` (currently a placeholder hook)
 * Load and map static filesystem data via ``Configuration::mapStaticFSData()``
@@ -20,7 +20,7 @@ Initialization
 Workflow diagram see: :ref:`main-server-initialization-workflow`.
 
 Main Loop
-~~~~~~~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: text
 

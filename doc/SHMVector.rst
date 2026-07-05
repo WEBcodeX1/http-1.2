@@ -1,5 +1,7 @@
-SHMVector - Minimalistic C++ Vector with Shared Memory Support
-====================================================================
+SHMVector
+=========
+
+A minimalistic C++ Vector class with Shared Memory Support.
 
 Overview
 --------
@@ -98,7 +100,7 @@ SHMVector works perfectly with struct types, making it ideal for storing structu
     munmap(shmem, 640000);
 
 Placing SHMVector Object in Shared Memory
---------------------------------------------
+-----------------------------------------
 
 When using placement new to place the SHMVector object itself inside shared memory, you must ensure the data storage region does not overlap with the SHMVector object's memory:
 

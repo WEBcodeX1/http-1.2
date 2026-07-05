@@ -1,13 +1,13 @@
-Static Filesystem Handler
-============================
+Static Filesystem
+=================
 
 The StaticFSHandler Component manages Filesystem Data / Mime-Types for Static Data Requests.
 
 All Virtual Host dependent file properties will be loaded at startup into static C++ class
 member Objects / Structs.
 
-The File Data will be mmapped() into Kernel-Space for sendfile() usage when requested.
-If a files size is bigger than 2 Megabytes a huge-page for mmap() will be tried to allocate.
+The File Data will be ``mmapped()`` into Kernel-Space for ``sendfile()`` usage when requested.
+If a files size is bigger than 2 Megabytes a huge-page for ``mmap()`` will be tried to allocate.
 
 .. warning::
 

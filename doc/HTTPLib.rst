@@ -1,5 +1,5 @@
-HTTPLib
-===========
+HTTP Library
+============
 
 The HTTP library currently consists of two documented components:
 
@@ -7,7 +7,7 @@ The HTTP library currently consists of two documented components:
 * ``HTTPMessageGenerator`` implemented by ``HTTPGenerator`` in ``lib/http/httpgenerator.*``
 
 HTTPParser
-----------------
+----------
 
 ``HTTPParser`` is an incremental HTTP/1.1 parser used directly by ``Client`` objects.
 
@@ -21,7 +21,7 @@ Current parser behavior:
 * Rejects unsupported protocol versions and malformed request lines
 
 appendBuffer()
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 ``appendBuffer(const char*, const uint16_t)`` appends new socket bytes to the internal request
 buffer until ``_HTTPRequestBufferMax`` is reached.
@@ -34,7 +34,7 @@ Processing flow:
 4. Otherwise, start request processing once the HTTP header end marker has been found
 
 Request Splitting and Parsing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``_processRequests()`` and ``_processRequestProperties()`` split buffered data by ``\\r\\n\\r\\n``
 and build ``RequestProperties_t`` entries.
@@ -49,13 +49,13 @@ The parser currently records:
 * ``URLParams``
 
 Public Accessors
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 ``getRequests()`` returns the parsed request vector by value, while ``getRequestsPtr()`` returns a
 pointer to the same internal request collection.
 
 HTTPMessageGenerator
---------------------------
+--------------------
 
 The documented message-generator component is implemented by the ``HTTPGenerator`` class.
 
@@ -68,7 +68,7 @@ Current generator behavior:
 * Supports incremental sending by updating the active buffer pointer after each write
 
 Message Construction
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Typical usage:
 
@@ -82,7 +82,7 @@ Typical usage:
 ``Content-Length``, and prepares the header buffer for transmission.
 
 Incremental Send State
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 ``MsgGetSendMetadata()`` exposes the active buffer pointer and remaining byte count for either the
 header or the body.

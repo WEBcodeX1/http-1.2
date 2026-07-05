@@ -1,8 +1,8 @@
 Termination Handling
-========================
+====================
 
 Problem Statement
------------------------
+-----------------
 
 The current shutdown path is designed around a main server process that may register backend child
 processes and propagate ``SIGTERM`` to them.
@@ -13,15 +13,15 @@ processes and propagate ``SIGTERM`` to them.
 4. The shutdown flow is safe even when no child processes were spawned
 
 Solution
---------------
+--------
 
 Implemented proper termination handling where the main server process tracks all child PIDs and propagates SIGTERM signals to them.
 
 How It Works
-------------------
+------------
 
 Process Hierarchy
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: text
 
@@ -29,7 +29,7 @@ Process Hierarchy
    └── ASProcessHandler children (optional, when backend workers are enabled)
 
 Termination Flow
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 1. User sends ``kill -TERM <main_pid>`` or ``pkill falcon-as``
 2. Main server process receives SIGTERM
@@ -40,7 +40,7 @@ Termination Flow
 7. If no children were registered, the main server simply exits its own loop
 
 Key Design Decisions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 1. **Static Members**: ``ChildPIDs`` is static to be accessible from the signal handler context
 2. **Global Function**: ``registerChildPIDToServer()`` breaks the direct ``Server`` /
@@ -49,7 +49,7 @@ Key Design Decisions
 4. **Signal Order**: Children receive SIGTERM before parent exits
 
 Testing
--------------
+-------
 
 A comprehensive test suite validates:
 
@@ -59,7 +59,7 @@ A comprehensive test suite validates:
 - Processes don't terminate prematurely without SIGTERM
 
 Benefits
---------------
+--------
 
 1. **Clean Shutdown**: Server responds to standard SIGTERM signal
 2. **No Orphan Processes**: All children are properly terminated
@@ -68,7 +68,7 @@ Benefits
 5. **Systemd Compatible**: Works correctly with systemd service management
 
 Usage
------------
+-----
 
 .. code-block:: bash
 

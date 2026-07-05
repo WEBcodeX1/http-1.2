@@ -1,5 +1,5 @@
-HTTPParser Workflows
-====================
+HTTPParser
+==========
 
 This document contains Mermaid diagrams for the current ``HTTPParser`` implementation.
 

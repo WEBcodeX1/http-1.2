@@ -1,5 +1,5 @@
-AS Server Process Handler Workflows
-===================================
+AS Process Handler
+==================
 
 This document contains Mermaid diagrams for the current ``ASProcessHandler`` implementation.
 

@@ -1,5 +1,5 @@
-AS Server Process Handler
-============================
+AS Process Handler
+==================
 
 The application-server process handler currently provides the public lifecycle and configuration
 hooks for backend workers.
@@ -16,10 +16,10 @@ The active source code exposes:
 * ``forkProcessASHandler()`` as the entry point for backend worker setup
 
 Program Logic
-------------------
+-------------
 
 Initialization
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: text
 
@@ -31,7 +31,7 @@ Initialization
 Workflow diagram see: :ref:`as-process-handler-initialization-workflow`.
 
 Main Loop
-~~~~~~~~~~~~~~~~
+~~~~~~~~~
 
 .. code-block:: text
 

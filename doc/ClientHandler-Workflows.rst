@@ -1,5 +1,5 @@
-Client Handler Workflows
-========================
+Client Handler
+==============
 
 This document contains Mermaid diagrams for the current ``ClientHandler`` implementation.
 

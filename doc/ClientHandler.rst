@@ -1,14 +1,14 @@
 Client Handler
-=================
+==============
 
 The ``ClientHandler`` component owns the client socket registry, epoll state, and reusable
 receive buffers used by ``Client`` objects.
 
 Program Logic
-------------------
+-------------
 
 Add Client
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 
 Called from Main::Server on new Client Socket.
 
@@ -20,7 +20,7 @@ Called from Main::Server on new Client Socket.
 Workflow diagram see: :ref:`client-handler-add-client-workflow`.
 
 Process Clients
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Get all Epoll FDs with waiting data.
 
@@ -34,7 +34,7 @@ Reset ``ProcessedClients``, call ``epoll_wait()``, and pass the ready descriptor
 Workflow diagram see: :ref:`client-handler-process-clients-workflow`.
 
 Read Client Data
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Process all file descriptors with waiting data.
 
