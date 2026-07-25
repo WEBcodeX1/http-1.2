@@ -471,9 +471,10 @@ size_t _parseElement(const char* buf, size_t len, size_t pos, XMLNode& node)
         string closeTag = "</" + tagName + ">";
         size_t closePos = contentStart;
 
-        //- search for closing tag
+        //- search for closing tag with explicit bounds check
         while (closePos + closeTag.size() <= len) {
-            if (buf[closePos] == '<' && buf[closePos + 1] == '/'
+            if (buf[closePos] == '<'
+                && closePos + 1 < len && buf[closePos + 1] == '/'
                 && string_view(buf + closePos, closeTag.size()) == closeTag)
             {
                 break;
