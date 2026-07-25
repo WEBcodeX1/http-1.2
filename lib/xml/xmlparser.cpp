@@ -5,10 +5,10 @@
 
 #include <algorithm>
 #include <atomic>
+#include <generator>
 #include <cstring>
 #include <memory>
 #include <utility>
-#include <vector>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
@@ -69,18 +69,15 @@ std::string getElementText(DOMElement* Element)
     return trimCopy(Value);
 }
 
-std::vector<DOMElement*> iterateElementChildren(DOMElement* Parent)
+std::generator<DOMElement*> iterateElementChildren(DOMElement* Parent)
 {
-    std::vector<DOMElement*> Elements;
     DOMNodeList* Children = Parent->getChildNodes();
     for (XMLSize_t Index = 0; Index < Children->getLength(); ++Index) {
         DOMNode* Child = Children->item(Index);
         if (Child->getNodeType() == DOMNode::ELEMENT_NODE) {
-            Elements.push_back(static_cast<DOMElement*>(Child));
+            co_yield static_cast<DOMElement*>(Child);
         }
     }
-
-    return Elements;
 }
 
 struct MessageSlice
@@ -88,9 +85,8 @@ struct MessageSlice
     std::string_view Slice;
 };
 
-std::vector<MessageSlice> splitMessages(std::string_view Input, bool& FramingError)
+std::generator<MessageSlice> splitMessages(std::string_view Input, bool& FramingError)
 {
-    std::vector<MessageSlice> Messages;
     std::size_t Cursor = 0;
     std::size_t LastEnd = std::string_view::npos;
 
@@ -102,7 +98,7 @@ std::vector<MessageSlice> splitMessages(std::string_view Input, bool& FramingErr
 
         if (LastEnd != std::string_view::npos && Start != LastEnd) {
             FramingError = true;
-            return Messages;
+            co_return;
         }
 
         const std::size_t End = Input.find(NLAP_XML_END_MARKER, Start);
@@ -111,13 +107,11 @@ std::vector<MessageSlice> splitMessages(std::string_view Input, bool& FramingErr
         }
 
         const std::size_t MessageEnd = End + NLAP_XML_END_MARKER.size();
-        Messages.push_back(MessageSlice{Input.substr(Start, MessageEnd - Start)});
+        co_yield MessageSlice{Input.substr(Start, MessageEnd - Start)};
 
         Cursor = MessageEnd;
         LastEnd = MessageEnd;
     }
-
-    return Messages;
 }
 
 std::string ensureParseableXML(std::string_view Message)
@@ -321,9 +315,12 @@ XMLParser::XMLParser(std::size_t ParseBufferSize)
         XMLPlatformUtils::Initialize();
     }
 
-    auto* GrammarPool = new XMLGrammarPoolImpl(XMLPlatformUtils::fgMemoryManager);
+    std::unique_ptr<XMLGrammarPoolImpl> GrammarPoolOwner(
+        new XMLGrammarPoolImpl(XMLPlatformUtils::fgMemoryManager)
+    );
+    XMLGrammarPoolImpl* GrammarPool = GrammarPoolOwner.get();
     _GrammarPool = std::shared_ptr<void>(
-        GrammarPool,
+        GrammarPoolOwner.release(),
         [](void* Pointer) { delete static_cast<XMLGrammarPoolImpl*>(Pointer); }
     );
 
