@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <cstdint>
 #include <vector>
 
 #include "../../../lib/xml/xmlconstants.hpp"
@@ -65,8 +66,11 @@ BOOST_AUTO_TEST_CASE(parse_single_message_and_validate_leaf_pointer)
 
     string URL(URLNode.Address, URLNode.Length);
     BOOST_TEST(URL == "/testpath/index.html");
-    BOOST_TEST(URLNode.Address >= Buffer.data());
-    BOOST_TEST(URLNode.Address < (Buffer.data() + Buffer.size()));
+    const auto URLAddr = reinterpret_cast<std::uintptr_t>(URLNode.Address);
+    const auto BufStart = reinterpret_cast<std::uintptr_t>(Buffer.data());
+    const auto BufEnd = reinterpret_cast<std::uintptr_t>(Buffer.data() + Buffer.size());
+    BOOST_TEST(URLAddr >= BufStart);
+    BOOST_TEST(URLAddr < BufEnd);
 }
 
 BOOST_AUTO_TEST_CASE(parse_multiple_messages_returns_vector)
@@ -84,7 +88,7 @@ BOOST_AUTO_TEST_CASE(parse_invalid_syntax_returns_error)
 {
     unique_ptr<XMLParser> Parser = make_unique<XMLParser>(4096);
 
-    const string Broken = "<NLAP><Request><UUID>x</UUID><Protocol>NLAP</Protocol></Request>";
+    const string Broken = "<NLAP><Request><UUID>x</UUID><Protocol>NLAP</Protocol></RequestX></NLAP>";
     vector<char> Buffer = toMutableBuffer(Broken);
 
     ParseResult_t Result = Parser->parse(Buffer.data());

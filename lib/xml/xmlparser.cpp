@@ -220,44 +220,30 @@ public:
 
     void error(const SAXParseException& Exception) override
     {
-        classify(Exception);
+        _HasAnyError = true;
+        _LastMessage = transcodeXMLCh(Exception.getMessage());
     }
 
     void fatalError(const SAXParseException& Exception) override
     {
-        classify(Exception);
+        _HasAnyError = true;
+        _LastMessage = transcodeXMLCh(Exception.getMessage());
     }
 
     void warning(const SAXParseException&) override {}
 
     void resetErrors() override
     {
-        _HasSyntaxError = false;
-        _HasDTDContentError = false;
+        _HasAnyError = false;
+        _LastMessage.clear();
     }
 
-    bool hasSyntaxError() const { return _HasSyntaxError; }
-    bool hasDTDContentError() const { return _HasDTDContentError; }
+    bool hasAnyError() const { return _HasAnyError; }
+    const std::string& lastMessage() const { return _LastMessage; }
 
 private:
-    void classify(const SAXParseException& Exception)
-    {
-        const std::string Message = transcodeXMLCh(Exception.getMessage());
-        if (Message.find("element") != std::string::npos && Message.find("must") != std::string::npos) {
-            _HasDTDContentError = true;
-            return;
-        }
-
-        if (Message.find("valid") != std::string::npos && Message.find("content") != std::string::npos) {
-            _HasDTDContentError = true;
-            return;
-        }
-
-        _HasSyntaxError = true;
-    }
-
-    bool _HasSyntaxError = false;
-    bool _HasDTDContentError = false;
+    bool _HasAnyError = false;
+    std::string _LastMessage;
 };
 
 void populateTree(DOMElement* Element, XMLNode& Node, std::string_view RawMessage, std::size_t& SearchOffset)
@@ -315,7 +301,7 @@ uint16_t parseMessage(
     );
     SyntaxParser.parse(SyntaxSource);
 
-    if (SyntaxHandler.hasSyntaxError()) {
+    if (SyntaxHandler.hasAnyError()) {
         return XML_ERROR_INVALID_SYNTAX;
     }
 
@@ -340,12 +326,8 @@ uint16_t parseMessage(
     );
     DTDParser.parse(DTDSource);
 
-    if (DTDHandler.hasDTDContentError()) {
+    if (DTDHandler.hasAnyError()) {
         return XML_ERROR_INVALID_CONTENT_DTD;
-    }
-
-    if (DTDHandler.hasSyntaxError()) {
-        return XML_ERROR_INVALID_SYNTAX;
     }
 
     DOMDocument* Document = DTDParser.getDocument();
