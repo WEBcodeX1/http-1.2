@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <cstring>
 
 #include "../../../lib/xml/xmlparser.hpp"
 #include "../../../lib/xml/xmlconstants.hpp"
@@ -1196,4 +1197,151 @@ BOOST_AUTO_TEST_CASE( test_frame_multiple_full_nlap_messages )
     BOOST_TEST(result.status == FrameStatus::Valid);
     BOOST_TEST(result.message_count == 3u);
     BOOST_TEST(result.bytes_consumed == combined.size());
+}
+
+
+// ===========================================================================
+//  TEST CASES - ZERO-COPY RECURSIVE TREE PARSING (parseToTree)
+// ===========================================================================
+
+BOOST_AUTO_TEST_CASE( test_tree_simple_nlap_request )
+{
+    cout << "Tree: parse a full NLAMP request into a recursive tree." << endl;
+
+    auto tree = XMLParser::parseToTree(NLAMP_REQUEST_FULL.c_str(), NLAMP_REQUEST_FULL.size());
+
+    //- root should be a branch with one child: "NLAP"
+    BOOST_TEST(tree.is_leaf == false);
+    BOOST_TEST(tree.children.count("NLAP") == 1u);
+
+    auto& nlap = tree.children.at("NLAP");
+    BOOST_TEST(nlap.is_leaf == false);
+    BOOST_TEST(nlap.children.count("Request") == 1u);
+
+    auto& req = nlap.children.at("Request");
+    BOOST_TEST(req.is_leaf == false);
+
+    //- UUID leaf
+    BOOST_TEST(req.children.count("UUID") == 1u);
+    auto& uuid = req.children.at("UUID");
+    BOOST_TEST(uuid.is_leaf == true);
+    BOOST_TEST(uuid.ref.length == 36u);
+    BOOST_TEST(string_view(uuid.ref.address, uuid.ref.length) == "9b327afe-27ae-2367-aef2-e42445e5b23a");
+
+    //- Protocol leaf
+    BOOST_TEST(req.children.count("Protocol") == 1u);
+    BOOST_TEST(string_view(req.children.at("Protocol").ref.address,
+                           req.children.at("Protocol").ref.length) == "NLAP");
+
+    //- Header branch
+    BOOST_TEST(req.children.count("Header") == 1u);
+    auto& hdr = req.children.at("Header");
+    BOOST_TEST(hdr.is_leaf == false);
+
+    BOOST_TEST(hdr.children.count("Host") == 1u);
+    BOOST_TEST(string_view(hdr.children.at("Host").ref.address,
+                           hdr.children.at("Host").ref.length) == "testapp2.local");
+
+    BOOST_TEST(hdr.children.count("URL") == 1u);
+    BOOST_TEST(string_view(hdr.children.at("URL").ref.address,
+                           hdr.children.at("URL").ref.length) == "/python/service1");
+
+    BOOST_TEST(hdr.children.count("User-Agent") == 1u);
+    BOOST_TEST(string_view(hdr.children.at("User-Agent").ref.address,
+                           hdr.children.at("User-Agent").ref.length) == "Falcon-Python-Client");
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_pointers_reference_original_buffer )
+{
+    cout << "Tree: all BufferRef pointers reference the original buffer (zero-copy)." << endl;
+
+    auto tree = XMLParser::parseToTree(NLAMP_REQUEST_FULL.c_str(), NLAMP_REQUEST_FULL.size());
+
+    auto& uuid = tree.children.at("NLAP").children.at("Request").children.at("UUID");
+
+    //- verify the pointer is into the original buffer
+    BOOST_TEST((const void*)uuid.ref.address >= (const void*)NLAMP_REQUEST_FULL.c_str());
+    BOOST_TEST((const void*)uuid.ref.address <
+               (const void*)(NLAMP_REQUEST_FULL.c_str() + NLAMP_REQUEST_FULL.size()));
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_string_view_overload )
+{
+    cout << "Tree: string_view overload works identically." << endl;
+
+    string_view sv(NLAMP_REQUEST_FULL);
+    auto tree = XMLParser::parseToTree(sv);
+
+    BOOST_TEST(tree.is_leaf == false);
+    BOOST_TEST(tree.children.count("NLAP") == 1u);
+
+    auto& uuid = tree.children.at("NLAP").children.at("Request").children.at("UUID");
+    BOOST_TEST(uuid.is_leaf == true);
+    BOOST_TEST(uuid.ref.length == 36u);
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_response_with_status )
+{
+    cout << "Tree: parse a response with Status block." << endl;
+
+    auto tree = XMLParser::parseToTree(NLAMP_RESPONSE_FAILURE.c_str(), NLAMP_RESPONSE_FAILURE.size());
+
+    auto& resp = tree.children.at("NLAP").children.at("Response");
+
+    //- Status branch
+    BOOST_TEST(resp.children.count("Status") == 1u);
+    auto& status = resp.children.at("Status");
+    BOOST_TEST(status.is_leaf == false);
+    BOOST_TEST(status.children.count("Code") == 1u);
+    BOOST_TEST(string_view(status.children.at("Code").ref.address,
+                           status.children.at("Code").ref.length) == "10");
+
+    BOOST_TEST(status.children.count("Description") == 1u);
+    BOOST_TEST(string_view(status.children.at("Description").ref.address,
+                           status.children.at("Description").ref.length) == "Application Exception");
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_char_array_buffer )
+{
+    cout << "Tree: operates on a raw char[] buffer (InputBuffer pattern)." << endl;
+
+    //- simulate the InputBuffer pattern from the requirement
+    char InputBuffer[4096];
+    const char* msg = "<NLAP><Request><UUID>abc-123</UUID><Protocol>NLAP</Protocol></Request></NLAP>";
+    size_t msgLen = strlen(msg);
+    memcpy(InputBuffer, msg, msgLen);
+
+    string_view InputBufferView(InputBuffer, msgLen);
+    auto tree = XMLParser::parseToTree(InputBufferView);
+
+    auto& uuid = tree.children.at("NLAP").children.at("Request").children.at("UUID");
+    BOOST_TEST(uuid.is_leaf == true);
+    BOOST_TEST(string_view(uuid.ref.address, uuid.ref.length) == "abc-123");
+
+    //- verify pointer is into InputBuffer, not a copy
+    BOOST_TEST((const void*)uuid.ref.address >= (const void*)InputBuffer);
+    BOOST_TEST((const void*)uuid.ref.address < (const void*)(InputBuffer + 4096));
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_empty_buffer )
+{
+    cout << "Tree: empty buffer returns empty branch node." << endl;
+
+    auto tree = XMLParser::parseToTree("", 0);
+
+    BOOST_TEST(tree.is_leaf == false);
+    BOOST_TEST(tree.children.empty() == true);
+}
+
+BOOST_AUTO_TEST_CASE( test_tree_payload_as_leaf )
+{
+    cout << "Tree: Payload text content is captured as a leaf." << endl;
+
+    auto tree = XMLParser::parseToTree(NLAMP_REQUEST_FULL.c_str(), NLAMP_REQUEST_FULL.size());
+
+    auto& payload = tree.children.at("NLAP").children.at("Request").children.at("Payload");
+    BOOST_TEST(payload.is_leaf == true);
+    BOOST_TEST(payload.ref.length > 0u);
+    BOOST_TEST(string_view(payload.ref.address, payload.ref.length)
+               == "{\"param1\":\"string1\",\"param2\":\"string2\",\"param3\":100}");
 }

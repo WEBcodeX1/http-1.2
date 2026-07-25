@@ -345,6 +345,212 @@ void XMLParser::removeRequest(uint16_t Index)
 
 
 // ---------------------------------------------------------------------------
+//  Zero-copy recursive tree parsing
+//
+//  Lightweight position-tracking parser that walks a well-formed NLAP XML
+//  buffer and builds a recursive XMLNode tree.  Every leaf's BufferRef
+//  points directly into the caller-owned buffer — no copies are made for
+//  text content.
+//
+//  This parser does NOT validate the XML against the DTD; it only builds
+//  the tree structure.  Use the Xerces-based _parseXML for validation.
+// ---------------------------------------------------------------------------
+
+namespace {
+
+//- Skip whitespace at current position
+inline size_t _skipWS(const char* buf, size_t len, size_t pos)
+{
+    while (pos < len && (buf[pos] == ' ' || buf[pos] == '\t' ||
+                         buf[pos] == '\r' || buf[pos] == '\n'))
+    {
+        ++pos;
+    }
+    return pos;
+}
+
+//- Skip the XML declaration (<?xml ... ?>) if present at pos
+inline size_t _skipXMLDecl(const char* buf, size_t len, size_t pos)
+{
+    pos = _skipWS(buf, len, pos);
+    if (pos + 5 < len && buf[pos] == '<' && buf[pos+1] == '?'
+        && buf[pos+2] == 'x' && buf[pos+3] == 'm' && buf[pos+4] == 'l')
+    {
+        //- find closing ?>
+        for (size_t i = pos + 5; i + 1 < len; ++i) {
+            if (buf[i] == '?' && buf[i+1] == '>') {
+                return i + 2;
+            }
+        }
+    }
+    return pos;
+}
+
+//- Extract the tag name from an opening tag starting at buf[pos] == '<'.
+//- Returns the tag name and sets endPos to the position after '>'.
+inline string _extractTagName(const char* buf, size_t len, size_t pos, size_t& endPos)
+{
+    //- buf[pos] should be '<'
+    size_t nameStart = pos + 1;
+    size_t nameEnd   = nameStart;
+    while (nameEnd < len && buf[nameEnd] != '>' && buf[nameEnd] != ' '
+           && buf[nameEnd] != '/' && buf[nameEnd] != '\t'
+           && buf[nameEnd] != '\r' && buf[nameEnd] != '\n')
+    {
+        ++nameEnd;
+    }
+    string name(buf + nameStart, nameEnd - nameStart);
+
+    //- find the closing '>'
+    size_t closeAngle = nameEnd;
+    while (closeAngle < len && buf[closeAngle] != '>') { ++closeAngle; }
+    endPos = (closeAngle < len) ? closeAngle + 1 : len;
+    return name;
+}
+
+//- Recursively parse an element at buf[pos] and populate the given XMLNode.
+//- pos should point at the '<' of the opening tag.
+//- Returns the position after the element's closing tag.
+size_t _parseElement(const char* buf, size_t len, size_t pos, XMLNode& node)
+{
+    //- parse opening tag
+    size_t afterOpen;
+    string tagName = _extractTagName(buf, len, pos, afterOpen);
+    pos = afterOpen;
+
+    //- check what follows: text content or child elements
+    //- scan to determine if the next '<' is a child element or the closing tag
+    size_t contentStart = pos;
+    bool hasChildElements = false;
+
+    //- look ahead to determine content type
+    size_t probe = _skipWS(buf, len, pos);
+    if (probe < len && buf[probe] == '<') {
+        //- check if it's a closing tag </tagName>
+        if (probe + 1 < len && buf[probe + 1] == '/') {
+            //- closing tag immediately follows → leaf with empty or whitespace content
+            hasChildElements = false;
+        } else {
+            //- another opening tag → branch with child elements
+            hasChildElements = true;
+        }
+    }
+
+    if (hasChildElements) {
+        //- branch node: parse child elements until we hit the closing tag
+        node.is_leaf = false;
+
+        while (pos < len) {
+            pos = _skipWS(buf, len, pos);
+            if (pos >= len) break;
+
+            if (buf[pos] != '<') {
+                //- unexpected non-tag content in a branch; skip it
+                ++pos;
+                continue;
+            }
+
+            //- check for closing tag
+            if (pos + 1 < len && buf[pos + 1] == '/') {
+                //- closing tag: find '>' and skip
+                size_t closeEnd = pos;
+                while (closeEnd < len && buf[closeEnd] != '>') { ++closeEnd; }
+                return (closeEnd < len) ? closeEnd + 1 : len;
+            }
+
+            //- child element
+            XMLNode child;
+            size_t childNameEnd;
+            string childName = _extractTagName(buf, len, pos, childNameEnd);
+            pos = _parseElement(buf, len, pos, child);
+            node.children.emplace(childName, child);
+        }
+    } else {
+        //- leaf node: text content up to the closing tag
+        //- find the closing tag </tagName>
+        string closeTag = "</" + tagName + ">";
+        size_t closePos = contentStart;
+
+        //- search for closing tag
+        while (closePos + closeTag.size() <= len) {
+            if (buf[closePos] == '<' && buf[closePos + 1] == '/'
+                && string_view(buf + closePos, closeTag.size()) == closeTag)
+            {
+                break;
+            }
+            ++closePos;
+        }
+
+        //- text content is between contentStart and closePos
+        node.is_leaf = true;
+
+        //- trim leading/trailing whitespace from the text content reference
+        size_t textStart = contentStart;
+        size_t textEnd   = closePos;
+        while (textStart < textEnd && (buf[textStart] == ' ' || buf[textStart] == '\t'
+               || buf[textStart] == '\r' || buf[textStart] == '\n'))
+        {
+            ++textStart;
+        }
+        while (textEnd > textStart && (buf[textEnd - 1] == ' ' || buf[textEnd - 1] == '\t'
+               || buf[textEnd - 1] == '\r' || buf[textEnd - 1] == '\n'))
+        {
+            --textEnd;
+        }
+
+        node.ref.address = buf + textStart;
+        node.ref.length  = textEnd - textStart;
+
+        //- advance past the closing tag
+        return closePos + closeTag.size();
+    }
+
+    return pos;
+}
+
+} // anonymous namespace
+
+
+XMLNode XMLParser::parseToTree(const char* buffer, size_t length)
+{
+    return parseToTree(string_view(buffer, length));
+}
+
+XMLNode XMLParser::parseToTree(string_view buffer)
+{
+    XMLNode root;
+    root.is_leaf = false;
+
+    if (buffer.empty()) {
+        return root;
+    }
+
+    const char* buf = buffer.data();
+    size_t len      = buffer.size();
+    size_t pos      = 0;
+
+    //- skip <?xml ...?> declaration if present
+    pos = _skipXMLDecl(buf, len, pos);
+    pos = _skipWS(buf, len, pos);
+
+    if (pos >= len || buf[pos] != '<') {
+        return root;
+    }
+
+    //- parse the root element (e.g. <NLAP>)
+    XMLNode rootElement;
+    size_t afterOpen;
+    string rootTag = _extractTagName(buf, len, pos, afterOpen);
+    pos = _parseElement(buf, len, pos, rootElement);
+
+    //- wrap in a tree: { "NLAP": { ... } }
+    root.children.emplace(rootTag, rootElement);
+
+    return root;
+}
+
+
+// ---------------------------------------------------------------------------
 //  Zero-copy message framing
 // ---------------------------------------------------------------------------
 

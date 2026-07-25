@@ -7,11 +7,24 @@
 #include <cstdint>
 #include <ostream>
 #include <unordered_map>
+#include <map>
 using namespace std;
 
 //- Header fields map: key = element name (e.g. "Host", "URL", "Mime-Type"), value = text content
 typedef unordered_map<string, string> NLAPHeader_t;
 typedef NLAPHeader_t& NLAPHeaderRef_t;
+
+
+// ---------------------------------------------------------------------------
+//  Zero-copy buffer reference: pointer + length into the caller's buffer.
+//  Used by both message framing and recursive tree parsing.
+// ---------------------------------------------------------------------------
+
+struct BufferRef
+{
+    const char* address;  //- pointer into the original buffer
+    size_t      length;   //- byte length of the referenced data
+};
 
 
 // ---------------------------------------------------------------------------
@@ -54,6 +67,39 @@ struct MessageFrameResult
     vector<MessageSegment>   messages;
     size_t                   bytes_consumed;  //- total bytes consumed from the buffer
 };
+
+
+// ---------------------------------------------------------------------------
+//  Recursive zero-copy XML node tree.
+//  Leaf nodes store a BufferRef (address + length) pointing into the
+//  original caller-owned buffer.  Branch nodes store an ordered map of
+//  child element names to XMLNode sub-trees.
+// ---------------------------------------------------------------------------
+
+struct XMLNode;
+typedef map<string, XMLNode> XMLNodeMap;
+
+struct XMLNode
+{
+    bool        is_leaf;     //- true  = leaf (ref is valid)
+                             //- false = branch (children is valid)
+    BufferRef   ref;         //- text content reference (leaf only)
+    XMLNodeMap  children;    //- child elements (branch only)
+
+    XMLNode() : is_leaf(false), ref{nullptr, 0} {}
+};
+
+//- output operator for XMLNode (for Boost.Test diagnostics)
+inline ostream& operator<<(ostream& os, const XMLNode& node)
+{
+    if (node.is_leaf) {
+        os << "Leaf{addr=" << (const void*)node.ref.address
+           << ", len=" << node.ref.length << "}";
+    } else {
+        os << "Branch{" << node.children.size() << " children}";
+    }
+    return os;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -121,6 +167,13 @@ public:
     //- No XML parsing is performed; only message boundary detection.
     static MessageFrameResult frameMessages(const char* buffer, size_t length);
     static MessageFrameResult frameMessages(string_view buffer);
+
+    //- Zero-copy recursive tree parsing: parse a single NLAP XML message
+    //- and return a recursive XMLNode tree where every leaf's BufferRef
+    //- points directly into the caller-owned buffer.  No copies are made
+    //- for element text content.
+    static XMLNode parseToTree(const char* buffer, size_t length);
+    static XMLNode parseToTree(string_view buffer);
 
 private:
 
