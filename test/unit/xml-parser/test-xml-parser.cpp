@@ -262,7 +262,7 @@ static const string INVALID_MISSING_PROTOCOL(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_WRONG_ROOT(
-    "<NOTnlap>"
+    "<notnlap>"
     "<Request>"
     "<UUID>some-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -270,7 +270,7 @@ static const string INVALID_WRONG_ROOT(
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host></Header>"
     "</Request>"
-    "</NOTnlap>"
+    "</notnlap>"
 );
 
 // ---------------------------------------------------------------------------
