@@ -5,10 +5,10 @@
 
 #include <algorithm>
 #include <atomic>
-#include <coroutine>
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
@@ -26,84 +26,6 @@ namespace
 {
 
 static std::atomic_uint32_t XercesRefCount{0};
-
-template<typename T>
-class Generator
-{
-public:
-    struct promise_type {
-        T CurrentValue{};
-
-        Generator get_return_object()
-        {
-            return Generator(std::coroutine_handle<promise_type>::from_promise(*this));
-        }
-
-        std::suspend_always initial_suspend() noexcept { return {}; }
-        std::suspend_always final_suspend() noexcept { return {}; }
-        std::suspend_always yield_value(T Value) noexcept
-        {
-            CurrentValue = std::move(Value);
-            return {};
-        }
-        void return_void() {}
-        void unhandled_exception() { std::terminate(); }
-    };
-
-    class iterator
-    {
-    public:
-        explicit iterator(std::coroutine_handle<promise_type> Handle) : _Handle(Handle) {}
-
-        iterator& operator++()
-        {
-            _Handle.resume();
-            if (_Handle.done()) {
-                _Handle = {};
-            }
-            return *this;
-        }
-
-        const T& operator*() const
-        {
-            return _Handle.promise().CurrentValue;
-        }
-
-        bool operator==(std::default_sentinel_t) const
-        {
-            return !_Handle;
-        }
-
-    private:
-        std::coroutine_handle<promise_type> _Handle;
-    };
-
-    explicit Generator(std::coroutine_handle<promise_type> Handle) : _Handle(Handle) {}
-    Generator(Generator&& Other) noexcept : _Handle(Other._Handle) { Other._Handle = {}; }
-
-    ~Generator()
-    {
-        if (_Handle) {
-            _Handle.destroy();
-        }
-    }
-
-    iterator begin()
-    {
-        if (_Handle) {
-            _Handle.resume();
-            if (_Handle.done()) {
-                return iterator({});
-            }
-        }
-        return iterator(_Handle);
-    }
-
-    std::default_sentinel_t end() const { return {}; }
-
-private:
-    std::coroutine_handle<promise_type> _Handle;
-};
 
 std::string transcodeXMLCh(const XMLCh* Input)
 {
@@ -147,25 +69,28 @@ std::string getElementText(DOMElement* Element)
     return trimCopy(Value);
 }
 
-Generator<DOMElement*> iterateElementChildren(DOMElement* Parent)
+std::vector<DOMElement*> iterateElementChildren(DOMElement* Parent)
 {
+    std::vector<DOMElement*> Elements;
     DOMNodeList* Children = Parent->getChildNodes();
     for (XMLSize_t Index = 0; Index < Children->getLength(); ++Index) {
         DOMNode* Child = Children->item(Index);
         if (Child->getNodeType() == DOMNode::ELEMENT_NODE) {
-            co_yield static_cast<DOMElement*>(Child);
+            Elements.push_back(static_cast<DOMElement*>(Child));
         }
     }
+
+    return Elements;
 }
 
 struct MessageSlice
 {
     std::string_view Slice;
-    std::size_t StartOffset;
 };
 
-Generator<MessageSlice> splitMessages(std::string_view Input, bool& FramingError)
+std::vector<MessageSlice> splitMessages(std::string_view Input, bool& FramingError)
 {
+    std::vector<MessageSlice> Messages;
     std::size_t Cursor = 0;
     std::size_t LastEnd = std::string_view::npos;
 
@@ -177,7 +102,7 @@ Generator<MessageSlice> splitMessages(std::string_view Input, bool& FramingError
 
         if (LastEnd != std::string_view::npos && Start != LastEnd) {
             FramingError = true;
-            co_return;
+            return Messages;
         }
 
         const std::size_t End = Input.find(NLAP_XML_END_MARKER, Start);
@@ -186,11 +111,13 @@ Generator<MessageSlice> splitMessages(std::string_view Input, bool& FramingError
         }
 
         const std::size_t MessageEnd = End + NLAP_XML_END_MARKER.size();
-        co_yield MessageSlice{Input.substr(Start, MessageEnd - Start), Start};
+        Messages.push_back(MessageSlice{Input.substr(Start, MessageEnd - Start)});
 
         Cursor = MessageEnd;
         LastEnd = MessageEnd;
     }
+
+    return Messages;
 }
 
 std::string ensureParseableXML(std::string_view Message)
