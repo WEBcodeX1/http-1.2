@@ -5,7 +5,7 @@
 ### 2.1.1. Request (Static HTML File)
 
 ```xml
-<NLAP>
+<nlap>
     <Request>
         <UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</UUID>
         <Protocol>NLAP</Protocol>
@@ -17,13 +17,13 @@
             <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
-</NLAP>
+</nlap>
 ```
 
 ### 2.1.2. Response (Inline-HTML)
 
 ```xml
-<NLAP>
+<nlap>
     <Response>
         <UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</UUID>
         <Protocol>NLAP</Protocol>
@@ -43,7 +43,7 @@
             </html>
         </Payload>
     </Response>
-</NLAP>
+</nlap>
 ```
 
 ## 2.2. Request / Response Encoded Files
@@ -51,7 +51,7 @@
 ### 2.2.1. Request (Static PNG Image)
 
 ```xml
-<NLAP>
+<nlap>
     <Request>
         <UUID>9a728a72-34ac-9abc-2245-af65cbde66ff</UUID>
         <Protocol>NLAP</Protocol>
@@ -63,13 +63,13 @@
             <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
-</NLAP>
+</nlap>
 ```
 
 ## 2.2.2. Response (Encoded File)
 
 ```xml
-<NLAP>
+<nlap>
     <Response>
         <UUID>9a728a72-34ac-9abc-2245-af65cbde66ff</UUID>
         <Protocol>NLAP</Protocol>
@@ -85,7 +85,7 @@
         [BINARY_PAYLOAD]
         </Payload>
     </Response>
-</NLAP>
+</nlap>
 ```
 
 ## 2.3. Sending Large Files In Parts
@@ -110,7 +110,7 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
 ### 2.3.1. Request (Static BZIP Image)
 
 ```xml
-<NLAP>
+<nlap>
     <Request>
         <UUID>f3477af2-1212-76af-3377-bc7721afbc7a</UUID>
         <Protocol>NLAP</Protocol>
@@ -122,13 +122,13 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
             <User-Agent>Falcon-Browser</User-Agent>
         </Header>
     </Request>
-</NLAP>
+</nlap>
 ```
 
 ## 2.3.2. Partial Response (First Part)
 
 ```xml
-<NLAP>
+<nlap>
     <Response>
         <UUID>f3477af2-1212-76af-3377-bc7721afbc7a</UUID>
         <Protocol>NLAP</Protocol>
@@ -148,7 +148,7 @@ the configuration to chose between sending via `sendfile()` or NLAFP partial tra
         [BINARY_PAYLOAD]
         </Payload>
     </Response>
-</NLAP>
+</nlap>
 ```
 
 ## 2.4. Signing Requests / Responses

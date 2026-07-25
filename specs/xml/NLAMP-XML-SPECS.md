@@ -5,7 +5,7 @@
 ### 1.1.1. Application Request (JSON)
 
 ```xml
-<NLAP>
+<nlap>
     <Request>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
         <Protocol>NLAP</Protocol>
@@ -24,13 +24,13 @@
             }
         </Payload>
     </Request>
-</NLAP>
+</nlap>
 ```
 
 ### 1.1.2. Data Response (JSON)
 
 ```xml
-<NLAP>
+<nlap>
     <Response>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
         <Protocol>NLAP</Protocol>
@@ -47,13 +47,13 @@
             <Code>0</Code>
         </Status>
     </Response>
-</NLAP>
+</nlap>
 ```
 
 ### 1.1.3. Failure Response
 
 ```xml
-<NLAP>
+<nlap>
     <Response>
         <UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>
         <Protocol>NLAP</Protocol>
@@ -69,5 +69,5 @@
             <Exception>NameError: name 'test' is not defined</Exception>
         </Status>
     </Response>
-</NLAP>
+</nlap>
 ```

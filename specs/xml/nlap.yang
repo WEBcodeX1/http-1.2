@@ -298,7 +298,7 @@ module nlap {
   container NLAP {
     description
       "Root element of an NLAP protocol message
-       (maps to DTD element <NLAP>).";
+       (maps to DTD element <nlap>).";
 
     choice message-type {
       mandatory true;

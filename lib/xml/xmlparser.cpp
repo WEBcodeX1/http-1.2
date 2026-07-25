@@ -2,6 +2,7 @@
 #include "xmlconstants.hpp"
 
 #include <atomic>
+#include <string_view>
 
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -211,19 +212,19 @@ static void _parseStatus(DOMElement* statusElem, RequestProperties_t& props)
 //  inject a DOCTYPE declaration so Xerces can locate the DTD for validation.
 // ---------------------------------------------------------------------------
 
-static string _buildParseableXML(const string& xmlMsg)
+static string _buildParseableXML(string_view xmlMsg)
 {
-    string result = xmlMsg;
+    string result(xmlMsg);
 
-    const string declTag  = "<?xml";
-    const string declEnd  = "?>";
-    const string doctype  = "<!DOCTYPE NLAP SYSTEM \"" + NLAP_DTD_SYSTEM_PATH + "\">";
+    constexpr string_view declTag  = "<?xml";
+    constexpr string_view declEnd  = "?>";
+    const string doctype  = "<!DOCTYPE nlap SYSTEM \"" + NLAP_DTD_SYSTEM_PATH + "\">";
 
     size_t declStartPos = result.find(declTag);
 
     if (declStartPos == string::npos) {
         //- no XML declaration at all: prepend both
-        result = NLAP_XML_DECLARATION + doctype + result;
+        result = string(NLAP_XML_DECLARATION_SV) + doctype + result;
     } else {
         //- XML declaration is present: inject DOCTYPE right after it
         size_t declEndPos = result.find(declEnd, declStartPos);
@@ -242,7 +243,7 @@ static string _buildParseableXML(const string& xmlMsg)
 
 class StringHelper {
 public:
-    static void split(string& StringRef, const string& Delimiter, vector<string>& ResultRef)
+    static void split(string& StringRef, string_view Delimiter, vector<string>& ResultRef)
     {
         string SplitElement;
         auto pos = StringRef.find(Delimiter);
@@ -343,6 +344,78 @@ void XMLParser::removeRequest(uint16_t Index)
 }
 
 
+// ---------------------------------------------------------------------------
+//  Zero-copy message framing
+// ---------------------------------------------------------------------------
+
+MessageFrameResult XMLParser::frameMessages(const char* buffer, size_t length)
+{
+    return frameMessages(string_view(buffer, length));
+}
+
+MessageFrameResult XMLParser::frameMessages(string_view buffer)
+{
+    MessageFrameResult result;
+    result.status        = FrameStatus::Valid;
+    result.message_count = 0;
+    result.bytes_consumed = 0;
+
+    if (buffer.empty()) {
+        return result;
+    }
+
+    size_t pos = 0;
+
+    while (pos < buffer.size()) {
+        //- skip leading whitespace between messages
+        size_t nonWs = buffer.find_first_not_of(" \t\r\n", pos);
+        if (nonWs == string_view::npos) {
+            //- only whitespace remaining; treat as consumed
+            result.bytes_consumed = buffer.size();
+            break;
+        }
+        pos = nonWs;
+
+        //- look for start marker at current position
+        if (buffer.substr(pos).substr(0, NLAP_XML_START_MARKER_SV.size()) != NLAP_XML_START_MARKER_SV) {
+            //- data at current position is not a start tag → invalid (garbage)
+            result.status = FrameStatus::Invalid;
+            return result;
+        }
+
+        //- look for matching end marker
+        size_t endPos = buffer.find(NLAP_XML_END_MARKER_SV, pos);
+        if (endPos == string_view::npos) {
+            //- start tag found but no end tag → incomplete trailing message
+            result.status = FrameStatus::Incomplete;
+            return result;
+        }
+
+        //- check for nested / duplicate start tags within the message body
+        size_t innerStart = buffer.find(NLAP_XML_START_MARKER_SV, pos + NLAP_XML_START_MARKER_SV.size());
+        if (innerStart != string_view::npos && innerStart < endPos) {
+            //- nested/duplicate start tag found inside a message → invalid
+            result.status = FrameStatus::Invalid;
+            return result;
+        }
+
+        size_t msgEnd = endPos + NLAP_XML_END_MARKER_SV.size();
+        size_t msgLen = msgEnd - pos;
+
+        MessageSegment seg;
+        seg.start  = buffer.data() + pos;
+        seg.length = msgLen;
+        result.messages.push_back(seg);
+        result.message_count += 1;
+
+        pos = msgEnd;
+        result.bytes_consumed = pos;
+    }
+
+    return result;
+}
+
+
 inline void XMLParser::_processRequests()
 {
     //- split stream buffer into individual NLAP messages on the end marker
@@ -365,7 +438,7 @@ inline bool XMLParser::_processRequestProperties(const size_t Index)
     if (Request.empty()) { return false; }
 
     //- reassemble a complete, valid XML message:
-    //-   1. append </NLAP> (was consumed as the delimiter during split)
+    //-   1. append </nlap> (was consumed as the delimiter during split)
     //-   2. prepend <?xml declaration if not already present
     string XMLMessage = Request;
     XMLMessage += NLAP_XML_END_MARKER;
@@ -388,7 +461,7 @@ inline bool XMLParser::_processRequestProperties(const size_t Index)
     return true;
 }
 
-inline bool XMLParser::_parseXML(const string& XMLMessage, RequestProperties_t& Props)
+inline bool XMLParser::_parseXML(string_view XMLMessage, RequestProperties_t& Props)
 {
     //- build a version of the XML that includes a DOCTYPE so Xerces can
     //- identify the grammar to use from the pre-loaded grammar pool
@@ -431,11 +504,11 @@ inline bool XMLParser::_parseXML(const string& XMLMessage, RequestProperties_t& 
     DOMDocument* doc = parser.getDocument();
     if (!doc) { return false; }
 
-    //- root element: <NLAP>
+    //- root element: <nlap>
     DOMElement* root = doc->getDocumentElement();
     if (!root) { return false; }
 
-    //- first element child of <NLAP> is either <Request> or <Response>
+    //- first element child of <nlap> is either <Request> or <Response>
     DOMNodeList* rootChildren = root->getChildNodes();
     DOMElement*  reqresElem   = nullptr;
 

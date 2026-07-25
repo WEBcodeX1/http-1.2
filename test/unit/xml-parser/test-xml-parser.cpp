@@ -14,7 +14,7 @@ using namespace std;
 // ---------------------------------------------------------------------------
 
 static const string NLAMP_REQUEST_FULL(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -27,7 +27,7 @@ static const string NLAMP_REQUEST_FULL(
     "</Header>"
     "<Payload>{\"param1\":\"string1\",\"param2\":\"string2\",\"param3\":100}</Payload>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ static const string NLAMP_REQUEST_FULL(
 // ---------------------------------------------------------------------------
 
 static const string NLAMP_RESPONSE_SUCCESS(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -48,7 +48,7 @@ static const string NLAMP_RESPONSE_SUCCESS(
     "<Payload>{ \"Result\": 100 }</Payload>"
     "<Status><Code>0</Code></Status>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ static const string NLAMP_RESPONSE_SUCCESS(
 // ---------------------------------------------------------------------------
 
 static const string NLAMP_RESPONSE_FAILURE(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>9b327afe-27ae-2367-aef2-e42445e5b23a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -72,7 +72,7 @@ static const string NLAMP_RESPONSE_FAILURE(
     "<Exception>NameError: name test is not defined</Exception>"
     "</Status>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ static const string NLAMP_RESPONSE_FAILURE(
 // ---------------------------------------------------------------------------
 
 static const string NLAFP_REQUEST_STATIC_FILE(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>7ea45c8a-5193-4855-b9e8-77ae1b9d49ed</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -92,7 +92,7 @@ static const string NLAFP_REQUEST_STATIC_FILE(
     "<User-Agent>Falcon-Browser</User-Agent>"
     "</Header>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -100,7 +100,7 @@ static const string NLAFP_REQUEST_STATIC_FILE(
 // ---------------------------------------------------------------------------
 
 static const string NLAFP_RESPONSE_ENCODED_FILE(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>9a728a72-34ac-9abc-2245-af65cbde66ff</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -114,7 +114,7 @@ static const string NLAFP_RESPONSE_ENCODED_FILE(
     "</Header>"
     "<Payload>BINARY_PAYLOAD_DATA</Payload>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -122,7 +122,7 @@ static const string NLAFP_RESPONSE_ENCODED_FILE(
 // ---------------------------------------------------------------------------
 
 static const string NLAFP_RESPONSE_PARTIAL_FIRST(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>f3477af2-1212-76af-3377-bc7721afbc7a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -140,7 +140,7 @@ static const string NLAFP_RESPONSE_PARTIAL_FIRST(
     "</Header>"
     "<Payload>PART_ONE_DATA</Payload>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -148,7 +148,7 @@ static const string NLAFP_RESPONSE_PARTIAL_FIRST(
 // ---------------------------------------------------------------------------
 
 static const string NLAPS_REQUEST_ENCRYPTED(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -166,7 +166,7 @@ static const string NLAPS_REQUEST_ENCRYPTED(
     "</Security>"
     "<Payload>BASE64ENCRYPTEDPAYLOAD</Payload>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -174,7 +174,7 @@ static const string NLAPS_REQUEST_ENCRYPTED(
 // ---------------------------------------------------------------------------
 
 static const string NLAPS_RESPONSE_ENCRYPTED(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -191,7 +191,7 @@ static const string NLAPS_RESPONSE_ENCRYPTED(
     "<Payload>BASE64ENCRYPTEDPAYLOAD</Payload>"
     "<Status><Code>0</Code></Status>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -200,7 +200,7 @@ static const string NLAPS_RESPONSE_ENCRYPTED(
 
 static const string NLAMP_REQUEST_WITH_XMLDECL(
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>decl-uuid-1234</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -208,7 +208,7 @@ static const string NLAMP_REQUEST_WITH_XMLDECL(
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>declared.local</Host></Header>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ static const string NLAMP_REQUEST_WITH_XMLDECL(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_MALFORMED_XML(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>bad-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -224,7 +224,7 @@ static const string INVALID_MALFORMED_XML(
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host>"   // Header not closed
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -232,14 +232,14 @@ static const string INVALID_MALFORMED_XML(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_MISSING_UUID(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<Protocol>NLAP</Protocol>"
     "<Version>0.1</Version>"
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host></Header>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -247,14 +247,14 @@ static const string INVALID_MISSING_UUID(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_MISSING_PROTOCOL(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>some-uuid</UUID>"
     "<Version>0.1</Version>"
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host></Header>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -262,7 +262,7 @@ static const string INVALID_MISSING_PROTOCOL(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_WRONG_ROOT(
-    "<NOTLAP>"
+    "<NOTnlap>"
     "<Request>"
     "<UUID>some-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -270,7 +270,7 @@ static const string INVALID_WRONG_ROOT(
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host></Header>"
     "</Request>"
-    "</NOTLAP>"
+    "</NOTnlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -278,7 +278,7 @@ static const string INVALID_WRONG_ROOT(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_UNKNOWN_ELEMENT(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>some-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -287,7 +287,7 @@ static const string INVALID_UNKNOWN_ELEMENT(
     "<Header><Host>h.local</Host></Header>"
     "<NotInDTD>some-value</NotInDTD>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -295,7 +295,7 @@ static const string INVALID_UNKNOWN_ELEMENT(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_SECURITY_MISSING_SIGNATURE(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>sec-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -306,7 +306,7 @@ static const string INVALID_SECURITY_MISSING_SIGNATURE(
     "<Encryption>1</Encryption>"
     "</Security>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -314,7 +314,7 @@ static const string INVALID_SECURITY_MISSING_SIGNATURE(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_SECURITY_MISSING_ENCRYPTION(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>sec-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -325,7 +325,7 @@ static const string INVALID_SECURITY_MISSING_ENCRYPTION(
     "<Signature>BASE64SIG</Signature>"
     "</Security>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -333,7 +333,7 @@ static const string INVALID_SECURITY_MISSING_ENCRYPTION(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_STATUS_MISSING_CODE(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>stat-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -344,7 +344,7 @@ static const string INVALID_STATUS_MISSING_CODE(
     "<Description>No Code here</Description>"
     "</Status>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -355,7 +355,7 @@ static const string INVALID_STATUS_MISSING_CODE(
 // ---------------------------------------------------------------------------
 
 static const string INVALID_HEADER_WRONG_ORDER(
-    "<NLAP>"
+    "<nlap>"
     "<Response>"
     "<UUID>order-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -366,7 +366,7 @@ static const string INVALID_HEADER_WRONG_ORDER(
     "<Mime-Type>image/png</Mime-Type>"    // Mime-Type must come before Byte-Size in DTD
     "</Header>"
     "</Response>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
@@ -375,10 +375,10 @@ static const string INVALID_HEADER_WRONG_ORDER(
 
 static const string INVALID_XXE_ATTEMPT(
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-    "<!DOCTYPE NLAP ["
+    "<!DOCTYPE nlap ["
     "  <!ENTITY xxe SYSTEM \"file:///etc/passwd\">"
     "]>"
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>&xxe;</UUID>"
     "<Protocol>NLAP</Protocol>"
@@ -386,19 +386,19 @@ static const string INVALID_XXE_ATTEMPT(
     "<Subtype>NLAMP</Subtype>"
     "<Header><Host>h.local</Host></Header>"
     "</Request>"
-    "</NLAP>"
+    "</nlap>"
 );
 
 // ---------------------------------------------------------------------------
-//  INVALID: empty string (no </NLAP> end marker - never triggers processing)
+//  INVALID: empty string (no </nlap> end marker - never triggers processing)
 // ---------------------------------------------------------------------------
 
 static const string INVALID_NO_END_MARKER(
-    "<NLAP>"
+    "<nlap>"
     "<Request>"
     "<UUID>partial-uuid</UUID>"
     "<Protocol>NLAP</Protocol>"
-    // message deliberately truncated - no </NLAP>
+    // message deliberately truncated - no </nlap>
 );
 
 
@@ -798,7 +798,7 @@ BOOST_AUTO_TEST_CASE( test_valid_header_user_field )
 
 BOOST_AUTO_TEST_CASE( test_invalid_no_end_marker )
 {
-    cout << "Invalid: no end marker </NLAP> - message not processed." << endl;
+    cout << "Invalid: no end marker </nlap> - message not processed." << endl;
 
     unique_ptr<XMLParser> parser = make_unique<XMLParser>(4096);
     parser->appendBuffer(INVALID_NO_END_MARKER.c_str(), INVALID_NO_END_MARKER.length());
@@ -857,7 +857,7 @@ BOOST_AUTO_TEST_CASE( test_invalid_wrong_root_element )
     cout << "Invalid: wrong root element (not NLAP) - DTD validation rejects." << endl;
 
     unique_ptr<XMLParser> parser = make_unique<XMLParser>(4096);
-    // The end marker </NLAP> is not present, so the split on NLAP_XML_END_MARKER
+    // The end marker </nlap> is not present, so the split on NLAP_XML_END_MARKER
     // will never trigger processing. The message is therefore never parsed.
     string bad = INVALID_WRONG_ROOT;
     parser->appendBuffer(bad.c_str(), bad.length());
@@ -1011,4 +1011,188 @@ BOOST_AUTO_TEST_CASE( test_invalid_mixed_valid_invalid_in_one_buffer )
 
     BOOST_TEST(rs == 1u);
     BOOST_TEST(requests.at(0).Subtype == "NLAMP");
+}
+
+
+// ===========================================================================
+//  TEST CASES - ZERO-COPY MESSAGE FRAMING (frameMessages)
+// ===========================================================================
+
+BOOST_AUTO_TEST_CASE( test_frame_single_message )
+{
+    cout << "Frame: single complete message." << endl;
+
+    string input = "<nlap><tag1>value1</tag1></nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 1u);
+    BOOST_TEST(result.messages.size() == 1u);
+    BOOST_TEST(result.messages[0].start == input.c_str());
+    BOOST_TEST(result.messages[0].length == input.size());
+    BOOST_TEST(result.bytes_consumed == input.size());
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_two_contiguous_messages )
+{
+    cout << "Frame: two contiguous messages in one buffer." << endl;
+
+    string msg1 = "<nlap><tag1>value1</tag1></nlap>";
+    string msg2 = "<nlap><tag2>value22</tag2></nlap>";
+    string input = msg1 + msg2;
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 2u);
+    BOOST_TEST(result.messages.size() == 2u);
+
+    BOOST_TEST(result.messages[0].start == input.c_str());
+    BOOST_TEST(result.messages[0].length == msg1.size());
+
+    BOOST_TEST(result.messages[1].start == input.c_str() + msg1.size());
+    BOOST_TEST(result.messages[1].length == msg2.size());
+
+    BOOST_TEST(result.bytes_consumed == input.size());
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_three_messages )
+{
+    cout << "Frame: three contiguous messages." << endl;
+
+    string msg1 = "<nlap><a>1</a></nlap>";
+    string msg2 = "<nlap><b>22</b></nlap>";
+    string msg3 = "<nlap><c>333</c></nlap>";
+    string input = msg1 + msg2 + msg3;
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 3u);
+    BOOST_TEST(result.messages[0].length == msg1.size());
+    BOOST_TEST(result.messages[1].length == msg2.size());
+    BOOST_TEST(result.messages[2].length == msg3.size());
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_string_view_overload )
+{
+    cout << "Frame: string_view overload works identically." << endl;
+
+    string input = "<nlap><tag1>value1</tag1></nlap><nlap><tag2>value2</tag2></nlap>";
+    string_view sv(input);
+
+    auto result = XMLParser::frameMessages(sv);
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 2u);
+    BOOST_TEST(result.messages[0].start == input.data());
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_incomplete_trailing_message )
+{
+    cout << "Frame: trailing incomplete message returns Incomplete." << endl;
+
+    string input = "<nlap><tag1>value1</tag1></nlap><nlap><tag2>val";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Incomplete);
+    BOOST_TEST(result.message_count == 1u);
+    BOOST_TEST(result.messages.size() == 1u);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_garbage_before_first_message )
+{
+    cout << "Frame: garbage before first start tag returns Invalid." << endl;
+
+    string input = "garbage<nlap><tag1>value1</tag1></nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Invalid);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_garbage_between_messages )
+{
+    cout << "Frame: garbage between two messages returns Invalid." << endl;
+
+    string input = "<nlap><tag1>v1</tag1></nlap>GARBAGE<nlap><tag2>v2</tag2></nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Invalid);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_double_start_tag )
+{
+    cout << "Frame: double/nested start tag returns Invalid." << endl;
+
+    string input = "<nlap><nlap><tag1>value1</tag1></nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Invalid);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_empty_buffer )
+{
+    cout << "Frame: empty buffer returns Valid with 0 messages." << endl;
+
+    auto result = XMLParser::frameMessages("", 0);
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 0u);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_only_start_tag )
+{
+    cout << "Frame: only start tag, no end tag returns Incomplete." << endl;
+
+    string input = "<nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Incomplete);
+    BOOST_TEST(result.message_count == 0u);
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_pointers_reference_original_buffer )
+{
+    cout << "Frame: returned pointers reference the original buffer (zero-copy)." << endl;
+
+    string input = "<nlap><x>1</x></nlap><nlap><y>2</y></nlap>";
+
+    auto result = XMLParser::frameMessages(input.c_str(), input.size());
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 2u);
+
+    //- verify that the pointers are into the original buffer, not copies
+    BOOST_TEST((const void*)result.messages[0].start >= (const void*)input.c_str());
+    BOOST_TEST((const void*)result.messages[0].start < (const void*)(input.c_str() + input.size()));
+    BOOST_TEST((const void*)result.messages[1].start >= (const void*)input.c_str());
+    BOOST_TEST((const void*)result.messages[1].start < (const void*)(input.c_str() + input.size()));
+
+    //- verify we can construct string_view from the segment
+    string_view seg0(result.messages[0].start, result.messages[0].length);
+    string_view seg1(result.messages[1].start, result.messages[1].length);
+    BOOST_TEST(seg0 == "<nlap><x>1</x></nlap>");
+    BOOST_TEST(seg1 == "<nlap><y>2</y></nlap>");
+}
+
+BOOST_AUTO_TEST_CASE( test_frame_multiple_full_nlap_messages )
+{
+    cout << "Frame: multiple full NLAP protocol messages." << endl;
+
+    string combined;
+    combined += NLAMP_REQUEST_FULL;
+    combined += NLAMP_RESPONSE_SUCCESS;
+    combined += NLAFP_REQUEST_STATIC_FILE;
+
+    auto result = XMLParser::frameMessages(combined.c_str(), combined.size());
+
+    BOOST_TEST(result.status == FrameStatus::Valid);
+    BOOST_TEST(result.message_count == 3u);
+    BOOST_TEST(result.bytes_consumed == combined.size());
 }
