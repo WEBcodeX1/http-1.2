@@ -13,6 +13,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/XMLGrammarPoolImpl.hpp>
+#include <xercesc/sax/InputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -246,6 +247,31 @@ private:
     std::string _LastMessage;
 };
 
+class BlockingEntityResolver : public HandlerBase
+{
+public:
+    InputSource* resolveEntity(const XMLCh*, const XMLCh* SystemId) override
+    {
+        const std::string AllowedPath(NLAP_DTD_SYSTEM_PATH);
+        const std::string AllowedName("nlap.dtd");
+        const std::string SystemPath = transcodeXMLCh(SystemId);
+
+        if (!SystemPath.empty()) {
+            if (SystemPath == AllowedPath) {
+                return nullptr;
+            }
+
+            if (SystemPath.size() >= AllowedName.size() &&
+                SystemPath.compare(SystemPath.size() - AllowedName.size(), AllowedName.size(), AllowedName) == 0) {
+                return nullptr;
+            }
+        }
+
+        static const XMLByte EmptyDocument[] = {};
+        return new MemBufInputSource(EmptyDocument, 0, "blocked-entity", false);
+    }
+};
+
 void populateTree(DOMElement* Element, XMLNode& Node, std::string_view RawMessage, std::size_t& SearchOffset)
 {
     bool HasElementChildren = false;
@@ -287,11 +313,15 @@ uint16_t parseMessage(
     const std::string Parseable = ensureParseableXML(RawMessage);
 
     ParseErrorHandler SyntaxHandler;
+    BlockingEntityResolver SyntaxResolver;
     XercesDOMParser SyntaxParser;
     SyntaxParser.setErrorHandler(&SyntaxHandler);
     SyntaxParser.setValidationScheme(XercesDOMParser::Val_Never);
     SyntaxParser.setDoNamespaces(false);
     SyntaxParser.setDoSchema(false);
+    SyntaxParser.setLoadExternalDTD(false);
+    SyntaxParser.setCreateEntityReferenceNodes(false);
+    SyntaxParser.setEntityResolver(&SyntaxResolver);
 
     MemBufInputSource SyntaxSource(
         reinterpret_cast<const XMLByte*>(Parseable.data()),
@@ -306,6 +336,7 @@ uint16_t parseMessage(
     }
 
     ParseErrorHandler DTDHandler;
+    BlockingEntityResolver DTDResolver;
     auto* CastedPool = static_cast<XMLGrammarPool*>(GrammarPool.get());
     XercesDOMParser DTDParser(nullptr, XMLPlatformUtils::fgMemoryManager, CastedPool);
 
@@ -317,6 +348,7 @@ uint16_t parseMessage(
     DTDParser.useCachedGrammarInParse(true);
     DTDParser.setCreateEntityReferenceNodes(false);
     DTDParser.setValidationConstraintFatal(true);
+    DTDParser.setEntityResolver(&DTDResolver);
 
     MemBufInputSource DTDSource(
         reinterpret_cast<const XMLByte*>(Parseable.data()),
