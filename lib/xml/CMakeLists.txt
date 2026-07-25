@@ -31,5 +31,6 @@ install(
     FILES
     ./xmlparser.hpp
     ./xmlconstants.hpp
+    ./static-dtd.hpp
     DESTINATION /usr/local/include
 )
