@@ -117,7 +117,7 @@ public:
     void removeRequest(uint16_t Index);
 
     //- Zero-copy message framing: scan a buffer (or string_view) for
-    //- complete <nlap>...</nlap> messages and return their locations.
+    //- complete <NLAP>...</NLAP> messages and return their locations.
     //- No XML parsing is performed; only message boundary detection.
     static MessageFrameResult frameMessages(const char* buffer, size_t length);
     static MessageFrameResult frameMessages(string_view buffer);

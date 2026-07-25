@@ -5,17 +5,17 @@
 #include <cstdint>
 
 //- NLAP XML start marker: configurable tag used to identify message boundaries
-static const std::string NLAP_XML_START_MARKER("<nlap>");
+static const std::string NLAP_XML_START_MARKER("<NLAP>");
 
 //- NLAP XML end marker: used to split stream data into individual NLAP messages
-static const std::string NLAP_XML_END_MARKER("</nlap>");
+static const std::string NLAP_XML_END_MARKER("</NLAP>");
 
 //- XML declaration prepended to messages that do not already contain it
 static const std::string NLAP_XML_DECLARATION("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
 //- string_view variants for zero-copy operations
-static constexpr std::string_view NLAP_XML_START_MARKER_SV("<nlap>");
-static constexpr std::string_view NLAP_XML_END_MARKER_SV("</nlap>");
+static constexpr std::string_view NLAP_XML_START_MARKER_SV("<NLAP>");
+static constexpr std::string_view NLAP_XML_END_MARKER_SV("</NLAP>");
 static constexpr std::string_view NLAP_XML_DECLARATION_SV("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
 //- Path to the NLAP DTD used for validation (override at compile time via -DNLAP_DTD_PATH=...)

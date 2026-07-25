@@ -20,7 +20,7 @@
      Root element
      ============================================================ -->
 
-<!ELEMENT nlap (Request | Response)>
+<!ELEMENT NLAP (Request | Response)>
 
 <!-- ============================================================
      Request

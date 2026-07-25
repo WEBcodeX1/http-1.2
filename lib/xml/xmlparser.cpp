@@ -218,7 +218,7 @@ static string _buildParseableXML(string_view xmlMsg)
 
     constexpr string_view declTag  = "<?xml";
     constexpr string_view declEnd  = "?>";
-    const string doctype  = "<!DOCTYPE nlap SYSTEM \"" + NLAP_DTD_SYSTEM_PATH + "\">";
+    const string doctype  = "<!DOCTYPE NLAP SYSTEM \"" + NLAP_DTD_SYSTEM_PATH + "\">";
 
     size_t declStartPos = result.find(declTag);
 
@@ -438,7 +438,7 @@ inline bool XMLParser::_processRequestProperties(const size_t Index)
     if (Request.empty()) { return false; }
 
     //- reassemble a complete, valid XML message:
-    //-   1. append </nlap> (was consumed as the delimiter during split)
+    //-   1. append </NLAP> (was consumed as the delimiter during split)
     //-   2. prepend <?xml declaration if not already present
     string XMLMessage = Request;
     XMLMessage += NLAP_XML_END_MARKER;
@@ -504,11 +504,11 @@ inline bool XMLParser::_parseXML(string_view XMLMessage, RequestProperties_t& Pr
     DOMDocument* doc = parser.getDocument();
     if (!doc) { return false; }
 
-    //- root element: <nlap>
+    //- root element: <NLAP>
     DOMElement* root = doc->getDocumentElement();
     if (!root) { return false; }
 
-    //- first element child of <nlap> is either <Request> or <Response>
+    //- first element child of <NLAP> is either <Request> or <Response>
     DOMNodeList* rootChildren = root->getChildNodes();
     DOMElement*  reqresElem   = nullptr;
 

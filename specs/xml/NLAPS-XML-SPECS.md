@@ -5,7 +5,7 @@
 ### 5.1.1. Encrypted / Signed Request
 
 ```xml
-<nlap>
+<NLAP>
     <Request>
         <UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>
         <Protocol>NLAP</Protocol>
@@ -27,13 +27,13 @@
             #BASE64-ENCODED-ENCRYPTED-PAYLOAD
         </Payload>
     </Request>
-</nlap>
+</NLAP>
 ```
 
 ### 5.1.2. Encrypted / Signed Response
 
 ```xml
-<nlap>
+<NLAP>
     <Response>
         <UUID>a2327a55-33ae-2557-aef2-e42445e5b23a</UUID>
         <Protocol>NLAP</Protocol>
@@ -56,5 +56,5 @@
             <Code>0</Code>
         </Status>
     </Response>
-</nlap>
+</NLAP>
 ```
