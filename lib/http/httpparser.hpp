@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
+#include <span>
 #include <vector>
 #include <cstdint>
 #include <utility>
@@ -9,11 +11,19 @@
 
 using namespace std;
 
-typedef unordered_map<string, string> RequestHeader_t;
-typedef RequestHeader_t& RequestHeaderRef_t;
+//- transparent hasher: enables heterogeneous lookup (string_view keys without string construction)
+struct StringHash {
+    using is_transparent = void;
+    size_t operator()(string_view sv) const noexcept {
+        return hash<string_view>{}(sv);
+    }
+};
 
-typedef unordered_map<string, string> URLParamMap_t;
-typedef URLParamMap_t& URLParamMapRef_t;
+using RequestHeader_t    = unordered_map<string, string, StringHash, equal_to<>>;
+using RequestHeaderRef_t = RequestHeader_t&;
+
+using URLParamMap_t    = unordered_map<string, string, StringHash, equal_to<>>;
+using URLParamMapRef_t = URLParamMap_t&;
 
 struct RequestProperties_t
 {
@@ -25,10 +35,10 @@ struct RequestProperties_t
     URLParamMap_t URLParams;
 };
 
-typedef RequestProperties_t& RequestPropertiesRef_t;
+using RequestPropertiesRef_t = RequestProperties_t&;
 
-typedef vector<RequestProperties_t> RequestsMap_t;
-typedef RequestsMap_t* RequestsMapPtr_t;
+using RequestsMap_t    = vector<RequestProperties_t>;
+using RequestsMapPtr_t = RequestsMap_t*;
 
 
 class HTTPParser
@@ -40,7 +50,7 @@ public:
     ~HTTPParser();
 
     void appendBuffer(const char*, const uint16_t);
-    RequestsMap_t getRequests();
+    const RequestsMap_t& getRequests() const;
     RequestsMapPtr_t getRequestsPtr();
 
 private:
@@ -68,9 +78,9 @@ private:
 
 protected:
 
-    bool _parseRequestProperties(string&, const RequestPropertiesRef_t);
-    void _parseRequestHeaders(string&, RequestHeaderRef_t);
-    void _parseGETParameter(const string&, URLParamMapRef_t);
+    bool _parseRequestProperties(string_view, const RequestPropertiesRef_t);
+    void _parseRequestHeaders(string_view, RequestHeaderRef_t);
+    void _parseGETParameter(string_view, URLParamMapRef_t);
 };
 
 
@@ -78,36 +88,40 @@ class StringHelper {
 
 public:
 
-    static void split(string& StringRef, const string Delimiter, vector<string>& ResultRef)
+    //- Non-destructive split: returns string_view slices into sv (zero heap allocation per token)
+    static void split(string_view sv, string_view delim, vector<string_view>& out)
     {
-        string SplitElement;
-        auto pos = StringRef.find(Delimiter);
+        for (size_t pos; (pos = sv.find(delim)) != sv.npos; sv.remove_prefix(pos + delim.size()))
+            out.push_back(sv.substr(0, pos));
+        if (!sv.empty()) out.push_back(sv);
+    }
 
+    //- Destructive split: erases consumed tokens from StringRef in-place (used for buffer management)
+    static void split(string& StringRef, string_view Delimiter, vector<string>& ResultRef)
+    {
+        auto pos = StringRef.find(Delimiter);
         while (pos != string::npos) {
-            SplitElement = StringRef.substr(0, pos);
-            ResultRef.push_back(SplitElement);
-            StringRef.erase(0, pos + Delimiter.length());
+            ResultRef.push_back(StringRef.substr(0, pos));
+            StringRef.erase(0, pos + Delimiter.size());
             pos = StringRef.find(Delimiter);
         }
     }
 
-    static void rsplit(string& String, size_t StartPos, const string Delimiter, vector<string>& ResultRef)
+    static void rsplit(string_view String, size_t StartPos, string_view Delimiter, vector<string>& ResultRef)
     {
         size_t FindPos = 0;
         size_t FindPosLast = 0;
-        string Token;
 
         if (StartPos < Delimiter.length()) {
-            ResultRef.push_back(String.substr(0, StartPos));
+            ResultRef.push_back(string(String.substr(0, StartPos)));
             return;
         }
 
         StartPos -= Delimiter.length();
 
-        while ((FindPos = String.rfind(Delimiter, StartPos)) != String.npos) {
+        while ((FindPos = String.rfind(Delimiter, StartPos)) != string_view::npos) {
 
-            Token = String.substr(FindPos+Delimiter.length(), (StartPos-FindPos));
-            ResultRef.push_back(Token);
+            ResultRef.push_back(string(String.substr(FindPos + Delimiter.length(), StartPos - FindPos)));
 
             if (FindPos < Delimiter.length()) {
                 FindPosLast = FindPos;
@@ -118,11 +132,10 @@ public:
             FindPosLast = FindPos;
         }
 
-        Token = String.substr(0, FindPosLast);
-        ResultRef.push_back(Token);
+        ResultRef.push_back(string(String.substr(0, FindPosLast)));
     }
 
-    static bool is_digits(const string& checkdigits)
+    static bool is_digits(string_view checkdigits)
     {
         return all_of(checkdigits.begin(), checkdigits.end(), ::isdigit);
     }
