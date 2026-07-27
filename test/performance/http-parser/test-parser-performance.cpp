@@ -33,7 +33,7 @@
 
 using namespace std;
 using namespace chrono;
-using Nanos = long long;
+using Nanos = chrono::nanoseconds::rep;
 
 // ─── Legacy (pre-optimisation) implementations ───────────────────────────────
 
@@ -156,7 +156,7 @@ static const pair<string,string> kHeaders[] = {
     {"Accept-Charset",   "utf-8"},
     {"DNT",              "1"},
 };
-static constexpr int kHeaderPoolSize = (int)(sizeof(kHeaders) / sizeof(kHeaders[0]));
+static constexpr int kHeaderPoolSize = static_cast<int>(sizeof(kHeaders) / sizeof(kHeaders[0]));
 
 static GenRequest generateRequest(mt19937& rng, int idx)
 {

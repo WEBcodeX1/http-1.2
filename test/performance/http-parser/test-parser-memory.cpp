@@ -22,6 +22,9 @@
 #include <new>
 
 // ─── Allocation tracker (must appear before any other includes) ───────────────
+// NOTE: g_tracking / g_alloc_count / g_alloc_bytes are intentionally not
+// thread-safe.  This benchmark is strictly single-threaded; no synchronisation
+// primitives are needed or added here.
 static bool   g_tracking    = false;
 static size_t g_alloc_count = 0;
 static size_t g_alloc_bytes = 0;
@@ -188,7 +191,7 @@ static const pair<string,string> kHeaders[] = {
     {"Accept-Charset",   "utf-8"},
     {"DNT",              "1"},
 };
-static constexpr int kHeaderPoolSize = (int)(sizeof(kHeaders) / sizeof(kHeaders[0]));
+static constexpr int kHeaderPoolSize = static_cast<int>(sizeof(kHeaders) / sizeof(kHeaders[0]));
 
 static GenRequest generateRequest(mt19937& rng, int idx)
 {
@@ -236,11 +239,16 @@ static GenRequest generateRequest(mt19937& rng, int idx)
 }
 
 // ─── Median helper ────────────────────────────────────────────────────────────
+// For even-length vectors the two central elements are averaged.
 
 template<typename T>
 static T median(vector<T>& v) {
     sort(v.begin(), v.end());
-    return v[v.size() / 2];
+    const size_t n = v.size();
+    if (n == 0) return T{};
+    if (n % 2 == 0)
+        return (v[n / 2 - 1] + v[n / 2]) / 2;
+    return v[n / 2];
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
