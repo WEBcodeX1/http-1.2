@@ -231,7 +231,7 @@ inline void HTTPParser::_parseGETParameter(string_view RequestURL, URLParamMapRe
         StringHelper::split(URLParamsPart, "&", ParamValuePairs);
 
         //- loop over param-value pairs
-        for (const auto ParamValuePair : ParamValuePairs) {
+        for (const auto& ParamValuePair : ParamValuePairs) {
 
             const size_t PVPDelimiterPos = ParamValuePair.find("=");
 

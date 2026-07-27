@@ -112,23 +112,25 @@ public:
         size_t FindPos = 0;
         size_t FindPosLast = 0;
 
+        //- guard ensures StartPos >= Delimiter.length() before the subtraction below
         if (StartPos < Delimiter.length()) {
             ResultRef.push_back(string(String.substr(0, StartPos)));
             return;
         }
 
-        StartPos -= Delimiter.length();
+        StartPos -= Delimiter.length();   //- safe: guarded by the check above
 
         while ((FindPos = String.rfind(Delimiter, StartPos)) != string_view::npos) {
 
             ResultRef.push_back(string(String.substr(FindPos + Delimiter.length(), StartPos - FindPos)));
 
+            //- guard ensures FindPos >= Delimiter.length() before the subtraction below
             if (FindPos < Delimiter.length()) {
                 FindPosLast = FindPos;
                 break;
             }
 
-            StartPos = FindPos - Delimiter.length();
+            StartPos = FindPos - Delimiter.length();   //- safe: guarded by the check above
             FindPosLast = FindPos;
         }
 
