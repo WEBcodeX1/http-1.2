@@ -36,11 +36,23 @@ if ( DEFINED JAVA_BACKEND )
 endif()
 
 # set g++ compiler flags
+# USE_LEGACY_CPP11: when ON the http library is compiled with -std=c++11 (legacy parser);
+#                  the rest of the project also uses c++11.  Default is c++23.
+# Enable with: cmake -DUSE_LEGACY_CPP11=ON ...
+option(USE_LEGACY_CPP11 "Build using the legacy C++11 HTTP parser implementation" OFF)
+if(USE_LEGACY_CPP11)
+    set(HTTP_CXX_STD "-std=c++11")
+    add_compile_definitions(USE_LEGACY_CPP11)
+    message(STATUS "USE_LEGACY_CPP11=ON: compiling with -std=c++11 (legacy HTTP parser)")
+else()
+    set(HTTP_CXX_STD "-std=c++23")
+endif()
+
 if ( DEFINED DEBUG_BUILD )
     add_compile_definitions(DEBUG_BUILD)
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++23 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic -fno-elide-constructors")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread ${HTTP_CXX_STD} -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic -fno-elide-constructors")
 else()
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++23 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv -fno-elide-constructors")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong ${HTTP_CXX_STD} -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv -fno-elide-constructors")
 endif()
 
 # set boost specs
