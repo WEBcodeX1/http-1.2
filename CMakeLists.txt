@@ -1,5 +1,20 @@
 # project settings
 cmake_minimum_required(VERSION 3.11)
+
+# The C++23 HTTP parser uses std::generator (<generator>), which requires GCC 14+.
+# When USE_LEGACY_CPP11 is OFF (default) we auto-detect g++-14 and promote it to
+# the project compiler.  This must be done BEFORE project() to take effect.
+option(USE_LEGACY_CPP11 "Build using the legacy C++11 HTTP parser implementation" OFF)
+if(NOT USE_LEGACY_CPP11)
+    find_program(GXX14 g++-14)
+    if(GXX14)
+        set(CMAKE_CXX_COMPILER "${GXX14}" CACHE STRING "C++ compiler" FORCE)
+        message(STATUS "std::generator requires GCC 14+: using ${GXX14}")
+    else()
+        message(WARNING "g++-14 not found; std::generator may not be available. Install gcc-14 or pass -DCMAKE_CXX_COMPILER=g++-14.")
+    endif()
+endif()
+
 project(falcon-as)
 
 # do not print out warnings about unused variables
@@ -39,7 +54,6 @@ endif()
 # USE_LEGACY_CPP11: when ON the http library is compiled with -std=c++11 (legacy parser);
 #                  the rest of the project also uses c++11.  Default is c++23.
 # Enable with: cmake -DUSE_LEGACY_CPP11=ON ...
-option(USE_LEGACY_CPP11 "Build using the legacy C++11 HTTP parser implementation" OFF)
 if(USE_LEGACY_CPP11)
     set(HTTP_CXX_STD "-std=c++11")
     add_compile_definitions(USE_LEGACY_CPP11)

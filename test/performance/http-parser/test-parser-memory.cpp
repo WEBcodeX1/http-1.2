@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // test-parser-memory.cpp
 //
-// Heap-allocation benchmark: new (C++23 ispanstream / string_view) HTTP
+// Heap-allocation benchmark: new (C++23 std::generator / string_view) HTTP
 // parser vs legacy (vector<string> / destructive split) implementation.
 //
 // Global ::operator new / ::operator delete are replaced with tracking
@@ -58,7 +58,6 @@ void operator delete[](void* p, size_t)  noexcept { std::free(p); }
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <spanstream>
 
 #include "../../../lib/http/httpparser.hpp"
 #include "../../../lib/http/httpconstants.hpp"
@@ -129,17 +128,12 @@ static void new_parseRequestHeaders(
         string_view    Request,
         RequestHeader_t& ResultRef)
 {
-    ispanstream ss(span<const char>(Request.data(), Request.size()));
-    string line;
-    while (getline(ss, line, '\n')) {
-        if (!line.empty() && line.back() == '\r') line.pop_back();
+    for (const auto line : StringHelper::linesOf(Request)) {
         const size_t cs = line.find(": ");
-        if (cs != string::npos && cs > 0) {
-            string_view lv(line);
-            string_view key = lv.substr(0, cs);
-            string_view val = lv.substr(cs + 2);
+        if (cs != string_view::npos && cs > 0) {
+            const string_view val = line.substr(cs + 2);
             if (!val.empty())
-                ResultRef.emplace(string(key), string(val));
+                ResultRef.emplace(string(line.substr(0, cs)), string(val));
         }
     }
 }
@@ -150,10 +144,8 @@ static void new_parseGETParameter(
 {
     const size_t start = RequestURL.find('?');
     if (start == string_view::npos || RequestURL.length() <= start) return;
-    string_view params = RequestURL.substr(start + 1);
-    vector<string_view> pairs;
-    StringHelper::split(params, "&", pairs);
-    for (const auto& pair : pairs) {
+    const string_view params = RequestURL.substr(start + 1);
+    for (const auto pair : StringHelper::splitView(params, "&")) {
         const size_t eq = pair.find('=');
         if (eq != string_view::npos && eq != 0 && pair.length() > eq) {
             ResultRef.emplace(
