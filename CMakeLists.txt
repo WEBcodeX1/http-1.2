@@ -38,9 +38,9 @@ endif()
 # set g++ compiler flags
 if ( DEFINED DEBUG_BUILD )
     add_compile_definitions(DEBUG_BUILD)
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic -fno-elide-constructors")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -std=c++23 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -fwrapv -rdynamic -fno-elide-constructors")
 else()
-    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++20 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv -fno-elide-constructors")
+    set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -pthread -O3 -fstack-protector-strong -std=c++23 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv -fno-elide-constructors")
 endif()
 
 # set boost specs
