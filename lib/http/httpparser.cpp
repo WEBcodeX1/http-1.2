@@ -1,5 +1,6 @@
 #include "httpparser.hpp"
 #include "httpconstants.hpp"
+#include <spanstream>
 
 using namespace std;
 
@@ -198,12 +199,20 @@ inline bool HTTPParser::_parseRequestProperties(string_view Request, const Reque
 
 inline void HTTPParser::_parseRequestHeaders(string_view Request, RequestHeaderRef_t ResultRef)
 {
-    for (const auto line : StringHelper::linesOf(Request)) {
+    //- wrap the raw buffer in a spanstream to parse lines without intermediate copies
+    ispanstream ss(span<const char>(Request.data(), Request.size()));
+    string line;
+    while (getline(ss, line, '\n')) {
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+
+        //- require ": " (colon + space) to match original strict parsing behaviour
         const size_t colonSpace = line.find(": ");
-        if (colonSpace != string_view::npos && colonSpace > 0) {
-            const string_view value = line.substr(colonSpace + 2);
+        if (colonSpace != string::npos && colonSpace > 0) {
+            string_view lv(line);
+            string_view key   = lv.substr(0, colonSpace);
+            string_view value = lv.substr(colonSpace + 2);
             if (!value.empty()) {
-                ResultRef.emplace(string(line.substr(0, colonSpace)), string(value));
+                ResultRef.emplace(string(key), string(value));
             }
         }
     }
@@ -216,9 +225,13 @@ inline void HTTPParser::_parseGETParameter(string_view RequestURL, URLParamMapRe
 
     if (URLParamsStartPos != string_view::npos && RequestURL.length() > URLParamsStartPos) {
 
-        const string_view URLParamsPart = RequestURL.substr(URLParamsStartPos + 1);
+        string_view URLParamsPart = RequestURL.substr(URLParamsStartPos + 1);
 
-        for (const auto ParamValuePair : StringHelper::splitView(URLParamsPart, "&")) {
+        vector<string_view> ParamValuePairs;
+        StringHelper::split(URLParamsPart, "&", ParamValuePairs);
+
+        //- loop over param-value pairs
+        for (const auto& ParamValuePair : ParamValuePairs) {
 
             const size_t PVPDelimiterPos = ParamValuePair.find("=");
 

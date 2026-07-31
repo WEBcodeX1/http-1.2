@@ -8,7 +8,6 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-#include <generator>
 
 using namespace std;
 
@@ -89,25 +88,12 @@ class StringHelper {
 
 public:
 
-    //- Non-destructive split: lazily yields string_view tokens (zero heap allocation per token)
-    static generator<string_view> splitView(string_view sv, string_view delim)
+    //- Non-destructive split: returns string_view slices into sv (zero heap allocation per token)
+    static void split(string_view sv, string_view delim, vector<string_view>& out)
     {
         for (size_t pos; (pos = sv.find(delim)) != sv.npos; sv.remove_prefix(pos + delim.size()))
-            co_yield sv.substr(0, pos);
-        if (!sv.empty()) co_yield sv;
-    }
-
-    //- Line iterator: lazily yields each CR-stripped line from sv (skips empty lines)
-    static generator<string_view> linesOf(string_view sv)
-    {
-        while (!sv.empty()) {
-            const size_t pos = sv.find('\n');
-            string_view line = (pos == sv.npos) ? sv : sv.substr(0, pos);
-            if (!line.empty() && line.back() == '\r') line.remove_suffix(1);
-            if (!line.empty()) co_yield line;
-            if (pos == sv.npos) break;
-            sv.remove_prefix(pos + 1);
-        }
+            out.push_back(sv.substr(0, pos));
+        if (!sv.empty()) out.push_back(sv);
     }
 
     //- Destructive split: erases consumed tokens from StringRef in-place (used for buffer management)
