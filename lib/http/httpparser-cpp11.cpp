@@ -1,6 +1,5 @@
-#include "httpparser.hpp"
-#include "httpconstants.hpp"
-#include <spanstream>
+#include "httpparser-cpp11.hpp"
+#include "httpconstants-cpp11.hpp"
 
 using namespace std;
 
@@ -78,17 +77,18 @@ inline void HTTPParser::_processRequests()
 inline bool HTTPParser::_processRequestProperties(const size_t Index)
 {
     //- get request ref at vector index
-    auto &Request = _SplittedRequests.at(Index);
+    string &Request = _SplittedRequests.at(Index);
 
     //- on empty request return
     if (Request.empty()) { return false; }
 
-    //- init unparsed base properties with default values
-    _RequestProperties = {
-        .HTTPVersion = HTTP_VERSION_UNKNOWN,
-        .HTTPMethod = HTTP_METHOD_OTHER,
-        .URL = "/"
-    };
+    //- init unparsed base properties with default values (C++11 compatible)
+    _RequestProperties.HTTPVersion = HTTP_VERSION_UNKNOWN;
+    _RequestProperties.HTTPMethod  = HTTP_METHOD_OTHER;
+    _RequestProperties.URL         = "/";
+    _RequestProperties.Payload.clear();
+    _RequestProperties.RequestHeaders.clear();
+    _RequestProperties.URLParams.clear();
 
     //- parse base properties
     if (_parseRequestProperties(Request, _RequestProperties) == false) { return false; }
@@ -149,7 +149,7 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
         }
         //- otherwise payload in next splitted message
         else if (_SplittedRequests.size() > Index) {
-            auto &NextRequest = _SplittedRequests.at(Index+1);
+            string &NextRequest = _SplittedRequests.at(Index+1);
             if (NextRequest.length() >= _POSTContentLength) {
                 _RequestProperties.Payload = NextRequest.substr(0, _POSTContentLength);
                 NextRequest.erase(0, _POSTContentLength);
@@ -164,13 +164,13 @@ inline bool HTTPParser::_processRequestProperties(const size_t Index)
     return true;
 }
 
-inline bool HTTPParser::_parseRequestProperties(string_view Request, const RequestPropertiesRef_t ResultBaseProps)
+inline bool HTTPParser::_parseRequestProperties(const string& Request, const RequestPropertiesRef_t ResultBaseProps)
 {
     //- find first line endline
     size_t StartPos = Request.find("\r\n");
 
     //-> if no headers (no \r\n), set start pos to end of string
-    if (StartPos == string_view::npos) {
+    if (StartPos == string::npos) {
         StartPos = Request.length();
     }
 
@@ -197,48 +197,51 @@ inline bool HTTPParser::_parseRequestProperties(string_view Request, const Reque
     return true;
 }
 
-inline void HTTPParser::_parseRequestHeaders(string_view Request, RequestHeaderRef_t ResultRef)
+inline void HTTPParser::_parseRequestHeaders(const string& RequestIn, RequestHeaderRef_t ResultRef)
 {
-    //- wrap the raw buffer in a spanstream to parse lines without intermediate copies
-    ispanstream ss(span<const char>(Request.data(), Request.size()));
-    string line;
-    while (getline(ss, line, '\n')) {
-        if (!line.empty() && line.back() == '\r') line.pop_back();
+    //- copy request to allow destructive split
+    string Request = RequestIn;
 
-        //- require ": " (colon + space) to match original strict parsing behaviour
-        const size_t colonSpace = line.find(": ");
-        if (colonSpace != string::npos && colonSpace > 0) {
-            string_view lv(line);
-            string_view key   = lv.substr(0, colonSpace);
-            string_view value = lv.substr(colonSpace + 2);
-            if (!value.empty()) {
-                ResultRef.emplace(string(key), string(value));
-            }
+    //- split header section into individual lines
+    vector<string> Lines;
+    StringHelper::split(Request, "\r\n", Lines);
+    Lines.push_back(Request);   //- push remainder after last \r\n
+
+    for (auto& Line : Lines) {
+        vector<string> HeaderPair;
+        StringHelper::rsplit(Line, Line.length(), ": ", HeaderPair);
+        if (HeaderPair.size() == 2 &&
+            !HeaderPair[0].empty() &&
+            !HeaderPair[1].empty())
+        {
+            ResultRef.emplace(HeaderPair[1], HeaderPair[0]);   //- key, value
         }
     }
 }
 
-inline void HTTPParser::_parseGETParameter(string_view RequestURL, URLParamMapRef_t ResultRef)
+inline void HTTPParser::_parseGETParameter(const string& RequestURL, URLParamMapRef_t ResultRef)
 {
     //- only process on init character "?" found
     const size_t URLParamsStartPos = RequestURL.find("?");
 
-    if (URLParamsStartPos != string_view::npos && RequestURL.length() > URLParamsStartPos) {
+    if (URLParamsStartPos != string::npos && RequestURL.length() > URLParamsStartPos) {
 
-        string_view URLParamsPart = RequestURL.substr(URLParamsStartPos + 1);
+        //- copy params substring (no string_view in C++11)
+        string URLParamsPart = RequestURL.substr(URLParamsStartPos + 1);
 
-        vector<string_view> ParamValuePairs;
+        vector<string> ParamValuePairs;
         StringHelper::split(URLParamsPart, "&", ParamValuePairs);
+        if (!URLParamsPart.empty()) ParamValuePairs.push_back(URLParamsPart);
 
         //- loop over param-value pairs
-        for (const auto& ParamValuePair : ParamValuePairs) {
+        for (auto& ParamValuePair : ParamValuePairs) {
 
             const size_t PVPDelimiterPos = ParamValuePair.find("=");
 
-            if (PVPDelimiterPos != string_view::npos && PVPDelimiterPos != 0 && ParamValuePair.length() > PVPDelimiterPos) {
+            if (PVPDelimiterPos != string::npos && PVPDelimiterPos != 0 && ParamValuePair.length() > PVPDelimiterPos) {
                 ResultRef.emplace(
-                    string(ParamValuePair.substr(0, PVPDelimiterPos)),
-                    string(ParamValuePair.substr(PVPDelimiterPos + 1))
+                    ParamValuePair.substr(0, PVPDelimiterPos),
+                    ParamValuePair.substr(PVPDelimiterPos + 1)
                 );
             }
         }
