@@ -1,91 +1,50 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
+#include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <string>
+#include <string_view>
 #include <unordered_map>
-using namespace std;
+#include <vector>
 
-//- Header fields map: key = element name (e.g. "Host", "URL", "Mime-Type"), value = text content
-typedef unordered_map<string, string> NLAPHeader_t;
-typedef NLAPHeader_t& NLAPHeaderRef_t;
-
-//- Unified request/response properties covering all NLAP sub-protocols:
-//-   NLAMP  (Next Level Application Metadata Protocol)
-//-   NLAFP  (Next Level Application File Protocol)
-//-   NLASP  (Next Level Application Session Protocol)
-//-   NLAPP  (Next Level Application Proxy Protocol)
-//-   NLAPS  (Next Level Application Protocol Secure Extension)
-struct RequestProperties_t
+struct XMLNode
 {
-    //- full, valid, parsable XML NLAP message (beginning with <?xml)
-    string XMLRawMessage;
+    std::unordered_map<std::string, XMLNode> Children;
+    const char* Address = nullptr;
+    std::size_t Length = 0;
 
-    //- common fields (Request and Response)
-    string RequestType;     //- "Request" or "Response"
-    string UUID;
-    string Protocol;
-    string Version;
-    string Subtype;
+    XMLNode& operator[](const std::string& Key)
+    {
+        return Children[Key];
+    }
 
-    //- Header child elements (all optional per DTD; stored by element name)
-    //- Covers NLAMP: Host, URL, User-Agent, Mime-Type, Encoding
-    //- Covers NLAFP additions: Byte-Size, Byte-Size-Full, Byte-Size-Part,
-    //-                         Compression, File-UUID, File-Part-Sum, File-Part
-    //- Covers NLAPS additions: user, Connection-Close
-    NLAPHeader_t Header;
-
-    //- Security block (NLAPS)
-    string Encryption;
-    string Signature;
-
-    //- Payload (optional, ANY content)
-    string Payload;
-
-    //- Status block (Response only)
-    string StatusCode;
-    string StatusDescription;
-    string StatusException;
+    const XMLNode& at(const std::string& Key) const
+    {
+        return Children.at(Key);
+    }
 };
 
-typedef RequestProperties_t& RequestPropertiesRef_t;
-typedef shared_ptr<RequestProperties_t> RequestPropertiesPtr_t;
+using ResultTree_t = std::unordered_map<std::string, XMLNode>;
 
-typedef unordered_map<uint16_t, RequestProperties_t> RequestsMap_t;
-
+struct ParseResult_t
+{
+    std::vector<ResultTree_t> Results;
+    std::uint16_t ErrorCode = 0;
+};
 
 class XMLParser
 {
-
 public:
-
-    XMLParser(const uint16_t BufferSize);
+    explicit XMLParser(std::size_t ParseBufferSize = 4096);
     ~XMLParser();
 
-    void appendBuffer(const char* BufferRef, const uint16_t RecvBytes);
-    RequestsMap_t getRequests();
-    RequestPropertiesPtr_t getNextRequest();
-    void removeRequest(uint16_t Index);
+    void setParseBufferSize(std::size_t ParseBufferSize);
+    std::size_t getParseBufferSize() const;
+
+    ParseResult_t parse(char* InputBuffer) const;
 
 private:
-
-    void _processRequests();
-    bool _processRequestProperties(const size_t Index);
-    bool _parseXML(const string& XMLMessage, RequestProperties_t& Props);
-
-    vector<string> _SplittedRequests;
-
-    uint16_t _RequestParseError;
-
-    uint16_t _ReqAddIndex;
-    uint16_t _ReqNextIndex;
-
-    string _XMLRequestBuffer;
-    uint16_t _XMLRequestBufferMax;
-
-    RequestProperties_t _RequestProperties;
-    RequestsMap_t _Requests;
-
-    void* _grammarPool;     //- xercesc::XMLGrammarPool* (opaque to avoid Xerces in public header)
+    std::size_t _ParseBufferSize;
+    std::shared_ptr<void> _GrammarPool;
 };
