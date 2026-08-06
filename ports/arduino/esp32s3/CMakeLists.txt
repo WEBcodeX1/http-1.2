@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.11)
 project(esp32s3-httplib)
 
-set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Os -std=c++11 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3 -std=c++23 -Wno-unused-result -Wsign-compare -Wformat -Werror=format-security -DNDEBUG -fwrapv")
 
 # add source dir
 aux_source_directory(../../../lib/http/ SRC_LIST_LIBHTTP)
