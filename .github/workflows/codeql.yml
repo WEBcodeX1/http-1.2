@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            gcc-13 g++-13 \
+            gcc g++ \
             cmake \
             libboost-all-dev \
             nlohmann-json3-dev \
@@ -43,10 +43,10 @@ jobs:
 
       - name: Build
         env:
-          CC: gcc-13
-          CXX: g++-13
+          CC: gcc
+          CXX: g++
         run: |
-          cmake -B _build -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+          cmake -B _build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
           cmake --build _build --parallel $(nproc)
 
       - name: Perform CodeQL Analysis
