@@ -7,6 +7,7 @@
 #include <atomic>
 #include <cstring>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 #include <xercesc/dom/DOM.hpp>
@@ -71,6 +72,10 @@ std::string getElementText(DOMElement* Element)
 template <typename Callback>
 void iterateElementChildren(DOMElement* Parent, Callback&& Handler)
 {
+    static_assert(
+        std::is_void_v<std::invoke_result_t<Callback, DOMElement*>>,
+        "iterateElementChildren callback must return void"
+    );
     DOMNodeList* Children = Parent->getChildNodes();
     for (XMLSize_t Index = 0; Index < Children->getLength(); ++Index) {
         DOMNode* Child = Children->item(Index);
@@ -108,6 +113,7 @@ void splitMessages(std::string_view Input, bool& FramingError, Callback&& Handle
         }
 
         const std::size_t MessageEnd = End + NLAP_XML_END_MARKER.size();
+        // Handler must return true to continue iterating and false to stop.
         if (!Handler(MessageSlice{Input.substr(Start, MessageEnd - Start)})) {
             return;
         }
