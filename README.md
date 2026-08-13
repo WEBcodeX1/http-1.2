@@ -4,7 +4,7 @@ Falcon Application Server - NLAP (Next Level Application Protocol)
 
 [![CodeQL](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql)
 [![License](https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat)](https://github.com/WEBcodeX1/http-1.2/tree/main/LICENSE)
-[![Doxygen API](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html)
+[![Doxygen API](https://img.shields.io/badge/docs-doxygen-blue)](https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html)
 [![Sphinx Docs](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/developer/falconas/v0.3/sphinx/index.html)
 
 ---
