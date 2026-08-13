@@ -1,57 +1,32 @@
-# Signal Termination Handling Test
+# 1. Signal Termination Integration Test
 
-## Overview
+This directory contains a self-contained Boost.Test executable that models the server's
+child-process shutdown flow.
 
-This integration test verifies that the server properly handles SIGTERM signals and propagates them to all child processes.
+## 1.1. Contents
 
-## Test Description
+- `test-signal-termination.cpp`: forks helper child processes, installs `SIGTERM`
+  handlers, and verifies orderly shutdown behavior.
+- `CMakeLists.txt`: registers the `test-signal-termination` executable.
 
-The test validates the following behavior:
+## 1.2. Covered Behavior
 
-1. **Parent Process Tracking**: When child processes are forked, their PIDs are registered with the parent process
-2. **Signal Propagation**: When the parent process receives a SIGTERM signal, it sends SIGTERM to all tracked child processes
-3. **Clean Shutdown**: All child processes handle SIGTERM gracefully and exit cleanly
+The test mirrors the shutdown pattern implemented in the runtime sources without starting
+the full server:
 
-## Test Cases
+- `src/Server.cpp`: keeps track of child PIDs and terminates them during shutdown.
+- `src/ASProcessHandler.cpp`: registers forked application-server processes with the
+  server-side PID tracker.
 
-### Test 1: Parent Sends SIGTERM to Children
-- Creates a parent process with two child processes
-- Registers child PIDs with the parent
-- Sends SIGTERM to parent
-- Verifies that parent forwards SIGTERM to all children
-- Verifies that all processes exit cleanly with status 0
+The Boost.Test cases verify that:
 
-### Test 2: Child Processes Not Killed Without SIGTERM
-- Creates a parent with a child process
-- Verifies that without receiving SIGTERM, the child continues running
-- Sends SIGTERM to verify clean shutdown capability
+1. child PIDs can be collected by the parent-side tracker,
+2. sending `SIGTERM` to the tracked children terminates them cleanly, and
+3. a child process continues running until an explicit termination signal is sent.
 
-## How It Works
-
-The termination handling in the HTTP server follows this pattern:
-
-1. **Server.cpp**: Main server process
-   - Maintains a static vector `ChildPIDs` to track all child process IDs
-   - `Server::terminate()` handler sends SIGTERM to all tracked children when parent receives SIGTERM
-
-2. **ASProcessHandler.cpp**: Application Server child processes
-   - Each forked AS process PID is registered via `registerChildPID()`
-   - Child processes have their own SIGTERM handlers to exit gracefully
-
-3. **ResultProcessor.cpp**: Result processor child process
-   - Forked process PID is returned and registered with parent
-   - Has its own SIGTERM handler for clean shutdown
-
-## Running the Test
+## 1.3. Running the Test
 
 ```bash
 cd build/test/integration/signal-termination
 ./test-signal-termination
 ```
-
-## Expected Output
-
-All test cases should pass, indicating:
-- ✓ Parent successfully tracks child PIDs
-- ✓ SIGTERM is propagated from parent to all children
-- ✓ All processes exit cleanly without requiring SIGKILL

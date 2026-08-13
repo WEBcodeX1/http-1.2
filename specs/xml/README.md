@@ -1,15 +1,15 @@
 # 1. XML Service Metadata Specifications
 
-This directory contains XML service metadata specifications for the Next Level Application Protocol (NLAP) sub-protocols.
+This directory contains the XML-oriented protocol material for NLAP.
 
-## 1.1. Table of Contents
+## 1.1. Contents
 
-1. [Next Level Application Metadata Protocol (NLAMP)](./NLAMP-XML-SPECS.md)
-2. [Next Level Application File Protocol (NLAFP)](./NLAFP-XML-SPECS.md)
-3. [Next Level Application Session Protocol (NLASP)](./NLASP-XML-SPECS.md)
-4. [Next Level Application Proxy Protocol (NLAPP)](./NLAPP-XML-SPECS.md)
-5. [Next Level Application Protocol Secure Extension (NLAPS)](./NLAPS-XML-SPECS.md)
+- `nlap.dtd`: shared DTD describing the common NLAP message envelope and elements.
+- `NLAMP-XML-SPECS.md`: metadata protocol draft.
+- `NLAFP-XML-SPECS.md`: file-transfer protocol draft.
+- `NLAPP-XML-SPECS.md`: proxy protocol draft.
+- `NLAPS-XML-SPECS.md`: security extension draft.
 
-## 1.2. Development Status
+## 1.2. Notes
 
-Ongoing RFP / RFC development status: [Exemplary HTTP Processing Protocol Design](https://www.der-it-pruefer.de/network/Exemplary-HTTP-Processing-Protocol-Design)
+The XML parser library and XML parser tests in this repository use these definitions as the current structural reference point.
