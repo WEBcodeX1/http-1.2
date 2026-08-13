@@ -11,11 +11,11 @@ Falcon Application Server - NLAP (Next Level Application Protocol)
 
 # 1. Overview
 
-An advanced architectural paradigm for *low-latency* **TCP**/IP transport tailored for
-modern browser web-applications and high-throughput data aggregation middleware.
+An advanced architectural paradigm for **low-latency** **TCP**/IP transport tailored for
+modern browser web-applications and **high-throughput** data aggregation middleware.
 
 It incorporates a high-speed *Python 3* or *Java* application server that natively utilizes
-NLAP as its core transport protocol to minimize execution and scheduling overhead.
+**NLAP** as its core transport protocol to minimize execution and scheduling overhead.
 
 # 2. Project Evolution & History
 
