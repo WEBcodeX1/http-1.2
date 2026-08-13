@@ -58,7 +58,7 @@ The technical progression and current state of the NLAP implementation comprise 
 
 1. **Protocol Paradigm Validation:** Analytical evaluation of HTTP/1.1 pipeline extensions resulted in the complete deprecation of stream-oriented processing for the FalconAS architecture in favor of a transactional framework.
 2. **I/O Subsystem Evaluation:** Systematic review of synchronous Berkeley Sockets and multi-threaded processing layouts identified critical architectural bottlenecks, leading to the rejection of traditional multi-threading paradigms.
-3. **Reference Socket Specification:** Formulated and published a verified, non-blocking, and deterministic Berkeley Sockets blueprint on *Der IT Prüfer* ([Technical Insight](https://der-it-pruefer.de)).
+3. **Reference Socket Specification:** Formulated and published a verified, non-blocking, and deterministic Berkeley Sockets blueprint on *Der IT Prüfer* ([Technical Insight](https://www.der-it-pruefer.de/network/Network-Sockets-Insight)).
 4. **Cross-Platform Verification:** Demonstrated the portability of the socket layer by adapting the core FalconAS network-handling runtime to resource-constrained environments, utilizing the ESP32-S3 microcontroller as a reference platform.
 5. **C++23 Parsing Library:** Engineered a specialized, performance- and heap-optimized C++23 validation library for low-level HTTP/1.1 parsing and message generation.
 6. **Architectural Refactoring:** Executed a comprehensive code-base refactoring based on the empirical performance metrics gathered from the initial reference implementations.
