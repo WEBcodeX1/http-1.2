@@ -8,4 +8,4 @@ This directory contains service definitions for the init systems currently suppo
 - [`openrc/`](./openrc/): OpenRC service wrapper.
 - [`init.d/`](./init.d/): SysVinit compatible startup script.
 
-The top-level installer logic in `../install_startup_script.cmake` chooses one of these variants during installation.
+The top-level installer logic in [`../install_startup_script.cmake`](../install_startup_script.cmake) chooses one of these variants during installation.
