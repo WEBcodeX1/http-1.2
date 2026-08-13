@@ -1,15 +1,9 @@
 # 1. Specifications
 
-This folder contains service specifications in XML (including DTD) and YANG format.
+This directory groups the protocol and benchmark specification material that accompanies the implementation.
 
-## 1.1. XML
+## 1.1. Subdirectories
 
-Service specifications in XML format: [./xml/](./xml).
-
-## 1.2. YANG
-
-Service specifications in YANG format: [./yang/](./yang).
-
-## 1.3. Database
-
-Database definitions / performance-test data: [./database/](./database).
+- [`xml/`](./xml/): XML / DTD protocol definitions and per-subtype specification drafts.
+- [`yang/`](./yang/): YANG representation of the NLAP message model.
+- [`database/`](./database/): database notes for performance-test result storage.

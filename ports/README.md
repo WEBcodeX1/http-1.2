@@ -1,5 +1,7 @@
-# Ported Systems
-This directory contains ports to multiple systems.
+# 1. Ported Systems
 
-## Arduino
-The ./arduino subdir contains ports to arduino based microcontrollers. 
+This directory contains platform-specific ports of reusable FalconAS components.
+
+## 1.1. Subdirectories
+
+- [`arduino/`](./arduino/): microcontroller-focused cross-builds of the HTTP parser library for ESP32 targets.

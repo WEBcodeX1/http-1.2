@@ -1,14 +1,9 @@
-# Internal C++ Libraries
+# 1. Internal C++ Libraries
 
-The following C++ Libraries are used internally by the project.
+This directory contains the reusable libraries that are built before the main `falcon-as` server and linked into tests.
 
-## 1. Event Library
+## 1.1. Subdirectories
 
-The **Event Library** is a tiny library providing a simple callback mechanism.
-
-## 2. HTTP/1.1 Library
-
-The **HTTP/1.1 Library** is used to
-
-- Parse HTTP Requests / Headers
-- Generate HTTP Requests / Headers
+- [`event/`](./event/): small shared callback / event helper library (`libevent2`).
+- [`http/`](./http/): static HTTP parsing and message generation library (`httpparser`).
+- [`xml/`](./xml/): static Xerces-C++ backed XML parsing library (`xmlparser`).

@@ -1,8 +1,10 @@
-# Tests
+# 1. Tests
 
-Tests are devided into the following Sub-Sections.
+This directory contains the CMake-organized test and benchmark tree for FalconAS.
 
-- Evaluation Tests [./eval](./eval)
-- Unit Tests [./unit](./unit)
-- Integration Tests [./integration](./integration)
-- Performace Tests [./performance](./performance)
+## 1.1. Subdirectories
+
+- [`eval/`](./eval/): exploratory and feature-evaluation executables.
+- [`integration/`](./integration/): cross-component tests and end-to-end style checks.
+- [`unit/`](./unit/): focused tests for individual libraries and helpers.
+- [`performance/`](./performance/): benchmark and measurement-oriented executables.
