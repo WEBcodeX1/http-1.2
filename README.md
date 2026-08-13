@@ -1,351 +1,95 @@
-<h1 align="center">🚀 NLAP - FalconAS</h1>
-<p align="center"><em>XML based <b>N</b>ext <b>L</b>evel <b>A</b>pplication <b>P</b>rotocol including a lightning-fast Python / Java Application Server (FalconAS)</em></p>
+![FalconAS Logo](./image/falconas-logo.png)
 
-<div align="center">
-  <a href="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql">
-    <img src="https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg" alt="CodeQL">
-  </a>
-  <a href="https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html">
-    <img src="https://img.shields.io/badge/docs-webcodex-blue" alt="Docs Oxygen">
-  </a>
-  <a href="https://docs.webcodex.de/developer/falconas/v0.3/sphinx/index.html">
-    <img src="https://img.shields.io/badge/docs-sphinx-blue" alt="Docs Sphinx">
-  </a>
-  <a href="https://github.com/WEBcodeX1/http-1.2/releases">
-    <img src="https://img.shields.io/github/v/release/WEBcodeX1/http-1.2?include_prereleases" alt="Release">
-  </a>
-</div>
+Falcon Application Server - NLAP (Next Level Application Protocol)
+
+[![CodeQL](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql)
+[![License](https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat)](https://github.com/WEBcodeX1/http-1.2/tree/main/LICENSE)
+[![Doxygen API](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html)
+[![Sphinx Docs](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/x0/v1.0/)
 
 ---
 
-This project includes:
-
-- A rock-solid, fast, and secure HTTP/1.1 parser and generator C++ library for use in microcontroller (e.g., Arduino) projects
-- A (not-yet-finished) XML-based (NLAP protocol) application server (Python or Java) for real-time or high-security requirements
-
-## :pushpin: Overview
-
-**NLAP (Next Level Application Protocol)** is an XML-based protocol designed to replace HTTP
-for modern web application requirements.
-
-**NLAP solves these problems** with a clean, XML-based transport encapsulation that natively supports:
-
-- ✅ **Robust** parallel **multi-response** transmission **over a single socket**
-- ✅ **Elimination** of **head-of-line blocking** (time-consuming responses do not block follow-ups)
-- ✅ Structured, **XML-encapsulated transport** data, including **validatable** XML schemas
-- ✅ Firewall-friendly, **port-separated protocol subtypes** (NLAFP for files, NLAMP for application server requests)
-- ✅ Simple, non-TLS, HSM- and TPM-based X.509 authentication, signing and encryption
-
-**FalconAS Server Features**:
+# 1. Overview
 
-- ✅ **Kernel Mutex-Less**: Built with on-chip atomic user space locks
-- ✅ **Lightning-Fast Performance**: Epoll-based / multi-socket optimized architecture
-- ✅ **Sendfile Static File Delivery**: In-kernel sendfile() decrease scheduling latency
-- ✅ **Rock-Solid App-Server Security**: Runs with tight backend process-separation model (non-threaded)
-- ✅ **SPA Realtime Demands**: Built for modern browser applications (SPAs) real-time demands
-- ✅ **Zero Bloat**: Eliminates unnecessary complexity while maintaining compatibility
-- ✅ **Python-Powered**: FalconAS application server with embedded Python scripting
-- ✅ **Java-Powered**: FalconAS application server with embedded Java scripting
+An advanced architectural paradigm for *low-latency* **TCP**/IP transport tailored for
+modern browser web-applications and high-throughput data aggregation middleware.
 
-## :bookmark_tabs: Table of Contents
-
-1. [Quick Start](#racehorse-quick-start)
-2. [Features](#star2-features)
-3. [Why NLAP Instead of HTTP/1.2?](#mega-why-nlap-instead-of-http12)
-4. [Build & Installation](#hammer_and_wrench-build--installation)
-5. [Testing](#test_tube-testing)
-6. [Technical Architecture](#gear-technical-architecture)
-7. [Documentation](#page_with_curl-documentation)
-8. [Community & Support](#globe_with_meridians-community--support)
-9. [Contributing](#wave-contributing)
-10. [Future Milestones](#alarm_clock-future-milestones)
-11. [License](#memo-license)
+It incorporates a high-speed *Python 3* or *Java* application server that natively utilizes
+NLAP as its core transport protocol to minimize execution and scheduling overhead.
 
----
+# 2. Project Evolution & History
 
-## :racehorse: Quick Start
+The project was originally conceptualized under the designation `HTTP/1.2`. The initial
+objective was to mitigate the limitations of the flawed HTTP/1.1 pipelining specification
+by injecting unique UUIDs into individual requests.
 
-Get FalconAS (using HTTP/1.1 or NLAP) running in minutes:
+However, practical implementation demonstrated that this approach introduces severe
+technical problems. 
 
-```bash
-# clone repository
-git clone https://github.com/WEBcodeX1/http-1.2.git
-cd http-1.2
+Because the `HTTP/1.1` specification relies strictly on synchronous, serial processing,
+it remains fundamentally incompatible with modern, deterministic zero-latency architectures.
+Consequently, the `HTTP/1.2` pipelining methodology was deprecated in favor of a novel
+architectural framework: **NLAP**.
 
-# install dependencies (Ubuntu 22.04/Debian 12)
-apt-get install git cmake python3-pip libboost-all-dev python3-dev nlohmann-json3-dev
+# 3. What is NLAP? What problems does NLAP solve?
 
-# build and install
-cmake .
-make
-sudo make install
+NLAP (Next Level Application Protocol) is a deterministic, transaction-oriented transport
+framework that formally resolves long-standing architectural omissions in Layer 5 (Session)
+and Layer 6 (Presentation) of the OSI model over standard TCP. Originally conceptualized by
+IETF engineers as an in-kernel transactional framed protocol, NLAP realizes this design paradigm
+in user space while maintaining full compatibility with standard `TCP_STREAM` sockets.
 
-# start using systemd (automatically configured during install)
-sudo systemctl daemon-reload
-sudo systemctl enable falcon-as
-sudo systemctl start falcon-as
+By replacing traditional, continuous stream-based processing with discrete, strictly validated
+XML message frames, NLAP achieves exceptional throughput, structural security, and minimal
+latency.
 
-# OR start manually
-. ./scripts/ulimit.sh
-. ./scripts/set-transparent-hugepages.sh
-/usr/local/bin/falcon-as
-```
+**Core Architectural Characteristics:**
 
-The server will be available with test applications at:
-- `http://testapp1.local/` (HTTP/1.1 compatibility mode)
-- `http://testapp2.local/` (HTTP/1.1 compatibility mode)
+- **Strict XML Message Framing:** Eliminates stream-parsing ambiguities by processing strictly bounded data packets. This non-streamed approach significantly enhances parsing security, mitigates memory-corruption vectors, and maximizes raw processing performance.
+- **Formalized Model Descriptions:** Reduces protocol complexity to a bare minimum by enforcing a 100% complete structural and semantic definition via Document Type Definitions (DTD) and YANG modeling schemas.
+- **Granular Protocol Sub-typing:** Sub-divides transport traffic into distinct, functional protocol variants to maximize scalability and simplify network firewalls (see chapter ).
+- **Simplified High-Integrity Cryptography**: Drastically reduces cryptographic complexity. Because data is processed as static, complete messages rather than continuous streams, the entire frame is signed and encrypted atomically. This enables hardware-native X.509 standard compliance with direct HSM and TPM integration without complex TLS state-machines.
+- **End-to-End Non-Blocking Architecture:** Features non-blocking execution primitives across all protocol layers. This design integrates seamlessly with Linux Kernel 7.0 AccECN (Accurate ECN) to optimize TCP retransmission timeouts (RTO) and low-latency feedback loops.
+- **Near-Kernel Latency & Zero HoL Blocking**: Inherently eliminates head-of-line (HoL) blocking over a single socket connection. By deploying hybridized io_uring and epoll I/O frameworks, NLAP achieves deterministic processing speeds that mirror kernel-level transport latencies.
 
-For detailed installation instructions, see [BUILD.md](BUILD.md).
+# 4. Achievements
 
----
+The technical progression and current state of the NLAP implementation comprise the following structural phases and components:
 
-## :star2: Features
+1. **Protocol Paradigm Validation:** Analytical evaluation of HTTP/1.1 pipeline extensions resulted in the complete deprecation of stream-oriented processing for the FalconAS architecture in favor of a transactional framework.
+2. **I/O Subsystem Evaluation:** Systematic review of synchronous Berkeley Sockets and multi-threaded processing layouts identified critical architectural bottlenecks, leading to the rejection of traditional multi-threading paradigms.
+3. **Reference Socket Specification:** Formulated and published a verified, non-blocking, and deterministic Berkeley Sockets blueprint on *Der IT Prüfer* ([Technical Insight](https://der-it-pruefer.de)).
+4. **Cross-Platform Verification:** Demonstrated the portability of the socket layer by adapting the core FalconAS network-handling runtime to resource-constrained environments, utilizing the ESP32-S3 microcontroller as a reference platform.
+5. **C++23 Parsing Library:** Engineered a specialized, performance- and heap-optimized C++23 validation library for low-level HTTP/1.1 parsing and message generation.
+6. **Architectural Refactoring:** Executed a comprehensive code-base refactoring based on the empirical performance metrics gathered from the initial reference implementations.
+7. **Schema Implementation:** Developed the comprehensive structural boundaries for all NLAP protocol subtypes, formalized through complete Document Type Definitions (DTD) and YANG modeling layouts compiled with AI assistance.
+8. **Zero-Copy XML Parsing Engine:** Implemented a memory-optimized XML parsing layer utilizing C++23 features (`std::generator`) and non-allocating string views (`std::string_view`) to minimize data-handling overhead, developed with AI assistance.
 
-### Core Advantages
-- **🚀 Lightning-Fast**: Epoll-based architecture for maximum performance
-- **🔒 Secure by Design**: Interpreters run non-threaded / unix process isolated
-- **⚡ Zero Bloat**: Clean XML-based protocol without HTTP's legacy complexity
-- **🎯 SPA-Optimized**: Perfect for modern Single Page Applications real-time demands
-- **🐍 Python-Powered**: Embedded Python interpreter / scripting integration
-- **☕ Java-Powered**: Embedded Java JNI / scripting integration
+# 5. Working Components
 
-### NLAP Protocol Innovations
-- **XML-Based Transport**: Clean, structured request/response format
-- **Native UUID System**: Built-in request/response matching
-- **Multiple Subtypes**: NLAFP for file transfer, NLAMP for application metadata
-- **Extensible Architecture**: XML schemas enable easy protocol evolution
-- **Partial File Transfer**: Efficient handling of large files with chunked transfer
-- **Request/Response Signing**: Built-in cryptographic signing support
+Below is a brief overview of the currently functional and production-ready components:
 
-### Technical Features
-- **Static Content Server**: High-performance file serving with sendfile()
-- **Application Server**: Python scripting with shared memory architecture
-- **Memory Management**: Huge pages support and optimized memory layout
-- **Process Architecture**: Separate processes to avoid Python GIL limitations
-- **JSON Configuration**: Clean, maintainable configuration system
-- **JSON Powered By**: [nlohmann/json](https://github.com/nlohmann/json) C++ JSON library
+- **Memory (heap)-optimized HTTP/1.1 library:** Features a fast parser and message generator (`/lib/http/`).
+- **Microcontroller portability:** The HTTP/1.1 parser library is fully ported to the ESP-IDF based ESP32-S3 and ESP32-C3 platforms (`/ports/arduino/`).
+- **Structural specifications:** Includes core XML and workflow schemas formalized via DTD and YANG models (`/specs/`).
+- **Optimized XML processing:** A memory-optimized Apache Xerces-based parser tailored for NLAP validation and message processing.
 
----
+# 6. Milestones
 
-## :mega: Why NLAP Instead of HTTP/1.2?
+The following developments are scheduled for immediate implementation:
 
-### The Problem with HTTP/1.2
+- **Kernel I/O Integration:** Adaptation of Linux `io_uring` (for asynchronous zero-copy receiving and sending) and `epoll` (restricted to transmission operations), adhering to the architectures validated in sections 4.2, 4.3, and 4.4.
+- **NLAMP Prototype:** Initial development of the Application Server Metadata ("M") prototype, featuring process-based Shared Memory (SHM) isolation within *FalconAS*.
+- **NLAFP Prototype:** Initial development of the File-Transport ("F") prototype, utilizing high-speed, direct user-space I/O.
+- **NLAPS Integration:** Full architectural implementation of the ("S") Security Extensions layer.
 
-**HTTP/1.2 is not being pursued** - The original plan to extend HTTP/1.1 with UUID headers faces insurmountable challenges:
+# 7. NLAP Subtypes
 
-- **Ancient Text-Based Protocol Design**: HTTP's line-based parsing is incompatible with efficient UUID integration
-- **Client Library Overhead**: Client processing must be re-implemented for a dead protocol, this means unnecessary effort,
-better implement intop modern NLAP design
+Each NLAP sub-protocol operates on a dedicated TCP port and is structured as follows:
 
-### The Problem with HTTP/2 & HTTP/3
+- **NLAFP:** File-transport operations.
+- **NLAMP:** Application server Metadata (JSON) exchange.
+- **NLAPP:** Upcoming Proxy Server implementation, featuring auto-scaling and multi-endpoint support.
+- **NLAPS:** Security Extensions, handling cryptographic signing, encryption, and authentication.
 
-**HTTP/2 Complexity Crisis:**
-- Excessive complexity destroys HTTP/1.1's elegant simplicity
-- Everything packed into one "black box" without logical separation
-- Libraries are confusing and difficult to understand
-- TLS/SSL handling unnecessarily embedded in protocol
-
-**HTTP/3 UDP Issues:**
-- Solves core issues but moves unneccessary (already worldwide approved and adopted) complexity
-from TCP into UDP (application) layer
-
-### Our Solution: NLAP (Next Level Application Protocol)
-
-NLAP replaces HTTP's legacy concepts with a clean, modern XML-based and application-centric (not document-centric) protocol.
-
-> **🎯 Key Innovation**: XML transport encapsulation, structured data, reliable concurrent-response transmission and extensibility that HTTP's ancient text format cannot match.
-
-**NLAP Protocol Specifications:**
-- **XML-Based**: Structured, parseable, extensible format
-- **Built-in UUID**: Native request/response correlation
-- **Multiple Subtypes**: NLAFP for file protocol, NLAMP for metadata protocol
-- **First Specs Available**: See `/specs/xml/` for NLAFP and NLAMP documentation
-
----
-
-## :hammer_and_wrench: Build & Installation
-
-### Prerequisites
-
-**Operating System Support:**
-- Ubuntu 22.04 (Jammy Jellyfish) 
-- Ubuntu 24.04 (Noble Numbat)
-- Debian 12
-
-**Required Dependencies:**
-```bash
-# core build tools
-apt-get install git cmake
-
-# c++ boost libraries
-apt-get install libboost-all-dev
-
-# python development headers
-apt-get install python3-dev
-
-# c++ json library
-apt-get install nlohmann-json3-dev
-```
-
-### Build Options
-
-**Standard Build:**
-```bash
-cmake .
-make
-make install
-```
-
-**Debug Build:**
-```bash
-cmake -DDEBUG_BUILD=1 .
-make
-make install
-```
-
-**Java Backend Build:**
-```bash
-export JAVA_HOME=/usr/lib/jvm/jdk-24.0.2-oracle-x64/
-cmake -DJAVA_BACKEND=1 .
-make
-make install
-```
-
-For complete build instructions, see [BUILD.md](BUILD.md).
-
----
-
-## :test_tube: Testing
-
-Comprehensive testing infrastructure ensures reliability:
-
-- **Unit Tests**: Core component validation (`/test/unit/`)
-- **Integration Tests**: End-to-end functionality (`/test/integration/`)
-- **Performance Tests**: Benchmarking and optimization (`/test/performance/`)
-- **Evaluation Tests**: Protocol compliance (`/test/eval/`)
-
-See [test documentation](/test/README.md) for detailed testing procedures.
-
----
-
-## :gear: Technical Architecture
-
-### Process Model
-
-```text
-+----------------+---------------+---------------+----------------+
-| Server Process | AS Process 1  | AS Process x  | Result Process |
-|                | Python Interp.| Python Interp.|                |
-+-----------------------------------------------------------------+
-| Shared Memory                                                   |
-|  - StaticFS Requests                                            |
-|  - AS Metadata                                                  |
-|  - AS Requests                                                  |
-|  - AS Results                                                   |
-+-----------------------------------------------------------------+
-```
-
-**Design Principles:**
-- **Process-Based**: Separate processes avoid Python GIL limitations
-- **Shared Memory**: High-performance IPC with atomic locks (kernel mutex-less)
-- **Huge Pages**: Memory optimization for better performance
-
-### Performance Philosophy: Epoll vs Coroutines
-
-**⚠️ Coroutine Warning**: While trending, coroutines can be **counterproductive** for scalability if implemented incorrectly.
-
-**The Problem with incorrectly implemented Coroutines:**
-- In case a single connection awaits a syscall `read()` result
-- Its similar to one `poll()`  for a single connection file descriptor
-- 10,000 connections = 10,000 syscalls (context switches)
-- Massive overhead for checking received data (unscalable)
-
-**Our Epoll Advantage:**
-- **Single syscall** informs about multiple FDs with pending data
-- Used by nginx and other high-performance servers
-
----
-
-## :page_with_curl: Documentation
-
-### Official Documentation
-- **Build Instructions**: [BUILD.md](BUILD.md)
-- **Testing Guide**: [test/README.md](/test/README.md)  
-- **Technical Specifications**: [specs/md/README.md](/specs/md/README.md)
-- **Feature Comparison**: [FEATURE-MATRIX.md](FEATURE-MATRIX.md)
-- **Sphinx Rendered**: [Detailed Sphinx](https://docs.webcodex.de/developer/falconas/sphinx/index.html)
-- **Doxygen Rendered**: [Doxygen - UML relations](https://docs.webcodex.de/developer/falconas/doxygen/index.html)
-
-### Online Resources
-- **CI Documentation**: [/doc/README.md](/doc/README.md)
-- **RFP/RFC Specs**: [http://docs.webcodex.de/wacp/rfp/](http://docs.webcodex.de/wacp/rfp/)
-- **Detailed Analysis**: [Der IT Prüfer](http://der-it-pruefer.de)
-
-### Protocol Specifications
-- **NLAP XML Specs**: See [/specs/xml/](/specs/xml/) for detailed protocol documentation
-  - [NLAFP (Next Level Application File Protocol)](/specs/xml/NLAFP-XML-SPECS.md)
-  - [NLAMP (Next Level Application Metadata Protocol)](/specs/xml/NLAMP-XML-SPECS.md)
-- **Internal Libraries**: [lib/README.md](lib/README.md)
-
----
-
-## :globe_with_meridians: Community & Support
-
-### Get Help & Discuss
-- **Issues**: [GitHub Issues](https://github.com/WEBcodeX1/http-1.2/issues) - Bug reports and feature requests
-- **Email**: [http1-2@webcodex.de](mailto:http1-2@webcodex.de) - Questions and improvement ideas
-- **Security**: [SECURITY.md](SECURITY.md) - Security vulnerability reporting
-
-### Stay Updated
-- **Documentation**: [Official Docs](http://docs.webcodex.de/wacp/rfp/)
-- **RFC Updates**: [Der IT Prüfer](http://der-it-pruefer.de) - Detailed protocol analysis
-
----
-
-## :wave: Contributing
-
-We welcome contributions! Whether you're:
-- 🐛 **Reporting bugs**
-- 💡 **Suggesting features** 
-- 📝 **Improving documentation**
-- 🔧 **Submitting code**
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Code Quality Standards:**
-- Clean, readable, maintainable code
-- Comprehensive testing
-- Security-conscious development
-- Commit signing with GPG/SSH keys
-
----
-
-## :alarm_clock: Future Milestones
-
-### Short-term Goals
-- [x] **HTTP/1.1 Compatibility**: Minimal SPA related features
-- [x] **x0 Framework Integration**: Seamless SPA framework compatibility
-- [ ] **NLAP Protocol Implementation**: Complete NLAFP and NLAMP implementation
-- [ ] **NLAP Client Library**: Reference implementation for clients
-- [ ] **Performance Benchmarks**: Comprehensive HTTP/1.1, HTTP/2, HTTP/3, and NLAP comparisons
-
-### Long-term Vision
-- [ ] **Protocol Standardization**: Submit NLAP as official RFC
-- [ ] **Enterprise Features**: Advanced monitoring, analytics, management
-- [ ] **Proxy Server Component**: Complete the load balancing/reverse proxy module
-- [ ] **NLAP Browser Support**: Native NLAP support in modern browsers
-
-See [GitHub Milestones](https://github.com/WEBcodeX1/http-1.2/milestones) for detailed roadmap.
-
----
-
-## :memo: License
-
-**GNU Affero General Public License v3.0** - See [LICENSE](LICENSE) for details.
-
----
-
-<p align="center">
-  <strong>🚀 Ready to experience the future of web protocols?</strong><br>
-  <sub>Made with ❤️ by Claus Prüfer / clickIT / WEBcodeX</sub>
-</p>
+Detailed specifications for each sub-protocol are available in the `/specs` directory.
