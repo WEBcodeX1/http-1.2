@@ -9,3 +9,5 @@ This directory contains service definitions for the init systems currently suppo
 - [`init.d/`](./init.d/): SysVinit compatible startup script.
 
 The top-level installer logic in [`../install_startup_script.cmake`](../install_startup_script.cmake) chooses one of these variants during installation.
+
+For manual installation, copy the file from the matching subdirectory into the init-system specific service location and enable it with the native service manager for that platform.
