@@ -4,21 +4,16 @@ Main Specs in [./md/](./md/README.md).
 
 ## 1.1. Database
 
-Database Definitions / Performance Test Data [./database/](./database).
+Database Definitions / Performance Test Data: [./database/](./database).
 
 ## 1.2. Markup
 
-Main Specs / Markup Documents [./md/](./md/README.md).
+Main Specs / Markup Documents: [./md/](./md/README.md).
 
-## 1.3. Portable Document Format
+## 1.3. XML
 
-PDF rendered / from Visio [./pdf/](./pdf).
+Service Specifications in XML format: [./xml/](./xml).
 
-## 1.4. MS Visio
+## 1.4. YANG
 
-Microsoft Visio Slides [./visio/](./visio).
-
-## 1.5. XML
-
-XML Service Specifications [./xml/](./xml).
-
+Service Specifications in YANG format: [./yang/](./yang).
