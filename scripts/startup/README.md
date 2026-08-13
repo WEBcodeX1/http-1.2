@@ -10,4 +10,8 @@ This directory contains service definitions for the init systems currently suppo
 
 The top-level installer logic in [`../install_startup_script.cmake`](../install_startup_script.cmake) chooses one of these variants during installation.
 
-For manual installation, copy the file from the matching subdirectory into the init-system specific service location and enable it with the native service manager for that platform.
+## 1.2. Manual Installation Quick Reference
+
+- **systemd:** copy `systemd/falcon-as.service` to `/etc/systemd/system/`, then run `systemctl daemon-reload` and `systemctl enable --now falcon-as`.
+- **OpenRC:** copy `openrc/falcon-as` to `/etc/init.d/`, make it executable, then run `rc-update add falcon-as default` and `rc-service falcon-as start`.
+- **SysVinit:** copy `init.d/falcon-as` to `/etc/init.d/`, make it executable, then run `update-rc.d falcon-as defaults` and `service falcon-as start`.
