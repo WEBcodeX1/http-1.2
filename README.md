@@ -20,8 +20,8 @@ NLAP as its core transport protocol to minimize execution and scheduling overhea
 # 2. Project Evolution & History
 
 The project was originally conceptualized under the designation `HTTP/1.2`. The initial
-objective was to mitigate the limitations of the flawed HTTP/1.1 pipelining specification
-by injecting unique UUIDs into individual requests.
+objective was to mitigate the limitations of the flawed `HTTP/1.1` pipelining specification
+by injecting unique **UUIDs** into individual requests.
 
 However, practical implementation demonstrated that this approach introduces severe
 technical problems. 
@@ -47,7 +47,7 @@ latency.
 
 - **Strict XML Message Framing:** Eliminates stream-parsing ambiguities by processing strictly bounded data packets. This non-streamed approach significantly enhances parsing security, mitigates memory-corruption vectors, and maximizes raw processing performance.
 - **Formalized Model Descriptions:** Reduces protocol complexity to a bare minimum by enforcing a 100% complete structural and semantic definition via Document Type Definitions (DTD) and YANG modeling schemas.
-- **Granular Protocol Sub-typing:** Sub-divides transport traffic into distinct, functional protocol variants to maximize scalability and simplify network firewalls (see chapter ).
+- **Granular Protocol Sub-typing:** Sub-divides transport traffic into distinct, functional protocol variants to maximize scalability and simplify network firewalls (see chapter [7. NLAP Subtypes](#nlap-subtypes)).
 - **Simplified High-Integrity Cryptography**: Drastically reduces cryptographic complexity. Because data is processed as static, complete messages rather than continuous streams, the entire frame is signed and encrypted atomically. This enables hardware-native X.509 standard compliance with direct HSM and TPM integration without complex TLS state-machines.
 - **End-to-End Non-Blocking Architecture:** Features non-blocking execution primitives across all protocol layers. This design integrates seamlessly with Linux Kernel 7.0 AccECN (Accurate ECN) to optimize TCP retransmission timeouts (RTO) and low-latency feedback loops.
 - **Near-Kernel Latency & Zero HoL Blocking**: Inherently eliminates head-of-line (HoL) blocking over a single socket connection. By deploying hybridized io_uring and epoll I/O frameworks, NLAP achieves deterministic processing speeds that mirror kernel-level transport latencies.
