@@ -1,19 +1,15 @@
 # 1. Specifications
 
-Main Specs in [./md/](./md/README.md).
+This folder contains service specifications in XML (including DTD) and YANG format.
 
-## 1.1. Database
+## 1.1. XML
 
-Database Definitions / Performance Test Data: [./database/](./database).
+Service specifications in XML format: [./xml/](./xml).
 
-## 1.2. Markup
+## 1.2. YANG
 
-Main Specs / Markup Documents: [./md/](./md/README.md).
+Service specifications in YANG format: [./yang/](./yang).
 
-## 1.3. XML
+## 1.3. Database
 
-Service Specifications in XML format: [./xml/](./xml).
-
-## 1.4. YANG
-
-Service Specifications in YANG format: [./yang/](./yang).
+Database definitions / performance-test data: [./database/](./database).
