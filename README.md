@@ -5,7 +5,7 @@ Falcon Application Server - NLAP (Next Level Application Protocol)
 [![CodeQL](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql)
 [![License](https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat)](https://github.com/WEBcodeX1/http-1.2/tree/main/LICENSE)
 [![Doxygen API](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/developer/falconas/v0.3/doxygen/index.html)
-[![Sphinx Docs](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/x0/v1.0/)
+[![Sphinx Docs](https://img.shields.io/badge/docs-sphinx-blue)](https://docs.webcodex.de/developer/falconas/v0.3/sphinx/index.html)
 
 ---
 
@@ -47,7 +47,7 @@ latency.
 
 - **Strict XML Message Framing:** Eliminates stream-parsing ambiguities by processing strictly bounded data packets. This non-streamed approach significantly enhances parsing security, mitigates memory-corruption vectors, and maximizes raw processing performance.
 - **Formalized Model Descriptions:** Reduces protocol complexity to a bare minimum by enforcing a 100% complete structural and semantic definition via Document Type Definitions (DTD) and YANG modeling schemas.
-- **Granular Protocol Sub-typing:** Sub-divides transport traffic into distinct, functional protocol variants to maximize scalability and simplify network firewalls (see chapter [7. NLAP Subtypes](#nlap-subtypes)).
+- **Granular Protocol Sub-typing:** Sub-divides transport traffic into distinct, functional protocol variants to maximize scalability and simplify network firewalls (see chapter [7. NLAP Subtypes](#7--nlap-subtypes)).
 - **Simplified High-Integrity Cryptography**: Drastically reduces cryptographic complexity. Because data is processed as static, complete messages rather than continuous streams, the entire frame is signed and encrypted atomically. This enables hardware-native X.509 standard compliance with direct HSM and TPM integration without complex TLS state-machines.
 - **End-to-End Non-Blocking Architecture:** Features non-blocking execution primitives across all protocol layers. This design integrates seamlessly with Linux Kernel 7.0 AccECN (Accurate ECN) to optimize TCP retransmission timeouts (RTO) and low-latency feedback loops.
 - **Near-Kernel Latency & Zero HoL Blocking**: Inherently eliminates head-of-line (HoL) blocking over a single socket connection. By deploying hybridized io_uring and epoll I/O frameworks, NLAP achieves deterministic processing speeds that mirror kernel-level transport latencies.
@@ -69,7 +69,7 @@ The technical progression and current state of the NLAP implementation comprise 
 
 Below is a brief overview of the currently functional and production-ready components:
 
-- **Memory (heap)-optimized HTTP/1.1 library:** Features a fast parser and message generator (`/lib/http/`).
+- **Memory (heap)-optimized HTTP/1.1 library:** Features a fast parser and message generator ([/lib/http/](`/lib/http/`)).
 - **Microcontroller portability:** The HTTP/1.1 parser library is fully ported to the ESP-IDF based ESP32-S3 and ESP32-C3 platforms (`/ports/arduino/`).
 - **Structural specifications:** Includes core XML and workflow schemas formalized via DTD and YANG models (`/specs/`).
 - **Optimized XML processing:** A memory-optimized Apache Xerces-based parser tailored for NLAP validation and message processing.
