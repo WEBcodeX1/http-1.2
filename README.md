@@ -70,8 +70,8 @@ The technical progression and current state of the NLAP implementation comprise 
 Below is a brief overview of the currently functional and production-ready components:
 
 - **Memory (heap)-optimized HTTP/1.1 library:** Features a fast parser and message generator ([`/lib/http/`](/lib/http/)).
-- **Microcontroller portability:** The HTTP/1.1 parser library is fully ported to the ESP-IDF based ESP32-S3 and ESP32-C3 platforms (`/ports/arduino/`).
-- **Structural specifications:** Includes core XML and workflow schemas formalized via DTD and YANG models (`/specs/`).
+- **Microcontroller portability:** The HTTP/1.1 parser library is fully ported to the ESP-IDF based ESP32-S3 and ESP32-C3 platforms ([`/ports/arduino/`](/ports/arduino/)).
+- **Structural specifications:** Includes core XML and workflow schemas formalized via DTD and YANG models ([`/specs/`](/specs/)).
 - **Optimized XML processing:** A memory-optimized Apache Xerces-based parser tailored for NLAP validation and message processing.
 
 # 6. Milestones
@@ -92,4 +92,4 @@ Each NLAP sub-protocol operates on a dedicated TCP port and is structured as fol
 - **NLAPP:** Upcoming Proxy Server implementation, featuring auto-scaling and multi-endpoint support.
 - **NLAPS:** Security Extensions, handling cryptographic signing, encryption, and authentication.
 
-Detailed specifications for each sub-protocol are available in the `/specs` directory.
+Detailed specifications for each sub-protocol are available in the [`/specs/`](/specs/) directory.
