@@ -63,7 +63,7 @@ The technical progression and current state of the NLAP implementation comprise 
 5. **C++23 Parsing Library:** Engineered a specialized, performance- and heap-optimized C++23 validation library for low-level HTTP/1.1 parsing and message generation.
 6. **Architectural Refactoring:** Executed a comprehensive code-base refactoring based on the empirical performance metrics gathered from the initial reference implementations.
 7. **Schema Implementation:** Developed the comprehensive structural boundaries for all NLAP protocol subtypes, formalized through complete Document Type Definitions (DTD) and YANG modeling layouts compiled with AI assistance.
-8. **Zero-Copy XML Parsing Engine:** Implemented a memory-optimized XML parsing layer utilizing non-allocating string views (`std::string_view`) and lightweight iteration helpers to minimize data-handling overhead, developed with AI assistance.
+8. **Zero-Copy XML Parsing Engine:** Implemented a memory-optimized XML parsing layer utilizing C++23 features (`std::generator`) and non-allocating string views (`std::string_view`) to minimize data-handling overhead, developed with AI assistance.
 
 # 5. Working Components
 
