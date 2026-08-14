@@ -39,11 +39,19 @@ jobs:
         run: |
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 140
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 140
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 140
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 140
           sudo update-alternatives --set gcc /usr/bin/gcc-14
           sudo update-alternatives --set g++ /usr/bin/g++-14
-          cc --version | head -n1
+          sudo update-alternatives --set cc /usr/bin/gcc-14
+          sudo update-alternatives --set c++ /usr/bin/g++-14
+          which gcc
+          which g++
+          which cc
+          which c++
           gcc --version | head -n1
           g++ --version | head -n1
+          cc --version | head -n1
           c++ --version | head -n1
 
       - name: Initialize CodeQL
@@ -54,10 +62,10 @@ jobs:
 
       - name: Build
         env:
-          CC: gcc-14
-          CXX: g++-14
+          CC: cc
+          CXX: c++
         run: |
-          cmake -B _build -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
+          cmake -B _build -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++
           cmake --build _build --parallel $(nproc)
 
       - name: Perform CodeQL Analysis
