@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <generator>
 #include <cstring>
 #include <memory>
 #include <utility>
@@ -69,13 +68,14 @@ std::string getElementText(DOMElement* Element)
     return trimCopy(Value);
 }
 
-std::generator<DOMElement*> iterateElementChildren(DOMElement* Parent)
+template <typename Callback>
+void forEachElementChild(DOMElement* Parent, Callback&& Visitor)
 {
     DOMNodeList* Children = Parent->getChildNodes();
     for (XMLSize_t Index = 0; Index < Children->getLength(); ++Index) {
         DOMNode* Child = Children->item(Index);
         if (Child->getNodeType() == DOMNode::ELEMENT_NODE) {
-            co_yield static_cast<DOMElement*>(Child);
+            Visitor(static_cast<DOMElement*>(Child));
         }
     }
 }
@@ -85,7 +85,8 @@ struct MessageSlice
     std::string_view Slice;
 };
 
-std::generator<MessageSlice> splitMessages(std::string_view Input, bool& FramingError)
+template <typename Callback>
+void splitMessages(std::string_view Input, bool& FramingError, Callback&& Visitor)
 {
     std::size_t Cursor = 0;
     std::size_t LastEnd = std::string_view::npos;
@@ -98,7 +99,7 @@ std::generator<MessageSlice> splitMessages(std::string_view Input, bool& Framing
 
         if (LastEnd != std::string_view::npos && Start != LastEnd) {
             FramingError = true;
-            co_return;
+            return;
         }
 
         const std::size_t End = Input.find(NLAP_XML_END_MARKER, Start);
@@ -107,7 +108,9 @@ std::generator<MessageSlice> splitMessages(std::string_view Input, bool& Framing
         }
 
         const std::size_t MessageEnd = End + NLAP_XML_END_MARKER.size();
-        co_yield MessageSlice{Input.substr(Start, MessageEnd - Start)};
+        if (!Visitor(MessageSlice{Input.substr(Start, MessageEnd - Start)})) {
+            return;
+        }
 
         Cursor = MessageEnd;
         LastEnd = MessageEnd;
@@ -197,12 +200,12 @@ void populateTree(DOMElement* Element, XMLNode& Node, std::string_view RawMessag
 {
     bool HasElementChildren = false;
 
-    for (DOMElement* Child : iterateElementChildren(Element)) {
+    forEachElementChild(Element, [&](DOMElement* Child) {
         HasElementChildren = true;
         const std::string ChildName = transcodeXMLCh(Child->getTagName());
         XMLNode& ChildNode = Node[ChildName];
         populateTree(Child, ChildNode, RawMessage, SearchOffset);
-    }
+    });
 
     if (HasElementChildren) {
         return;
@@ -297,11 +300,11 @@ uint16_t parseMessage(
     XMLNode& RootNode = OutputTree[RootName];
 
     std::size_t SearchOffset = 0;
-    for (DOMElement* Child : iterateElementChildren(Root)) {
+    forEachElementChild(Root, [&](DOMElement* Child) {
         const std::string ChildName = transcodeXMLCh(Child->getTagName());
         XMLNode& ChildNode = RootNode[ChildName];
         populateTree(Child, ChildNode, RawMessage, SearchOffset);
-    }
+    });
 
     return 0;
 }
@@ -372,17 +375,22 @@ ParseResult_t XMLParser::parse(char* InputBuffer) const
     }
 
     bool FramingError = false;
-    for (const MessageSlice& Slice : splitMessages(InputBufferSV, FramingError)) {
+    splitMessages(InputBufferSV, FramingError, [&](const MessageSlice& Slice) {
         ResultTree_t Tree;
         const uint16_t MessageError = parseMessage(_GrammarPool, Slice.Slice, Tree);
 
         if (MessageError != 0) {
             Result.ErrorCode = MessageError;
             Result.Results.clear();
-            return Result;
+            return false;
         }
 
         Result.Results.push_back(std::move(Tree));
+        return true;
+    });
+
+    if (Result.ErrorCode != 0) {
+        return Result;
     }
 
     if (FramingError) {
