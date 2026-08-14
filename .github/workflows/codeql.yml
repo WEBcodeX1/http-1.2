@@ -35,25 +35,6 @@ jobs:
             libjpeg-dev \
             libssl-dev
 
-      - name: Select gcc-14/g++-14 as default compiler
-        run: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 140
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 140
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 140
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 140
-          sudo update-alternatives --set gcc /usr/bin/gcc-14
-          sudo update-alternatives --set g++ /usr/bin/g++-14
-          sudo update-alternatives --set cc /usr/bin/gcc-14
-          sudo update-alternatives --set c++ /usr/bin/g++-14
-          which gcc
-          which g++
-          which cc
-          which c++
-          gcc --version | head -n1
-          g++ --version | head -n1
-          cc --version | head -n1
-          c++ --version | head -n1
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -61,11 +42,8 @@ jobs:
           build-mode: manual
 
       - name: Build
-        env:
-          CC: cc
-          CXX: c++
         run: |
-          cmake -B _build -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++
+          cmake -B _build -DCMAKE_C_COMPILER=/usr/bin/gcc-14 -DCMAKE_CXX_COMPILER=/usr/bin/g++-14
           cmake --build _build --parallel $(nproc)
 
       - name: Perform CodeQL Analysis
