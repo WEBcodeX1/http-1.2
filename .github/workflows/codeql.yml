@@ -35,6 +35,17 @@ jobs:
             libjpeg-dev \
             libssl-dev
 
+      - name: Select gcc-14/g++-14 as default compiler
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 140
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 140
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+          cc --version | head -n1
+          gcc --version | head -n1
+          g++ --version | head -n1
+          c++ --version | head -n1
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:

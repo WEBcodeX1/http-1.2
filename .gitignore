@@ -17,6 +17,7 @@ __pycache__
 .kate-swp
 .swp
 build
+_build
 CMakeFiles
 CMakeCache.txt
 Makefile
