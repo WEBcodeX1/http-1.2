@@ -17,6 +17,22 @@ modern browser web-applications and **high-throughput** data aggregation middlew
 It incorporates a high-speed *Python 3* or *Java* application server that natively utilizes
 **NLAP** as its core transport protocol to minimize execution and scheduling overhead.
 
+# 1.1. Implementation Specifications
+
+The implementation requirements / RFP adhere strictly to the guidelines detailed in the
+[Network Sockets Insight](https://www.der-it-pruefer.de/network/Network-Sockets-Insight) article
+from *Der IT Prüfer* BLOG. This ensures full compliance with the  outlined specifications.
+
+# 1.2. Empirical Validation
+
+Our current **ESP32-S3** PONG game project—a real-time, multiplayer, browser-controllable
+game—proves that even a highly CPU-constrained device achieves outstanding performance when
+powered by this framework's low-latency network sub-components, see [micropython-as](https://github.com/WEBcodeX1/micropython-as).
+
+The inclusion of default **TCP AccECN** (Accurate Explicit Congestion Notification) in recent Linux
+kernels validates that our choice of TCP—as utilized in this project—has always been the correct,
+forward-looking architectural decision.
+
 # 2. Project Evolution & History
 
 The project was originally conceptualized under the designation `HTTP/1.2`. The initial
