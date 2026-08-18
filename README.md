@@ -1,6 +1,6 @@
 ![FalconAS Logo](./image/falconas-logo.png)
 
-Falcon Application Server - NLAP (Next Level Application Protocol)
+Low Latency TCP - Falcon Application Server - NLAP (Next Level Application Protocol)
 
 [![CodeQL](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/WEBcodeX1/http-1.2/actions/workflows/github-code-scanning/codeql)
 [![License](https://img.shields.io/github/license/WEBcodeX1/http-1.2?style=flat)](https://github.com/WEBcodeX1/http-1.2/tree/main/LICENSE)
