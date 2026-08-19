@@ -49,11 +49,12 @@ architectural framework: **NLAP**.
 
 # 3. What is NLAP? What problems does NLAP solve?
 
-NLAP (Next Level Application Protocol) is a deterministic, transaction-oriented transport
-framework that formally resolves long-standing architectural omissions in Layer 5 (Session)
-and Layer 6 (Presentation) of the OSI model over standard TCP. Originally conceptualized by
-IETF engineers as an in-kernel transactional framed protocol, NLAP realizes this design paradigm
-in user space while maintaining full compatibility with standard `TCP_STREAM` sockets.
+NLAP (Next Level Application Protocol) is a deterministic, transaction-oriented
+transport framework that formally resolves long-standing architectural omissions
+in Layer 5 (Session) and Layer 6 (Presentation) of the OSI model. Originally
+conceptualized by IETF engineers as an in-kernel transactional framed protocol,
+NLAP realizes this design paradigm in user space, utilizing standard `SOCK_STREAM`
+sockets as a foundational base protocol.
 
 By replacing traditional, continuous stream-based processing with discrete, strictly validated
 XML message frames, NLAP achieves exceptional throughput, structural security, and minimal
