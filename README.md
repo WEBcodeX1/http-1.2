@@ -11,8 +11,13 @@ Low Latency TCP - Falcon Application Server - NLAP (Next Level Application Proto
 
 # 1. Overview
 
-An advanced architectural paradigm for **low-latency** **TCP**/IP transport tailored for
-modern browser web-applications and **high-throughput** data aggregation middleware.
+A low-latency, TCP XML-message-framed Next-Level Application Protocol Suite and server
+middleware designed for ultra-low-latency transmission outside the browser scope.
+
+As a low-level transport framework, NLAP establishes a highly efficient client / server
+protocol architecture. While engineered for standalone infrastructure, it holds the
+long-term potential for future browser integration to significantly reduce web-application
+latency.
 
 It incorporates a high-speed *Python 3* or *Java* application server that natively utilizes
 **NLAP** as its core transport protocol to minimize execution and scheduling overhead.
